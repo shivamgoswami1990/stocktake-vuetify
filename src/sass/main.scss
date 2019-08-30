@@ -1,0 +1,10 @@
+@import '~vuetify/src/styles/styles.sass';
+
+// The variables you want to modify
+$font-size-root: 14px;
+$material-dark: map-merge($material-dark, ( cards: black ));
+
+// For updating SASS lists
+$ripple-animation-transition-in: none;
+$ripple-animation-transition-out: none;
+$ripple-animation-visible-opacity: none;
