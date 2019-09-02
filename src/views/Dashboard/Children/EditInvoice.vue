@@ -295,18 +295,15 @@
                       </v-text-field>
                     </v-flex>
                     <v-flex xs12 sm6 md6>
-                      <v-menu ref="datedMenu" :close-on-content-click="false" :nudge-right="40"
-                              v-model="datedMenu" lazy offset-y :return-value.sync="dated"
-                              transition="scale-transition" full-width min-width="290px">
-
-                        <v-text-field slot="activator" v-model="dated"
-                                      readonly label="Dated"></v-text-field>
+                      <v-menu v-model="datedMenu" :close-on-content-click="false"
+                              :nudge-right="40" transition="scale-transition" offset-y full-width
+                              min-width="290px">
+                        <template v-slot:activator="{ on }">
+                          <v-text-field v-model="dated" readonly v-on="on"
+                                        label="Dated"></v-text-field>
+                        </template>
                         <v-date-picker v-model="dated" scrollable first-day-of-week="1"
-                                       color="primary">
-                          <v-spacer></v-spacer>
-                          <v-btn flat color="primary" @click="datedMenu = false">Cancel</v-btn>
-                          <v-btn flat color="primary" @click="$refs.datedMenu.save(dated)">OK
-                          </v-btn>
+                                       color="primary" @input="datedMenu = false">
                         </v-date-picker>
                       </v-menu>
                     </v-flex>
@@ -317,22 +314,15 @@
                       </v-text-field>
                     </v-flex>
                     <v-flex xs12 sm6 md6>
-                      <v-menu ref="despatchDateMenu" :close-on-content-click="false"
-                              :nudge-right="40"
-                              v-model="despatchDateMenu" lazy offset-y
-                              :return-value.sync="despatchDate"
-                              transition="scale-transition" full-width min-width="290px">
-
-                        <v-text-field slot="activator" v-model="despatchDate"
-                                      readonly label="Despatch date"></v-text-field>
+                      <v-menu v-model="despatchDateMenu" :close-on-content-click="false"
+                              :nudge-right="40" transition="scale-transition" offset-y full-width
+                              min-width="290px">
+                        <template v-slot:activator="{ on }">
+                          <v-text-field v-model="despatchDate" readonly v-on="on"
+                                        label="Despatch date"></v-text-field>
+                        </template>
                         <v-date-picker v-model="despatchDate" scrollable first-day-of-week="1"
-                                       color="primary">
-                          <v-spacer></v-spacer>
-                          <v-btn flat color="primary" @click="despatchDateMenu = false">Cancel
-                          </v-btn>
-                          <v-btn flat color="primary"
-                                 @click="$refs.despatchDateMenu.save(despatchDate)">OK
-                          </v-btn>
+                                       color="primary" @input="despatchDateMenu = false">
                         </v-date-picker>
                       </v-menu>
                     </v-flex>
@@ -476,7 +466,6 @@
                     <tbody>
                       <!-- Items row -->
                       <tr v-for="(item, index) in itemArray" :key="index">
-                        <td style="width: 2%;"><v-icon @click="deleteItem(item)">mdi-delete</v-icon></td>
                         <td>
                           <v-combobox v-model="item.item_name" :items="perfumesAfterFormatting"
                                       hide-details item-text="name" return-object item-value="id"
@@ -621,13 +610,15 @@
 
                         <td style="width: 6%;">{{item.units_for_display}}</td>
 
+                        <td style="width: 2%;"><v-icon @click="deleteItem(item)">mdi-delete</v-icon></td>
+
                         <td class="text-right">₹ {{item.item_amount}}</td>
                       </tr>
                       <!-- Items row -->
 
                       <tr>
-                        <td></td>
                         <td><h4>Total sum</h4></td>
+                        <td></td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -639,7 +630,6 @@
                       </tr>
 
                       <tr>
-                        <td></td>
                         <td><h4>Insurance on sale (+)</h4></td>
                         <td></td>
                         <td></td>
@@ -649,6 +639,7 @@
                                         @input="setInsuranceAmount()" step="0.01" hide-details>
                           </v-text-field>
                         </td>
+                        <td></td>
                         <td></td>
                         <td class="text-right">% {{itemSummary.insurance_percentage}}</td>
                       </tr>
@@ -667,7 +658,6 @@
                       </tr>
 
                       <tr>
-                        <td></td>
                         <td><h4>Postage & courier charge (+)</h4></td>
                         <td></td>
                         <td></td>
@@ -677,6 +667,7 @@
                                         @input="setPostageAmount()" step="0.01" hide-details>
                           </v-text-field>
                         </td>
+                        <td></td>
                         <td></td>
                         <td class="text-right">₹ {{itemSummary.postage_charge}}</td>
                       </tr>
@@ -695,7 +686,6 @@
                       </tr>
 
                       <tr>
-                        <td></td>
                         <td><h4>Discount (-)</h4></td>
                         <td></td>
                         <td></td>
@@ -710,6 +700,7 @@
                             {{customer.freight_type + ' freight'}}
                           </p>
                         </td>
+                        <td></td>
                         <td></td>
                         <td class="text-right">₹ {{itemSummary.discount}}</td>
                       </tr>
@@ -728,7 +719,6 @@
                       </tr>
 
                       <tr v-if="!isSameStateInvoice">
-                        <td></td>
                         <td><h4>IGST-OUTPUT</h4></td>
                         <td></td>
                         <td></td>
@@ -739,11 +729,11 @@
                           </v-text-field>
                         </td>
                         <td></td>
+                        <td></td>
                         <td class="text-right">₹ {{itemSummary.igst_percentage_amount}}</td>
                       </tr>
 
                       <tr v-if="isSameStateInvoice">
-                        <td></td>
                         <td><h4>CGST-OUTPUT</h4></td>
                         <td></td>
                         <td></td>
@@ -754,11 +744,11 @@
                           </v-text-field>
                         </td>
                         <td></td>
+                        <td></td>
                         <td class="text-right">₹ {{itemSummary.cgst_percentage_amount}}</td>
                       </tr>
 
                       <tr v-if="isSameStateInvoice">
-                        <td></td>
                         <td><h4>SGST-OUTPUT</h4></td>
                         <td></td>
                         <td></td>
@@ -769,13 +759,14 @@
                           </v-text-field>
                         </td>
                         <td></td>
+                        <td></td>
                         <td class="text-right">₹ {{itemSummary.sgst_percentage_amount}}</td>
                       </tr>
 
                       <tr>
-                        <td></td>
                         <td><h4>Round Off ({{itemSummary.round_off_difference_polarity}})</h4>
                         </td>
+                        <td></td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -785,7 +776,6 @@
                       </tr>
 
                       <tr style="border-top: 1px solid black;">
-                        <td></td>
                         <td>
                           <h4>Total</h4>
                         </td>
@@ -796,14 +786,14 @@
                         <td></td>
                         <td></td>
                         <td></td>
+                        <td></td>
                         <td class="text-right font-weight-bold">₹ {{itemSummary.total_after_round_off}}</td>
                       </tr>
 
                       <tr></tr>
 
                       <tr>
-                        <td></td>
-                        <td colspan="7" class="text-uppercase">
+                        <td colspan="8" class="text-uppercase">
                           Amount chargeable in words : <b>INR
                           {{itemSummary.total_after_round_off_in_words}} ONLY</b>
                         </td>
@@ -965,10 +955,6 @@ export default {
       perfumesAfterFormatting: [],
       headers: [
         {
-          text: '',
-          value: 'action'
-        },
-        {
           text: 'Name',
           value: 'name'
         },
@@ -991,6 +977,10 @@ export default {
         {
           text: 'per',
           value: 'units_for_display'
+        },
+        {
+          text: '',
+          value: 'action'
         },
         {
           text: 'Amount (₹)',
@@ -1155,7 +1145,6 @@ export default {
     },
 
     setIncomingData(invoiceData, itemData) {
-      console.log(invoiceData);
       this.id = invoiceData.id;
       this.invoiceNo = invoiceData.invoice_no;
       this.invoiceStatus = invoiceData.invoice_status;

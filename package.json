@@ -13,7 +13,7 @@
     "vue": "^2.6.10",
     "vue-resource": "^1.5.1",
     "vue-router": "^3.0.7",
-    "vuetify": "^2.0.7",
+    "vuetify": "^2.0.11",
     "written-number": "^0.9.1"
   },
   "devDependencies": {
@@ -54,7 +54,8 @@
       "no-plusplus": 0,
       "prefer-destructuring": 0,
       "no-unused-expressions": 0,
-      "no-param-reassign": 0
+      "no-param-reassign": 0,
+      "no-alert": 0
     }
   },
   "postcss": {

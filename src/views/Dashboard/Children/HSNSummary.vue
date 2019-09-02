@@ -50,7 +50,8 @@
         </v-flex>
 
         <v-flex xs12 sm2 md2 class="pa-2">
-          <v-btn color="primary" block :disabled="checkCompanyAndDateSelection" @click="loadHSNSummary">
+          <v-btn color="primary" block :disabled="checkCompanyAndDateSelection"
+                 @click="loadHSNSummary" :loading="isHSNSummaryLoading">
             Show summary
           </v-btn>
         </v-flex>
