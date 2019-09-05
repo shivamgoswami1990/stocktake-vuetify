@@ -4,7 +4,7 @@
       Items list
       <v-spacer></v-spacer>
       <v-text-field v-model="search" label="Search" solo class="hidden-sm-and-down"
-                    single-line hide-details clearable autofocus>
+                    single-line hide-details clearable autofocus @input="searchItem">
       </v-text-field>
       <v-dialog v-model="dialog" max-width="600px" persistent>
         <template v-slot:activator="{ on }">
@@ -76,17 +76,16 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
-      <v-badge right color="info" overlap>
-        <span slot="badge" v-if="selected.length > 0">{{selected.length}}</span>
-        <v-btn color="info" fab small depressed :disabled="selected.length === 0" @click="exportToCSV">
-          <v-icon>mdi-cloud-download</v-icon>
-        </v-btn>
-      </v-badge>
+      <v-btn color="info" fab small depressed @click="exportToCSV" :loading="isCSVDataLoading">
+        <v-icon>mdi-cloud-download</v-icon>
+      </v-btn>
     </v-card-title>
 
     <v-card-text>
       <v-data-table :headers="headers" :items="perfumes" :loading="isDataLoading"
-                    :search="search" v-model="selected" show-select multi-sort>
+                    :options.sync="dataTableOptions" :server-items-length="totalRecords"
+                    :footer-props="{'items-per-page-options': [10]}" disable-sort
+                    :hide-default-footer="hideDataTableFooter">
 
         <template v-slot:item.is_discount_enabled="{ item }">
           <v-chip color="secondary" class="black--text" label small>
@@ -113,6 +112,10 @@ export default {
   data() {
     return {
       isDataLoading: true,
+      dataTableOptions: {},
+      totalRecords: 0,
+      hideDataTableFooter: false,
+      isCSVDataLoading: false,
       search: '',
       dialog: false,
       editedIndex: -1,
@@ -202,28 +205,31 @@ export default {
   watch: {
     dialog(val) {
       val || this.close();
+    },
+    dataTableOptions(val) {
+      this.getItemsByPage(val.page);
     }
-  },
-
-  beforeRouteEnter(to, from, next) {
-    next(
-      vm => vm.$http.get(process.env.VUE_APP_REST_URL + '/items',
-        {
-          headers: {
-            'Content-Type': 'application/json; charset=utf-8'
-          }
-        })
-        .then((response) => {
-          vm.setItemsData(response.data);
-        }, (response) => {
-        })
-    );
   },
 
   methods: {
     setItemsData(data) {
       this.perfumes = data;
       this.isDataLoading = false;
+    },
+
+    getItemsByPage(pageNo) {
+      const vm = this;
+      vm.isDataLoading = true;
+      vm.$http.get(process.env.VUE_APP_REST_URL + '/items?page_no=' + pageNo,
+        {
+          headers: {
+            'Content-Type': 'application/json; charset=utf-8'
+          }
+        }).then((response) => {
+        vm.setItemsData(response.data.data);
+        vm.totalRecords = response.data.total_records;
+      }, (response) => {
+      });
     },
 
     editItem(item) {
@@ -344,25 +350,34 @@ export default {
     },
 
     exportToCSV() {
-      // Reformat the selected array to a comma seperated nested array
-      const reformattedSelectedArray = [
-        ['Item name', 'Series', '25gm price', '100gm price', '500gm/1Kg price', '5Kg/30Kg price',
-          'per doz price', 'per ltr price', '25gm/pc price', '100gm/pc price', 'Created date']
-      ];
+      // Get all the items for exporting
+      const vm = this;
+      vm.isCSVDataLoading = true;
+      vm.$http.get(process.env.VUE_APP_REST_URL + '/items',
+        {
+          headers: {
+            'Content-Type': 'application/json; charset=utf-8'
+          }
+        }).then((response) => {
+        // Reformat the selected array to a comma seperated nested array
+        const reformattedSelectedArray = [
+          ['Item name', 'Series', '25gm price', '100gm price', '500gm/1Kg price', '5Kg/30Kg price',
+            'per doz price', 'per ltr price', '25gm/pc price', '100gm/pc price', 'Created date']
+        ];
 
-      // Append only values sequentially
-      this.selected.forEach((row) => {
-        reformattedSelectedArray.push([
-          row.name, row.series, row.one_tenth_price, row.quarter_price, row.half_price, row.bulk_price,
-          row.dozen_price, row.litre_price, row.one_tenth_piece_price, row.quarter_piece_price, row.created_at
-        ]);
+        // Append only values sequentially
+        response.data.data.forEach((row) => {
+          reformattedSelectedArray.push([
+            row.name, row.series, row.one_tenth_price, row.quarter_price, row.half_price, row.bulk_price,
+            row.dozen_price, row.litre_price, row.one_tenth_piece_price, row.quarter_piece_price, this.calendarDate(row.created_at)
+          ]);
+        });
+
+        // Pass the reformatted array to the CSV fn
+        this.convertToCSV('perfume_list.csv', reformattedSelectedArray);
+        vm.isCSVDataLoading = false;
+      }, (response) => {
       });
-
-      // Pass the reformatted array to the CSV fn
-      this.convertToCSV('perfume_list.csv', reformattedSelectedArray);
-
-      // Empty the selected array
-      this.selected = [];
     },
 
     convertToCSV(filename, rows) {
@@ -405,6 +420,31 @@ export default {
           link.click();
           document.body.removeChild(link);
         }
+      }
+    },
+
+    searchItem() {
+      const vm = this;
+      if (vm.search !== '' && vm.search !== null) {
+        if (vm.search.length > 2) {
+          vm.$http.get(process.env.VUE_APP_REST_URL + '/items?search_term=' + vm.search,
+            {
+              headers: {
+                'Content-Type': 'application/json; charset=utf-8'
+              }
+            }).then((response) => {
+            vm.setItemsData(response.data.data);
+            this.hideDataTableFooter = true;
+            vm.totalRecords = response.data.total_records;
+          }, (response) => {
+          });
+        } else {
+          this.getItemsByPage(1);
+          this.hideDataTableFooter = false;
+        }
+      } else {
+        this.getItemsByPage(1);
+        this.hideDataTableFooter = false;
       }
     }
   }

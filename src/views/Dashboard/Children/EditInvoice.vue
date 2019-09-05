@@ -471,7 +471,7 @@
                                       hide-details item-text="name" return-object item-value="id"
                                       :rules="[rules.required]"
                                       @input="setItemNameObjectAndInitPriceList(item)">
-                            <template slot="item" slot-scope="{ item, tile }">
+                            <template slot="item" slot-scope="{ item }">
                               <v-list-item-avatar color="primary"
                                                   class="headline font-weight-light white--text">
                                 {{ item.name.charAt(0) }}
@@ -539,7 +539,7 @@
                                       item-text="price" item-value="name" type="number" hide-details
                                       @input="setItemPriceObjectAndInitPackagingAndUnits(item)"
                                       prefix="₹" return-object :rules="[rules.required]">
-                            <template slot="item" slot-scope="{ item, tile }">
+                            <template slot="item" slot-scope="{ item }">
                               <v-list-item-content
                                 v-if="item.price !== undefined && item.price !== null">
                                 <v-list-item-title v-text="'₹ ' + item.price"></v-list-item-title>
@@ -1093,28 +1093,6 @@ export default {
     );
   },
 
-  beforeRouteUpdate(to, from, next) {
-    this.$http.get(process.env.VUE_APP_REST_URL + '/invoices/' + to.params.id,
-      {
-        headers: {
-          'Content-Type': 'application/json; charset=utf-8'
-        }
-      }).then((response1) => {
-      this.$http.get(process.env.VUE_APP_REST_URL + '/items',
-        {
-          headers: {
-            'Content-Type': 'application/json; charset=utf-8'
-          }
-        }).then((response2) => {
-        this.setIncomingData(response1.data, response2.data);
-        next();
-      }, (response) => {
-      });
-    }, (response) => {
-      next({ path: '/dashboard/notFound' });
-    });
-  },
-
   methods: {
     addItemToInvoice(item) {
       this.itemArray.push(item);
@@ -1189,6 +1167,8 @@ export default {
       // Based on packaging type remove item prices. Also remove prices for undefined or null prices
       // #1. kg/dozen/piece
       // #2. litre
+
+      // TODO: Remove the items GET request on page load and use autocomplete search item API
       const vm = this;
       if (this.packagingType === 1) {
         this.perfumesBeforeFormatting.forEach((value) => {

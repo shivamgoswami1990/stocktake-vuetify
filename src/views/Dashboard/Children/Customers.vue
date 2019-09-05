@@ -8,7 +8,7 @@
       Customers list
       <v-spacer></v-spacer>
       <v-text-field v-model="search" label="Search" solo class="hidden-sm-and-down"
-                    single-line hide-details clearable autofocus>
+                    single-line hide-details clearable autofocus @input="searchCustomer">
       </v-text-field>
       <v-dialog v-model="dialog" max-width="600px" persistent>
         <template v-slot:activator="{ on }">
@@ -128,7 +128,9 @@
 
     <v-card-text>
       <v-data-table :headers="headers" :items="customers" :loading="isDataLoading"
-                    :search="search" multi-sort>
+                    :options.sync="dataTableOptions" :server-items-length="totalRecords"
+                    :footer-props="{'items-per-page-options': [10]}" disable-sort
+                    :hide-default-footer="hideDataTableFooter">
 
         <template v-slot:item.actions="{ item }">
           <v-icon small class="mr-2" @click="editItem(item)" color="info"
@@ -161,7 +163,10 @@ export default {
       sampleCommentsComponent: null,
       selectedCustomer: [],
       isDataLoading: true,
-      search: '',
+      dataTableOptions: {},
+      totalRecords: 0,
+      hideDataTableFooter: false,
+      search: null,
       dialog: false,
       editedIndex: -1,
       cities,
@@ -298,27 +303,31 @@ export default {
   watch: {
     dialog(val) {
       val || this.close();
+    },
+    dataTableOptions(val) {
+      this.getCustomersByPage(val.page);
     }
-  },
-
-  beforeRouteEnter(to, from, next) {
-    next(
-      vm => vm.$http.get(process.env.VUE_APP_REST_URL + '/customers',
-        {
-          headers: {
-            'Content-Type': 'application/json; charset=utf-8'
-          }
-        }).then((response) => {
-        vm.setCustomersData(response.data);
-      }, (response) => {
-      })
-    );
   },
 
   methods: {
     setCustomersData(data) {
       this.customers = data;
       this.isDataLoading = false;
+    },
+
+    getCustomersByPage(pageNo) {
+      const vm = this;
+      vm.isDataLoading = true;
+      vm.$http.get(process.env.VUE_APP_REST_URL + '/customers?page_no=' + pageNo,
+        {
+          headers: {
+            'Content-Type': 'application/json; charset=utf-8'
+          }
+        }).then((response) => {
+        vm.setCustomersData(response.data.data);
+        vm.totalRecords = response.data.total_records;
+      }, (response) => {
+      });
     },
 
     validatePan(value, limit, msg) {
@@ -507,6 +516,31 @@ export default {
     showSampleComments(customer) {
       this.selectedCustomer = customer;
       this.sampleCommentsComponent = () => import('../../../components/SampleComments.vue');
+    },
+
+    searchCustomer() {
+      const vm = this;
+      if (vm.search !== '' && vm.search !== null) {
+        if (vm.search.length > 2) {
+          vm.$http.get(process.env.VUE_APP_REST_URL + '/customers?search_term=' + vm.search,
+            {
+              headers: {
+                'Content-Type': 'application/json; charset=utf-8'
+              }
+            }).then((response) => {
+            vm.setCustomersData(response.data.data);
+            this.hideDataTableFooter = true;
+            vm.totalRecords = response.data.total_records;
+          }, (response) => {
+          });
+        } else {
+          this.getCustomersByPage(1);
+          this.hideDataTableFooter = false;
+        }
+      } else {
+        this.getCustomersByPage(1);
+        this.hideDataTableFooter = false;
+      }
     }
   }
 };
