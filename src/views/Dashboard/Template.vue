@@ -39,7 +39,7 @@
 
       <div v-if="isLoggedIn()">
         <v-btn height="48px" color="primary" :ripple="false" depressed tile elevation="0"
-               class="hidden-sm-and-down" to="/createInvoice">Create</v-btn>
+               class="hidden-sm-and-down" :to="{ name: 'newInvoice'}">Create</v-btn>
         <v-btn height="48px" color="primary" :ripple="false" depressed tile elevation="0"
                class="hidden-sm-and-down" :to="{ name: 'hsnSummary'}">HSN</v-btn>
         <v-btn height="48px" color="primary" :ripple="false" depressed tile elevation="0"
@@ -127,12 +127,13 @@ export default {
         const vm = this;
         vm.isSearchLoading = true;
 
-        this.$http.get(process.env.VUE_APP_REST_URL + '/past_invoices?search_term=' + val,
-          {
-            headers: {
-              'Content-Type': 'application/json; charset=utf-8'
-            }
-          }).then((response) => {
+        this.$http.get(process.env.VUE_APP_REST_URL + '/past_invoices?search_term=' + val
+          + '&financial_year=' + vm.currentlySelectedFinancialYear,
+        {
+          headers: {
+            'Content-Type': 'application/json; charset=utf-8'
+          }
+        }).then((response) => {
           vm.searchItems = response.data;
           vm.isSearchLoading = false;
           return response.data;
@@ -145,8 +146,8 @@ export default {
   methods: {
     setFinancialYear() {
       this.globalFinancialYear = this.selectedYear;
-      console.log(this.selectedYear);
       localStorage['financial-year'] = this.globalFinancialYear;
+      this.$router.go();
     },
     logoutUser() {
       // Ajax call for logout

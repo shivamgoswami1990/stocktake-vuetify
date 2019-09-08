@@ -85,7 +85,7 @@ export default {
     // Recent invoices API
     next(
       vm => vm.$http.get(process.env.VUE_APP_REST_URL + '/recent_invoices?by_user_id='
-          + JSON.parse(localStorage.user_info).id,
+          + JSON.parse(localStorage.user_info).id + '&financial_year=' + vm.currentlySelectedFinancialYear,
       {
         headers: {
           'Content-Type': 'application/json; charset=utf-8'

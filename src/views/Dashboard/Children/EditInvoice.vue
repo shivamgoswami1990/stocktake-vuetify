@@ -1094,11 +1094,6 @@ export default {
   },
 
   methods: {
-    addItemToInvoice(item) {
-      this.itemArray.push(item);
-      this.setItemPriceObjectAndInitPackagingAndUnits(item);
-    },
-
     floatingPercentage(percent, number, significantDigits) {
       if (significantDigits !== undefined && significantDigits !== null) {
         return parseFloat(parseFloat((parseFloat(percent) / 100) * parseFloat(number)).toFixed(significantDigits));
@@ -1154,7 +1149,7 @@ export default {
       this.sampleComments = invoiceData.sample_comments;
       this.itemArray = invoiceData.item_array;
       this.itemSummary = invoiceData.item_summary;
-      this.perfumesBeforeFormatting = itemData;
+      this.perfumesBeforeFormatting = itemData.data;
       this.hsnList = invoiceData.company.hsn_list;
       this.taxAmountInWords = invoiceData.tax_amount_in_words;
       this.invoiceFinancialYear = invoiceData.financial_year;
@@ -1224,6 +1219,7 @@ export default {
     },
 
     setItemNameObjectAndInitPriceList(item) {
+      console.log(item);
       if (item.item_name !== undefined && item.item_name !== null) {
         if (typeof item.item_name === 'object') {
           item.item_obj = item.item_name;

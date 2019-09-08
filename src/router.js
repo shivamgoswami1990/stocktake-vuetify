@@ -42,10 +42,11 @@ export default new Router({
           name: 'customers',
           component: () => import(/* webpackChunkName: "about" */ './views/Dashboard/Children/Customers.vue')
         },
-        // {
-        //   path: 'newInvoice',
-        //   component: () => import(/* webpackChunkName: "about" */ './views/Dashboard/Children/NewInvoice.vue')
-        // },
+        {
+          path: 'newInvoice',
+          name: 'newInvoice',
+          component: () => import(/* webpackChunkName: "about" */ './views/Dashboard/Children/NewInvoice.vue')
+        },
         // {
         //   path: 'invoices',
         //   component: () => import(/* webpackChunkName: "about" */ './views/Dashboard/Children/Invoices.vue')

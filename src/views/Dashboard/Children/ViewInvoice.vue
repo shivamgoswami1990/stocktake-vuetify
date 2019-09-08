@@ -680,13 +680,13 @@
 
         <v-tab-item value="invoiceNotifications">
           <v-timeline class="pa-4">
-            <v-timeline-item v-for="(notification, index, key) in invoiceNotifications" :key="key" large>
+            <v-timeline-item v-for="(notification, index, key) in invoiceNotifications" :key="key">
               <v-avatar color="primary" class="white--text font-weight-bold" slot="icon" size="40">
                 {{notification.actor_name.split(' ')[0].charAt(0) +
                 notification.actor_name.split(' ')[1].charAt(0)}}
               </v-avatar>
 
-              <v-card class="elevation-2" color="secondary">
+              <v-card class="elevation-0" tile color="secondary">
                 <v-list two-line color="secondary">
                   <v-list-item :key="key" ripple color="primary">
 
