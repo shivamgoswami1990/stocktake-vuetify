@@ -322,11 +322,11 @@ export default {
     checkIfValidInvoiceNo() {
       const vm = this;
       if (this.selectedInvoiceNo !== undefined && this.selectedInvoiceNo !== null) {
-        if (isNaN(parseInt(this.selectedInvoiceNo)) === false) {
-          if (parseInt(this.stepValue) > 3) {
+        if (isNaN(parseInt(this.selectedInvoiceNo, 10)) === false) {
+          if (parseInt(this.stepValue, 10) > 3) {
             // Get next and previous invoice details
             this.$http.get(process.env.VUE_APP_REST_URL + '/previous_and_next_invoice?for_invoice_no_as_int='
-                + parseInt(this.selectedInvoiceNo) + '&company_id=' + this.selectedCompany.id + '&financial_year='
+                + parseInt(this.selectedInvoiceNo, 10) + '&company_id=' + this.selectedCompany.id + '&financial_year='
                 + vm.currentlySelectedFinancialYear,
             {
               headers: {
@@ -411,10 +411,10 @@ export default {
             headers: {
               'Content-Type': 'application/json; charset=utf-8'
             }
-          }).then((response) => {
+          }).then((response1) => {
           vm.stepValue = 2;
-          vm.companies = response.data;
-        }, (response) => {
+          vm.companies = response1.data;
+        }, (response1) => {
         });
 
         // Go to company selection step
@@ -563,6 +563,7 @@ export default {
             company_id: companyId,
             last_edited_by_id: JSON.parse(localStorage.user_info).id,
             despatched_through: consigneeDetails.transport_name,
+            destination: consigneeDetails.destination,
             financial_year: vm.currentlySelectedFinancialYear
           }
         }),

@@ -25,69 +25,78 @@
                 <v-layout wrap>
 
                   <v-flex xs6 sm6 md6>
-                    <v-text-field v-model="editedCompany.name" :rules="[rules.required]" label="Name" clearable>
+                    <v-text-field v-model="editedCompany.name" :rules="[rules.required]"
+                                  label="Name" clearable class="pa-1">
                     </v-text-field>
                   </v-flex>
                   <v-flex xs6 sm6 md6>
-                    <v-text-field v-model="editedCompany.st_address" label="Street address" clearable>
+                    <v-text-field v-model="editedCompany.st_address" label="Street address"
+                                  clearable class="pa-1">
                     </v-text-field>
                   </v-flex>
 
                   <v-flex xs4 sm4 md4>
                     <v-combobox v-model="editedCompany.city" label="City" :items="cities"
-                                item-text="name" return-object @change="setCity">
+                                item-text="name" return-object @change="setCity" class="pa-1">
                     </v-combobox>
                   </v-flex>
                   <v-flex xs4 sm4 md4>
                     <v-combobox v-model="editedCompany.state_name" label="State" :items="states"
-                                item-text="name" return-object @change="setState">
+                                item-text="name" return-object @change="setState" class="pa-1">
                     </v-combobox>
                   </v-flex>
                   <v-flex xs4 sm4 md4>
-                    <v-text-field v-model="editedCompany.code" label="Code" disabled></v-text-field>
+                    <v-text-field v-model="editedCompany.code" label="Code" disabled class="pa-1">
+                    </v-text-field>
                   </v-flex>
 
                   <v-flex xs4 sm4 md4>
                     <v-text-field v-model="editedCompany.postcode" type="number" clearable
-                                  label="Postcode" :rules="[rules.postcode]">
+                                  label="Postcode" :rules="[rules.postcode]" class="pa-1">
                     </v-text-field>
                   </v-flex>
                   <v-flex xs4 sm4 md4>
-                    <v-text-field v-model="editedCompany.phone_no" label="Phone no" clearable></v-text-field>
+                    <v-text-field v-model="editedCompany.phone_no" label="Phone no" clearable class="pa-1">
+                    </v-text-field>
                   </v-flex>
                   <v-flex xs4 sm4 md4>
-                    <v-text-field v-model="editedCompany.contact_email" label="Email" clearable persistent-hint
+                    <v-text-field v-model="editedCompany.contact_email" label="Email"
+                                  clearable persistent-hint class="pa-1"
                                   :rules="[rules.counter, rules.email]" hint="proper email required">
                     </v-text-field>
                   </v-flex>
 
                   <v-flex xs4 sm4 md4>
-                    <v-text-field v-model="editedCompany.brand_name" label="Brand name" clearable></v-text-field>
+                    <v-text-field v-model="editedCompany.brand_name" label="Brand name"
+                                  class="pa-1" clearable></v-text-field>
                   </v-flex>
                   <v-flex xs4 sm4 md4>
-                    <v-text-field v-model="editedCompany.gstin_no" label="GSTIN no" clearable
-                                  :rules="[rules.gstin]">
+                    <v-text-field v-model="editedCompany.gstin_no" label="GSTIN no"
+                                  class="pa-1" clearable :rules="[rules.gstin]">
                     </v-text-field>
                   </v-flex>
                   <v-flex xs4 sm4 md4>
                     <v-text-field v-model="editedCompany.pan_no" label="PAN no" clearable
-                                  :rules="[rules.pan, rules.required]">
+                                  class="pa-1" :rules="[rules.pan, rules.required]">
                     </v-text-field>
                   </v-flex>
 
                   <v-flex xs4 sm4 md4>
-                    <v-text-field v-model="editedCompany.bank_name" label="Bank name" clearable></v-text-field>
+                    <v-text-field v-model="editedCompany.bank_name" label="Bank name"
+                                  class="pa-1" clearable></v-text-field>
                   </v-flex>
                   <v-flex xs4 sm4 md4>
-                    <v-text-field v-model="editedCompany.bank_account_no" label="Bank acc no" clearable></v-text-field>
+                    <v-text-field v-model="editedCompany.bank_account_no" label="Bank acc no"
+                                  class="pa-1" clearable></v-text-field>
                   </v-flex>
                   <v-flex xs4 sm4 md4>
-                    <v-text-field v-model="editedCompany.bank_branch" label="Bank branch" clearable></v-text-field>
+                    <v-text-field v-model="editedCompany.bank_branch" label="Bank branch"
+                                  class="pa-1" clearable></v-text-field>
                   </v-flex>
 
                   <v-flex xs12 sm12 md12>
                     <v-combobox v-model="editedCompany.hsn_list" type="number" label="HSN/SAC tags"
-                                multiple chips>
+                                class="pa-1" multiple chips>
                     </v-combobox>
                   </v-flex>
 
@@ -111,8 +120,6 @@
         <template v-slot:item.actions="{ item }">
           <v-icon small class="mr-2" @click="editItem(item)" v-if="userDetails().permissions.company.edit">
             mdi-pencil</v-icon>
-          <v-icon small class="mr-2" @click="deleteItem(item)" v-if="userDetails().permissions.company.edit">
-            mdi-delete-forever</v-icon>
         </template>
       </v-data-table>
     </v-card-text>
@@ -310,29 +317,6 @@ export default {
           this.editedCompany.code = this.editedCompany.state_name.tin_no;
           this.editedCompany.state_name = this.editedCompany.state_name.name;
         }
-      }
-    },
-
-    deleteItem(item) {
-      if (confirm('Are you sure you want to delete this company?')) {
-        this.$http.delete(process.env.VUE_APP_REST_URL + '/companies/' + item.id,
-          {
-            headers: {
-              'Content-Type': 'application/json; charset=utf-8'
-            }
-          }).then((response) => {
-          const index = this.companies.indexOf(item);
-          this.companies.splice(index, 1);
-
-          // Show success toast
-          this.showToast = true;
-          this.toastMessage = 'Successfully deleted company';
-          this.toastColor = '';
-        }, (response) => {
-          this.showToast = true;
-          this.toastMessage = 'Something went wrong';
-          this.toastColor = 'error';
-        });
       }
     },
 

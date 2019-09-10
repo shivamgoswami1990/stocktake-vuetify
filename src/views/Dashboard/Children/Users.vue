@@ -9,7 +9,7 @@
       <v-dialog v-model="dialog" max-width="600px" persistent>
         <template v-slot:activator="{ on }">
           <v-btn color="primary" v-on="on" fab small depressed class="mx-4"
-                 v-if="userDetails().permissions.item.create">
+                 v-if="userDetails().permissions.item.create && userDetails().is_superuser">
             <v-icon>mdi-plus</v-icon>
           </v-btn>
         </template>
@@ -201,9 +201,10 @@
         </template>
 
         <template v-slot:item.actions="{ item }">
-          <v-icon small class="mr-2" @click="openEditPasswordDialog(item)" color="success">
-            mdi-fingerprint</v-icon>
-          <v-icon small class="mr-2" @click="editUser(item)">mdi-pencil</v-icon>
+          <v-icon small class="mr-2" @click="openEditPasswordDialog(item)" color="success"
+                  v-if="userDetails().is_superuser">mdi-fingerprint</v-icon>
+          <v-icon small class="mr-2" @click="editUser(item)">
+            mdi-pencil</v-icon>
         </template>
       </v-data-table>
     </v-card-text>
@@ -390,10 +391,10 @@ export default {
 
     editPassword() {
       const vm = this;
-      this.$http.patch(process.env.VUE_APP_REST_URL + '/auth',
+      this.$http.patch(process.env.VUE_APP_REST_URL + '/change_user_password',
         {
-          password: vm.password,
-          password_confirmation: vm.password_confirmation
+          id: this.selectedUser.id,
+          password: this.password
         },
         {
           headers: {
@@ -411,20 +412,6 @@ export default {
         this.toastMessage = 'Something went wrong.';
         this.toastColor = 'error';
       });
-    },
-
-    toggleAll() {
-      if (this.selected.length) this.selected = [];
-      else this.selected = this.users.slice();
-    },
-
-    changeSort(column) {
-      if (this.pagination.sortBy === column) {
-        this.pagination.descending = !this.pagination.descending;
-      } else {
-        this.pagination.sortBy = column;
-        this.pagination.descending = false;
-      }
     },
 
     close() {
@@ -461,6 +448,12 @@ export default {
           this.showToast = true;
           this.toastMessage = 'Successfully edited user';
           this.toastColor = 'success';
+
+          // Refresh localStorage if the edited user is the current user
+          if (this.userDetails().id === response.data.id) {
+            localStorage.user_info = JSON.stringify(response.data);
+            this.$router.go();
+          }
         }, (response) => {
           // error callback. Show error alert
           this.showToast = true;

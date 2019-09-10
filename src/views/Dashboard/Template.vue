@@ -43,7 +43,7 @@
         <v-btn height="48px" color="primary" :ripple="false" depressed tile elevation="0"
                class="hidden-sm-and-down" :to="{ name: 'hsnSummary'}">HSN</v-btn>
         <v-btn height="48px" color="primary" :ripple="false" depressed tile elevation="0"
-               class="hidden-sm-and-down">History</v-btn>
+               class="hidden-sm-and-down" :to="{ name: 'invoices'}">History</v-btn>
         <v-btn height="48px" color="primary" :ripple="false" depressed tile elevation="0"
                @click="logoutUser()">LOGOUT</v-btn>
       </div>

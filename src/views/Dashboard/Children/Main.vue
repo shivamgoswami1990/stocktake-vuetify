@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-layout row align-center>
+    <v-layout row align-center v-if="userDetails().is_superuser">
 
       <v-flex xs12 sm4 md4>
         <v-card style="border-left: 5px solid #CFD8DC" class="ma-2" elevation="1">
@@ -83,9 +83,11 @@ export default {
     );
 
     // Recent invoices API
+    // If params - financial_year - is passed via login use that to make the API cal.
     next(
       vm => vm.$http.get(process.env.VUE_APP_REST_URL + '/recent_invoices?by_user_id='
-          + JSON.parse(localStorage.user_info).id + '&financial_year=' + vm.currentlySelectedFinancialYear,
+          + JSON.parse(localStorage.user_info).id + '&financial_year='
+        + (to.params.financial_year ? to.params.financial_year : vm.currentlySelectedFinancialYear),
       {
         headers: {
           'Content-Type': 'application/json; charset=utf-8'

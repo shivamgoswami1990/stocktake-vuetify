@@ -47,10 +47,11 @@ export default new Router({
           name: 'newInvoice',
           component: () => import(/* webpackChunkName: "about" */ './views/Dashboard/Children/NewInvoice.vue')
         },
-        // {
-        //   path: 'invoices',
-        //   component: () => import(/* webpackChunkName: "about" */ './views/Dashboard/Children/Invoices.vue')
-        // },
+        {
+          path: 'invoices',
+          name: 'invoices',
+          component: () => import(/* webpackChunkName: "about" */ './views/Dashboard/Children/Invoices.vue')
+        },
         {
           path: 'editInvoice/:id',
           name: 'editInvoice',

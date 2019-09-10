@@ -6,6 +6,10 @@
     </v-layout>
 
     <v-card v-else flat color="secondary">
+      <v-btn color="info" fab x-small depressed @click="exportToCSV"
+             style="position: absolute; right: 50px; top: 10px">
+        <v-icon>mdi-cloud-download</v-icon>
+      </v-btn>
       <v-btn dark color="black" x-small fab depressed @click="showDrawer = false"
              style="position: absolute; right: 10px; top: 10px">
         <v-icon>mdi-close</v-icon>
@@ -65,6 +69,7 @@ export default {
       isNotesSaving: false,
       isNotesLoading: true,
       items: [],
+      dataForExport: [],
       searchTerm: '',
       notes: '',
       headers: [
@@ -109,6 +114,7 @@ export default {
       }).then((response) => {
       vm.isDataLoading = false;
       vm.items = vm.groupItemsByName(response.data);
+      vm.dataForExport = response.data;
     }, (response) => {
       vm.isDataLoading = false;
     });
@@ -175,6 +181,24 @@ export default {
       }, (response) => {
         vm.isNotesSaving = false;
       });
+    },
+
+    exportToCSV() {
+      const vm = this;
+      // Reformat the selected array to a comma seperated nested array
+      const reformattedSelectedArray = [
+        ['Item name', 'Price per kg (₹)', 'Packaging', 'Date']
+      ];
+
+      // Append only values sequentially
+      this.dataForExport.forEach((row) => {
+        reformattedSelectedArray.push([
+          row.item_name, row.price_per_kg, row.packaging, vm.calendarDate(row.created_at)
+        ]);
+      });
+
+      // Pass the reformatted array to the CSV fn
+      this.convertToCSV(this.$attrs.data.name + '.csv', reformattedSelectedArray);
     }
   }
 };

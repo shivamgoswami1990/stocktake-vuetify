@@ -29,87 +29,100 @@
                 <v-layout wrap>
 
                   <v-flex xs6 sm6 md6>
-                    <v-text-field v-model="editedCustomer.name" :rules="[rules.required]" label="Name" clearable>
+                    <v-text-field v-model="editedCustomer.name" :rules="[rules.required]"
+                                  label="Name" clearable class="pa-1">
                     </v-text-field>
                   </v-flex>
                   <v-flex xs6 sm6 md6>
-                    <v-text-field v-model="editedCustomer.st_address" label="Street address" clearable>
+                    <v-text-field v-model="editedCustomer.st_address" label="Street address"
+                                  clearable class="pa-1">
                     </v-text-field>
                   </v-flex>
 
                   <v-flex xs4 sm4 md4>
                     <v-combobox v-model="editedCustomer.city" label="City" :items="cities"
-                                item-text="name" return-object @input="setCity">
+                                item-text="name" return-object @input="setCity" class="pa-1">
                     </v-combobox>
                   </v-flex>
                   <v-flex xs4 sm4 md4>
                     <v-combobox v-model="editedCustomer.state_name" :rules="[rules.required]" label="State"
-                                :items="states" item-text="name" return-object @change="setState">
+                                :items="states" item-text="name" return-object @change="setState" class="pa-1">
                     </v-combobox>
                   </v-flex>
                   <v-flex xs4 sm4 md4>
-                    <v-text-field v-model="editedCustomer.code" label="Code" disabled></v-text-field>
+                    <v-text-field v-model="editedCustomer.code" label="Code" disabled class="pa-1">
+                    </v-text-field>
                   </v-flex>
 
                   <v-flex xs4 sm4 md4>
                     <v-text-field v-model="editedCustomer.postcode" type="number" clearable
-                                  label="Postcode" :rules="[rules.postcode]">
+                                  label="Postcode" :rules="[rules.postcode]" class="pa-1">
                     </v-text-field>
                   </v-flex>
                   <v-flex xs4 sm4 md4>
-                    <v-text-field v-model="editedCustomer.phone_no" label="Phone no" clearable></v-text-field>
+                    <v-text-field v-model="editedCustomer.phone_no" label="Phone no" clearable class="pa-1">
+                    </v-text-field>
                   </v-flex>
                   <v-flex xs4 sm4 md4>
                     <v-text-field v-model="editedCustomer.contact_email" label="Email" clearable
-                                  :rules="[rules.email]">
+                                  :rules="[rules.email]" class="pa-1">
                     </v-text-field>
                   </v-flex>
 
 
                   <v-flex xs4 sm4 md4>
                     <v-text-field v-model="editedCustomer.gstin_no" label="GSTIN no" clearable
-                                  :rules="[rules.gstin]">
+                                  :rules="[rules.gstin]" class="pa-1">
                     </v-text-field>
                   </v-flex>
                   <v-flex xs4 sm4 md4>
-                    <v-text-field v-model="editedCustomer.pan_no" label="PAN no" clearable :rules="[rules.pan]">
+                    <v-text-field v-model="editedCustomer.pan_no" label="PAN no" clearable
+                                  :rules="[rules.pan]" class="pa-1">
                     </v-text-field>
                   </v-flex>
                   <v-flex xs4 sm4 md4>
-                    <v-text-field v-model="editedCustomer.aadhar_no" label="Aadhar no" clearable>
+                    <v-text-field v-model="editedCustomer.aadhar_no" label="Aadhar no"
+                                  clearable class="pa-1">
                     </v-text-field>
                   </v-flex>
 
 
-                  <v-flex xs4 sm4 md3>
+                  <v-flex xs4 sm4 md6>
                     <v-text-field v-model="editedCustomer.primary_discount" label="Primary discount"
-                                  clearable type="number" prefix="%">
-                    </v-text-field>
-                  </v-flex>
-                  <v-flex xs4 sm4 md3>
-                    <v-text-field v-model="editedCustomer.secondary_discount" label="Secondary discount"
-                                  clearable type="number" prefix="%">
+                                  clearable type="number" prefix="%" class="pa-1">
                     </v-text-field>
                   </v-flex>
                   <v-flex xs4 sm4 md6>
-                    <v-text-field v-model="editedCustomer.transport_name" label="Transport name" clearable>
+                    <v-text-field v-model="editedCustomer.secondary_discount" label="Secondary discount"
+                                  clearable type="number" prefix="%" class="pa-1">
+                    </v-text-field>
+                  </v-flex>
+
+                  <v-flex xs4 sm4 md6>
+                    <v-text-field v-model="editedCustomer.transport_name" label="Transport name"
+                                  clearable class="pa-1">
+                    </v-text-field>
+                  </v-flex>
+                  <v-flex xs4 sm4 md6>
+                    <v-text-field v-model="editedCustomer.destination" label="Destination"
+                                  clearable class="pa-1">
                     </v-text-field>
                   </v-flex>
 
                   <v-flex xs4 sm4 md6>
                     <v-switch v-model="editedCustomer.freight_allowed" color="primary"
                               :label="editedCustomer.freight_allowed ? 'Allowed' : 'Not allowed'"
-                              hint="Enable/disable freight" persistent-hint>
+                              hint="Enable/disable freight" persistent-hint class="pa-1">
                     </v-switch>
                   </v-flex>
 
                   <v-flex xs4 sm4 md6>
                     <v-select :items="freight_options" :disabled="!editedCustomer.freight_allowed" color="primary"
-                              label="Frieght type" v-model="editedCustomer.freight_type"></v-select>
+                              label="Frieght type" v-model="editedCustomer.freight_type" class="pa-1"></v-select>
                   </v-flex>
 
                   <v-flex xs12 sm12 md12>
-                    <v-textarea v-model="editedCustomer.notes" label="Notes" clearable auto-grow>
+                    <v-textarea v-model="editedCustomer.notes" label="Notes" clearable auto-grow class="pa-1">
                     </v-textarea>
                   </v-flex>
 
@@ -124,6 +137,9 @@
           </v-card>
         </v-form>
       </v-dialog>
+      <v-btn color="info" fab small depressed @click="exportToCSV" :loading="isCSVDataLoading">
+        <v-icon>mdi-cloud-download</v-icon>
+      </v-btn>
     </v-card-title>
 
     <v-card-text>
@@ -135,11 +151,11 @@
         <template v-slot:item.actions="{ item }">
           <v-icon small class="mr-2" @click="editItem(item)" color="info"
                   v-if="userDetails().permissions.customer.edit">mdi-border-color</v-icon>
-          <v-icon small class="mr-2" @click="showCustomerBook(item)" color="secondary"
+          <v-icon small class="mr-2" @click="showCustomerBook(item)"
                   v-if="userDetails().permissions.customer.edit">mdi-folder</v-icon>
           <v-icon small class="mr-2" @click="showSampleComments(item)" color="primary"
                   v-if="userDetails().permissions.customer.edit">mdi-message-reply</v-icon>
-          <v-icon small @click="deleteItem(item)" color="secondary"
+          <v-icon small @click="deleteItem(item)"
                   v-if="userDetails().permissions.customer.delete">mdi-delete</v-icon>
         </template>
       </v-data-table>
@@ -163,6 +179,7 @@ export default {
       sampleCommentsComponent: null,
       selectedCustomer: [],
       isDataLoading: true,
+      isCSVDataLoading: false,
       dataTableOptions: {},
       totalRecords: 0,
       hideDataTableFooter: false,
@@ -229,6 +246,7 @@ export default {
         freight_type: 'HALF',
         aadhar_no: '',
         transport_name: '',
+        destination: '',
         notes: ''
       },
       editedCustomer: {
@@ -251,6 +269,7 @@ export default {
         freight_type: 'HALF',
         aadhar_no: '',
         transport_name: '',
+        destination: '',
         notes: ''
       },
       headers: [
@@ -427,6 +446,7 @@ export default {
                 primary_discount: this.editedCustomer.primary_discount,
                 secondary_discount: this.editedCustomer.secondary_discount,
                 transport_name: this.editedCustomer.transport_name,
+                destination: this.editedCustomer.destination,
                 notes: this.editedCustomer.notes,
                 freight_allowed: this.editedCustomer.freight_allowed,
                 freight_type: this.editedCustomer.freight_type,
@@ -470,6 +490,7 @@ export default {
                 primary_discount: this.editedCustomer.primary_discount,
                 secondary_discount: this.editedCustomer.secondary_discount,
                 transport_name: this.editedCustomer.transport_name,
+                destination: this.editedCustomer.destination,
                 notes: this.editedCustomer.notes,
                 freight_allowed: this.editedCustomer.freight_allowed,
                 freight_type: this.editedCustomer.freight_type,
@@ -541,7 +562,39 @@ export default {
         this.getCustomersByPage(1);
         this.hideDataTableFooter = false;
       }
-    }
+    },
+
+    exportToCSV() {
+      // Get all the items for exporting
+      const vm = this;
+      vm.isCSVDataLoading = true;
+      vm.$http.get(process.env.VUE_APP_REST_URL + '/customers',
+        {
+          headers: {
+            'Content-Type': 'application/json; charset=utf-8'
+          }
+        }).then((response) => {
+        // Reformat the selected array to a comma seperated nested array
+        const reformattedSelectedArray = [
+          ['Customer name', 'St address', 'City', 'State', 'Postcode', 'Code',
+            'Phone no', 'GSTIN no', 'PAN no', 'Email', 'Transport', 'Destination', 'Notes', 'Created at']
+        ];
+
+        // Append only values sequentially
+        response.data.data.forEach((row) => {
+          reformattedSelectedArray.push([
+            row.name, row.st_address, row.city, row.state_name, row.postcode, row.code,
+            row.phone_no, row.gstin_no, row.pan_no, row.contact_email, row.transport_name,
+            row.destination, row.notes, vm.calendarDate(row.created_at)
+          ]);
+        });
+
+        // Pass the reformatted array to the CSV fn
+        vm.convertToCSV('Customers.csv', reformattedSelectedArray);
+        vm.isCSVDataLoading = false;
+      }, (response) => {
+      });
+    },
   }
 };
 </script>
