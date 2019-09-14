@@ -74,6 +74,25 @@ Vue.prototype.formattedMonth = function (numericalMonth) {
   return numericalMonth;
 };
 
+// Define postage, courier & labour charges list
+Vue.prototype.postageOptionsList = function () {
+  return {
+    0: 'Postage charges',
+    1: 'Postage & courier charges',
+    2: 'Postage & courier & labour charges',
+  };
+};
+
+// Get postage options key by looking up value
+Vue.prototype.postageOptionsKeyByValue = function (value) {
+  const valueList = Object.values(Vue.prototype.postageOptionsList());
+  for (let i = 0; i < valueList.length; i++) {
+    if (valueList[i] === value) {
+      return i;
+    }
+  }
+};
+
 // Check if user as a superuser
 Vue.prototype.userDetails = () => {
   if (localStorage.user_info !== undefined && localStorage.user_info !== null) {

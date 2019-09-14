@@ -285,7 +285,7 @@
         <tr v-show="checkIfZero(itemSummary.postage_charge)">
           <td></td>
           <td></td>
-          <td style="text-align: right;">Postage & courier charge (+)</td>
+          <td style="text-align: right;">{{postageTextOptions}} (+)</td>
           <td></td>
           <td></td>
           <td style="text-align: right;">{{itemSummary.postage_charge}}</td>
@@ -723,6 +723,7 @@ export default {
     this.itemArray = this.$attrs.data.item_array;
     this.itemSummary = this.$attrs.data.item_summary;
     this.sampleComments = this.$attrs.data.sample_comments;
+    this.postageTextOptions = this.$attrs.data.postage_text_options;
 
     this.hsnSummary = this.$attrs.data.tax_summary.hsn_summary;
     this.hsnSummaryTotal = this.$attrs.data.tax_summary.hsn_summary_total;

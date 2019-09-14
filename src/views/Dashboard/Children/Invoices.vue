@@ -42,7 +42,7 @@
 
             <v-flex md1 xs12>
               <v-menu v-model="menu" :close-on-content-click="false"
-                      :nudge-right="40" transition="scale-transition" offset-y full-width
+                      :nudge-right="40" transition="scale-transition" offset-y
                       min-width="290px">
                 <template v-slot:activator="{ on }">
                   <v-text-field v-model="selectedMonth" readonly v-on="on"
@@ -58,7 +58,7 @@
               <v-layout row wrap>
                 <v-flex md6 class="pr-2">
                   <v-menu v-model="fromDateMenu" :close-on-content-click="false"
-                          :nudge-right="40" transition="scale-transition" offset-y full-width
+                          :nudge-right="40" transition="scale-transition" offset-y
                           min-width="290px">
                     <template v-slot:activator="{ on }">
                       <v-text-field v-model="fromDate" readonly v-on="on"
@@ -71,7 +71,7 @@
                 </v-flex>
                 <v-flex md6 class="pr-2">
                   <v-menu v-model="toDateMenu" :close-on-content-click="false"
-                          :nudge-right="40" transition="scale-transition" offset-y full-width
+                          :nudge-right="40" transition="scale-transition" offset-y
                           min-width="290px">
                     <template v-slot:activator="{ on }">
                       <v-text-field v-model="toDate" readonly v-on="on"

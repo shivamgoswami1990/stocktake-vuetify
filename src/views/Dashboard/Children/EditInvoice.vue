@@ -457,7 +457,8 @@
                     <thead>
                       <tr>
                         <th v-for="header in headers" :key="header.value"
-                            :class="header.value !== 'item_amount'? 'text-left': 'text-right'">
+                            :class="header.value !== 'item_amount'? 'text-left': 'text-right'"
+                            v-bind:style="header.value === 'item_amount'? { width: header.width } : ''">
                           {{header.text}}
                         </th>
                       </tr>
@@ -484,17 +485,19 @@
                             </template>
                             <template slot="prepend" v-if="item.wasItemPreviouslyOrdered">
                               <v-menu v-if="item.previousOrderDetails.length > 0">
-                                <v-btn slot="activator" icon small color="primary">
-                                  <v-icon size="20">mdi-emoticon-outline</v-icon>
-                                </v-btn>
+                                <template v-slot:activator="{ on }">
+                                  <v-btn v-on="on" icon small color="primary">
+                                    <v-icon size="20">mdi-emoticon-outline</v-icon>
+                                  </v-btn>
+                                </template>
 
                                 <!-- Menu popover content -->
-                                <v-card flat>
-                                  <v-card-title class="secondary white--text justify-center">
+                                <v-card flat color="secondary" tile>
+                                  <v-card-title>
                                     Ordered {{item.previousOrderDetails.length}} times
                                   </v-card-title>
                                   <v-card-text>
-                                    <v-list two-line dense>
+                                    <v-list two-line dense color="secondary">
                                       <v-list-item
                                         v-for="(item, index) in item.previousOrderDetails"
                                         :key="index">
@@ -504,7 +507,7 @@
                                           {{index+1}}
                                         </v-list-item-avatar>
 
-                                        <v-list-item-content style="width: 90%;">
+                                        <v-list-item-content>
                                           <v-list-item-title>
                                             Price - ₹ {{item.price_per_kg}}
                                           </v-list-item-title>
@@ -658,7 +661,11 @@
                       </tr>
 
                       <tr>
-                        <td><h4>Postage & courier charge (+)</h4></td>
+                        <td>
+                          <v-select :items="Object.values(this.postageOptionsList())"
+                                    v-model="postageSelectedText" suffix="(+)">
+                          </v-select>
+                        </td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -984,7 +991,8 @@ export default {
         },
         {
           text: 'Amount (₹)',
-          value: 'item_amount'
+          value: 'item_amount',
+          width: '8%'
         }
       ],
       hsnIGSTHeaders: [
@@ -1063,6 +1071,8 @@ export default {
       hsnSummaryTotal: {},
       taxAmountInWords: '',
       invoiceFinancialYear: '',
+      postageTextOptions: null,
+      postageSelectedText: '',
       writtenNumberOptions: { lang: 'enIndian', baseSeparator: '-', unitSeparator: 'and ' },
       showToast: false,
       toastMessage: '',
@@ -1153,6 +1163,8 @@ export default {
       this.hsnList = invoiceData.company.hsn_list;
       this.taxAmountInWords = invoiceData.tax_amount_in_words;
       this.invoiceFinancialYear = invoiceData.financial_year;
+      this.postageTextOptions = invoiceData.postage_text_options;
+      this.postageSelectedText = this.postageOptionsList()[this.postageTextOptions];
 
       if (invoiceData.tax_summary !== undefined && invoiceData.tax_summary !== null) {
         this.hsnSummary = invoiceData.tax_summary.hsn_summary;
@@ -1219,7 +1231,6 @@ export default {
     },
 
     setItemNameObjectAndInitPriceList(item) {
-      console.log(item);
       if (item.item_name !== undefined && item.item_name !== null) {
         if (typeof item.item_name === 'object') {
           item.item_obj = item.item_name;
@@ -1742,7 +1753,7 @@ export default {
       });
 
       if (vm.editInvoiceFormValid) {
-        this.$http.patch(process.env.VUE_APP_REST_URL + '/invoices/' + vm.id,
+        vm.$http.patch(process.env.VUE_APP_REST_URL + '/invoices/' + vm.id,
           {
             invoice: {
               invoice_status: 1,
@@ -1777,7 +1788,8 @@ export default {
               tax_amount_in_words: vm.taxAmountInWords,
               buyer_aadhar: vm.buyerAadhar,
               last_edited_by_id: JSON.parse(localStorage.user_info).id,
-              sample_comments: vm.sampleComments
+              sample_comments: vm.sampleComments,
+              postage_text_options: vm.postageOptionsKeyByValue(vm.postageSelectedText)
             }
           },
           {
@@ -1836,7 +1848,8 @@ export default {
         },
         tax_amount_in_words: vm.taxAmountInWords,
         buyer_aadhar: vm.buyerAadhar,
-        sample_comments: vm.sampleComments
+        sample_comments: vm.sampleComments,
+        postage_text_options: vm.postageSelectedText
       };
       this.printInvoiceComponent = () => import('../../../components/PrintInvoice.vue');
     },

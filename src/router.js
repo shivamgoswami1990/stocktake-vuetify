@@ -67,10 +67,11 @@ export default new Router({
           name: 'hsnSummary',
           component: () => import(/* webpackChunkName: "about" */ './views/Dashboard/Children/HSNSummary.vue')
         },
-        // {
-        //   path: 'analysis',
-        //   component: () => import(/* webpackChunkName: "about" */ './views/Dashboard/Children/Analysis.vue')
-        // },
+        {
+          path: 'analysis',
+          name: 'analysis',
+          component: () => import(/* webpackChunkName: "about" */ './views/Dashboard/Children/Analysis.vue')
+        },
         {
           path: 'notFound',
           name: 'notFound',

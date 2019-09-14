@@ -23,18 +23,15 @@
         <v-flex xs12 sm5 md3 class="pa-2">
           <v-layout wrap align-baseline>
             <v-flex xs5 sm5 md5>
-              <v-menu ref="menu" :close-on-content-click="false" v-model="menu" :nudge-right="40"
-                      :return-value.sync="selectedMonth" transition="scale-transition" offset-y full-width
-                      max-width="290px" min-width="290px">
+              <v-menu v-model="menu" :close-on-content-click="false"
+                      :nudge-right="40" transition="scale-transition" offset-y
+                      min-width="290px">
                 <template v-slot:activator="{ on }">
-                  <v-text-field v-model="selectedMonth" label="Select month/s" readonly v-on="on"
-                                hide-details></v-text-field>
+                  <v-text-field v-model="selectedMonth" readonly v-on="on"
+                                label="Invoice date"></v-text-field>
                 </template>
-                <v-date-picker v-model="selectedMonth" type="month" no-title scrollable color="primary"
-                               @change="resetQuarterModel">
-                  <div class="flex-grow-1"></div>
-                  <v-btn text color="primary" @click="menu = false">Cancel</v-btn>
-                  <v-btn text color="primary" @click="$refs.menu.save(selectedMonth)">OK</v-btn>
+                <v-date-picker v-model="selectedMonth" scrollable first-day-of-week="1"
+                               color="primary" @input="menu = false" type="month" @change="resetQuarterModel">
                 </v-date-picker>
               </v-menu>
             </v-flex>

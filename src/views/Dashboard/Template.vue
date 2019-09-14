@@ -45,6 +45,8 @@
         <v-btn height="48px" color="primary" :ripple="false" depressed tile elevation="0"
                class="hidden-sm-and-down" :to="{ name: 'invoices'}">History</v-btn>
         <v-btn height="48px" color="primary" :ripple="false" depressed tile elevation="0"
+               class="hidden-sm-and-down" :to="{ name: 'analysis'}">Analysis</v-btn>
+        <v-btn height="48px" color="primary" :ripple="false" depressed tile elevation="0"
                @click="logoutUser()">LOGOUT</v-btn>
       </div>
     </v-app-bar>
@@ -55,7 +57,8 @@
       </v-container>
     </v-content>
 
-    <component :is="notificationDrawerComponent" @reduceNotificationsCount="reduceNotificationsCount"/>
+    <component :is="notificationDrawerComponent" @reduceNotificationsCount="reduceNotificationsCount"
+    @clearNotificationsCount = "clearNotificationsCount"/>
 
     <v-bottom-navigation app background-color="primary" color="white" height="48px"
                          v-if="isLoggedIn()" class="bottom-navigation">
@@ -203,6 +206,9 @@ export default {
       if (this.notificationCount >= 1) {
         this.notificationCount -= 1;
       }
+    },
+    clearNotificationsCount() {
+      this.notificationCount = 0;
     },
     setFinancialYear() {
       this.globalFinancialYear = this.selectedYear;

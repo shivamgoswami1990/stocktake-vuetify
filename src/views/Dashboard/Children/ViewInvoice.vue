@@ -465,7 +465,7 @@
                       </tr>
 
                       <tr>
-                        <td><h4>Postage & courier charge (+)</h4></td>
+                        <td><h4>{{postageOptionsList()[postageTextOptions]}} (+)</h4></td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -846,7 +846,8 @@ export default {
       taxAmountInWords: '',
       invoiceNotifications: '',
       writtenNumberOptions: { lang: 'enIndian', baseSeparator: '-', unitSeparator: 'and ' },
-      invoiceFinancialYear: ''
+      invoiceFinancialYear: '',
+      postageTextOptions: null
     };
   },
 
@@ -912,6 +913,7 @@ export default {
       this.hsnList = invoiceData.company.hsn_list;
       this.taxAmountInWords = invoiceData.tax_amount_in_words;
       this.invoiceFinancialYear = invoiceData.financial_year;
+      this.postageTextOptions = invoiceData.postage_text_options;
 
       if (invoiceData.tax_summary !== undefined && invoiceData.tax_summary !== null) {
         this.hsnSummary = invoiceData.tax_summary.hsn_summary;

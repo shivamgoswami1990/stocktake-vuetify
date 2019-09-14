@@ -72,7 +72,7 @@
 
                   <v-flex xs4 sm4 md4>
                     <v-text-field v-model="editedCustomer.gstin_no" label="GSTIN no" clearable
-                                  :rules="[rules.gstin]" class="pa-1">
+                                  :rules="[rules.gstin]" @input="setPanNo" class="pa-1">
                     </v-text-field>
                   </v-flex>
                   <v-flex xs4 sm4 md4>
@@ -137,6 +137,26 @@
           </v-card>
         </v-form>
       </v-dialog>
+
+      <v-dialog v-model="showDeleteCustomerDialog" max-width="600px" persistent>
+        <v-card>
+          <v-card-title class="secondary justify-center">
+            Action incomplete
+          </v-card-title>
+
+          <v-card-text class="pa-4">
+            <h3 class="text-center">This customer can't be deleted as they have
+              <b>{{currentCustomerInvoices}}</b> invoices</h3>
+          </v-card-text>
+
+          <v-card-actions>
+            <v-btn color="secondary" class="mx-auto" width="200px"
+                   depressed @click="showDeleteCustomerDialog = false">
+              Close</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
       <v-btn color="info" fab small depressed @click="exportToCSV" :loading="isCSVDataLoading">
         <v-icon>mdi-cloud-download</v-icon>
       </v-btn>
@@ -309,7 +329,9 @@ export default {
           text: 'Actions', value: 'actions', sortable: false, align: 'center'
         }
       ],
-      customers: []
+      customers: [],
+      showDeleteCustomerDialog: false,
+      currentCustomerInvoices: 0
     };
   },
 
@@ -377,6 +399,7 @@ export default {
           if (selectedStateFromCity === state.name.replace(/\s/g, '').toLowerCase()) {
             vm.editedCustomer.state_name = state.name;
             vm.editedCustomer.code = state.tin_no;
+            vm.setGSTINModelOnCodeChange(vm.editedCustomer.code);
 
             // Set the city model correctly
             vm.editedCustomer.city = selectedCity.name;
@@ -391,31 +414,61 @@ export default {
         if (typeof this.editedCustomer.state_name === 'object') {
           this.editedCustomer.code = this.editedCustomer.state_name.tin_no;
           this.editedCustomer.state_name = this.editedCustomer.state_name.name;
+
+          this.setGSTINModelOnCodeChange(this.editedCustomer.code);
+          // Once the code is set, set the two digits of code to GSTIN model
+          this.editedCustomer.gstin_no = this.editedCustomer.code;
         }
       }
     },
 
-    deleteItem(item) {
-      if (confirm('Are you sure you want to delete this customer?')) {
-        this.$http.delete(process.env.VUE_APP_REST_URL + '/customers/' + item.id,
-          {
-            headers: {
-              'Content-Type': 'application/json; charset=utf-8'
-            }
-          }).then((response) => {
-          const index = this.customers.indexOf(item);
-          this.customers.splice(index, 1);
+    setGSTINModelOnCodeChange(code) {
+      this.editedCustomer.gstin_no = code;
+    },
 
-          // Show success toast
-          this.showToast = true;
-          this.toastMessage = 'Successfully deleted customer';
-          this.toastColor = '';
-        }, (response) => {
-          this.showToast = true;
-          this.toastMessage = 'Something went wrong';
-          this.toastColor = 'error';
-        });
+    setPanNo() {
+      // As gstin no is typed, except the first two digits,
+      // set pan no model to typed value up till 12th index.
+      if (this.editedCustomer.gstin_no.length > 2 && this.editedCustomer.gstin_no.length < 13) {
+        this.editedCustomer.pan_no = this.editedCustomer.pan_no + this.editedCustomer.gstin_no.slice(-1);
       }
+    },
+
+    deleteItem(item) {
+      this.$http.get(process.env.VUE_APP_REST_URL + '/customers/' + item.id + '/invoice_count',
+        {
+          headers: {
+            'Content-Type': 'application/json; charset=utf-8'
+          }
+        }).then((response) => {
+        this.currentCustomerInvoices = response.data.invoice_count;
+
+        if (this.currentCustomerInvoices === 0) {
+          if (confirm('Are you sure you want to delete this customer?')) {
+            this.$http.delete(process.env.VUE_APP_REST_URL + '/customers/' + item.id,
+              {
+                headers: {
+                  'Content-Type': 'application/json; charset=utf-8'
+                }
+              }).then((response) => {
+              const index = this.customers.indexOf(item);
+              this.customers.splice(index, 1);
+
+              // Show success toast
+              this.showToast = true;
+              this.toastMessage = 'Successfully deleted customer';
+              this.toastColor = '';
+            }, (response) => {
+              this.showToast = true;
+              this.toastMessage = 'Something went wrong';
+              this.toastColor = 'error';
+            });
+          }
+        } else if (this.currentCustomerInvoices > 0) {
+          this.showDeleteCustomerDialog = true;
+        }
+      }, (response) => {
+      });
     },
 
     close() {

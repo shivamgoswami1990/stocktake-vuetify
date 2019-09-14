@@ -16,8 +16,8 @@
             <v-icon color="primary" class="mr-2">mdi-chevron-left</v-icon>Previous
           </v-btn>
 
-          <v-btn depressed text :loading="isNotificationBeingMarkedAsRead" class="flex">
-<!--                 @click="markNotificationsAsRead">-->
+          <v-btn depressed text :loading="isNotificationBeingMarkedAsRead" class="flex"
+                 @click="markNotificationsAsRead">
             Mark all as read &nbsp;
             <v-icon color="primary" v-if="notificationsMarkedAsRead">mdi-check-circle</v-icon>
           </v-btn>
@@ -173,6 +173,7 @@ export default {
         }).then((response) => {
         vm.isNotificationBeingMarkedAsRead = false;
         vm.notificationsMarkedAsRead = true;
+        vm.$emit('clearNotificationsCount');
       }, (response) => {
         vm.isNotificationBeingMarkedAsRead = false;
       });
