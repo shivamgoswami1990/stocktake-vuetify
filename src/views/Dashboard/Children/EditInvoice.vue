@@ -52,7 +52,7 @@
             <v-list-item-title>Customer book</v-list-item-title>
           </v-list-item>
 
-          <v-list-item @click="deleteInvoice" avatar v-if="userDetails().permissions.invoice.delete">
+          <v-list-item @click="deleteInvoice" v-if="userDetails().permissions.invoice.delete">
             <v-list-item-title>Delete invoice</v-list-item-title>
           </v-list-item>
         </v-list>
@@ -163,7 +163,7 @@
                     </v-flex>
                     <v-flex xs12 sm6 md6>
                       <v-menu v-model="invoiceDateMenu" :close-on-content-click="false"
-                              :nudge-right="40" transition="scale-transition" offset-y full-width
+                              :nudge-right="40" transition="scale-transition" offset-y
                               min-width="290px">
                         <template v-slot:activator="{ on }">
                           <v-text-field v-model="invoiceDate" readonly v-on="on"
@@ -296,7 +296,7 @@
                     </v-flex>
                     <v-flex xs12 sm6 md6>
                       <v-menu v-model="datedMenu" :close-on-content-click="false"
-                              :nudge-right="40" transition="scale-transition" offset-y full-width
+                              :nudge-right="40" transition="scale-transition" offset-y
                               min-width="290px">
                         <template v-slot:activator="{ on }">
                           <v-text-field v-model="dated" readonly v-on="on"
@@ -315,7 +315,7 @@
                     </v-flex>
                     <v-flex xs12 sm6 md6>
                       <v-menu v-model="despatchDateMenu" :close-on-content-click="false"
-                              :nudge-right="40" transition="scale-transition" offset-y full-width
+                              :nudge-right="40" transition="scale-transition" offset-y
                               min-width="290px">
                         <template v-slot:activator="{ on }">
                           <v-text-field v-model="despatchDate" readonly v-on="on"
@@ -497,7 +497,7 @@
                                     <v-list two-line dense>
                                       <v-list-item
                                         v-for="(item, index) in item.previousOrderDetails"
-                                        :key="index" avatar>
+                                        :key="index">
                                         <v-list-item-avatar color="primary"
                                                             class="white--text font-weight-bold"
                                                             size="40">

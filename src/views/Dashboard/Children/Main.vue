@@ -71,13 +71,16 @@ export default {
   beforeRouteEnter(to, from, next) {
     // Statistics API
     next(
-      vm => vm.$http.get(process.env.VUE_APP_REST_URL + '/statistics',
-        {
-          headers: {
-            'Content-Type': 'application/json; charset=utf-8'
-          }
-        }).then((response) => {
-        vm.setStatisticsData(response.data);
+      vm => vm.$http.get(process.env.VUE_APP_REST_URL + '/statistics?by_financial_year='
+        + vm.currentlySelectedFinancialYear,
+      {
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8'
+        }
+      }).then((response) => {
+        if (response.data.length > 0) {
+          vm.setStatisticsData(response.data[0]);
+        }
       }, (response) => {
       })
     );
@@ -86,8 +89,7 @@ export default {
     // If params - financial_year - is passed via login use that to make the API cal.
     next(
       vm => vm.$http.get(process.env.VUE_APP_REST_URL + '/recent_invoices?by_user_id='
-          + JSON.parse(localStorage.user_info).id + '&financial_year='
-        + (to.params.financial_year ? to.params.financial_year : vm.currentlySelectedFinancialYear),
+          + JSON.parse(localStorage.user_info).id + '&financial_year=' + vm.currentlySelectedFinancialYear,
       {
         headers: {
           'Content-Type': 'application/json; charset=utf-8'

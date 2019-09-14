@@ -55,6 +55,8 @@
       </v-container>
     </v-content>
 
+    <component :is="notificationDrawerComponent" @reduceNotificationsCount="reduceNotificationsCount"/>
+
     <v-bottom-navigation app background-color="primary" color="white" height="48px"
                          v-if="isLoggedIn()" class="bottom-navigation">
       <v-btn :to="{ name: 'companies'}">
@@ -63,6 +65,14 @@
       <v-btn :to="{ name: 'customers'}">
         <h3 class="white--text">Customers</h3><v-icon class="white--text">mdi-home-variant</v-icon>
       </v-btn>
+
+      <v-btn @click="loadNotificationDrawer">
+        <h3 class="white--text">Alerts</h3><v-icon class="white--text">mdi-bell-alert</v-icon>
+        <v-badge color="success" left overlap v-if="notificationCount > 0">
+          <template v-slot:badge class="font-weight-bold">{{notificationCount}}</template>
+        </v-badge>
+      </v-btn>
+
       <v-btn :to="{ name: 'items'}">
         <h3 class="white--text">Items</h3><v-icon class="white--text">mdi-briefcase</v-icon>
       </v-btn>
@@ -96,6 +106,7 @@
 
 <script>
 
+import ActionCable from 'actioncable';
 import logoImage from '../../assets/logo.png';
 import InvoiceDisplayList from '../../components/InvoiceDisplayList.vue';
 
@@ -109,8 +120,25 @@ export default {
     searchItems: [],
     isSearchLoading: false,
     userInitials: null,
-    selectedYear: null
+    selectedYear: null,
+    notificationDrawerComponent: null,
+    notificationCount: 0
   }),
+  beforeRouteEnter(to, from, next) {
+    // Get the notification count
+    next(
+      vm => vm.$http.get(process.env.VUE_APP_REST_URL + '/unread_notification_count?user_id='
+        + vm.userDetails().id,
+      {
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8'
+        }
+      }).then((response) => {
+        vm.notificationCount = response.data;
+      }, (response) => {
+      })
+    );
+  },
   mounted() {
     this.userInitials = this.userDetails().intitals;
     this.selectedYear = this.financialYearList().financial_year[0];
@@ -120,6 +148,31 @@ export default {
     } else {
       this.selectedYear = localStorage['financial-year'];
     }
+
+    if (this.$route.params.financial_year !== undefined && this.$route.params.financial_year !== null) {
+      this.$router.go();
+    }
+
+    // Initiate ActionCable with user details
+    const cable = ActionCable.createConsumer(process.env.VUE_APP_WSS_URL);
+    const vm = this;
+    cable.subscriptions.create({
+      channel: 'NotificationChannel'
+    }, {
+      connected() {
+        console.log('Notification channel CONNECTED !!!');
+      },
+      received(data) {
+        if (vm.userDetails() !== undefined && vm.userDetails() !== null) {
+          if (data.actor_id !== undefined && data.actor_id !== null) {
+            if (vm.userDetails().id !== data.actor_id) {
+              // If current user ID is different from the creator of notification, increment notification count
+              vm.notificationCount += 1;
+            }
+          }
+        }
+      }
+    });
   },
   watch: {
     search(val) {
@@ -144,6 +197,13 @@ export default {
     }
   },
   methods: {
+    reduceNotificationsCount() {
+      // Reduce notification count by 1 every time a notification is marked as read
+      // in the Notifications Drawer Component.
+      if (this.notificationCount >= 1) {
+        this.notificationCount -= 1;
+      }
+    },
     setFinancialYear() {
       this.globalFinancialYear = this.selectedYear;
       localStorage['financial-year'] = this.globalFinancialYear;
@@ -166,6 +226,9 @@ export default {
         this.$router.push({ name: 'login' }); // Navigate to login using router property
       });
     },
+    loadNotificationDrawer() {
+      this.notificationDrawerComponent = () => import('../../components/Notifications.vue');
+    }
   }
 };
 </script>
