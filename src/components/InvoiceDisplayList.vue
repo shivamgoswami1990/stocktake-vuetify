@@ -39,11 +39,11 @@
           </v-list-item-action-text>
 
           <v-list-item-action-text class="d-inline-flex">
-            <a @click="$router.push({ name: 'viewInvoice', params: { id: item.id}})">
+            <a @click="routeToInvoice('viewInvoice', item.id)">
               View
             </a>
             <a class="ml-4"  v-if="userDetails().permissions.invoice.edit"
-               @click="$router.push({ name: 'editInvoice', params: { id: item.id}})">
+               @click="routeToInvoice('editInvoice', item.id)">
               Edit
             </a>
           </v-list-item-action-text>
@@ -64,6 +64,19 @@ export default {
     if (this.$attrs.width !== undefined && this.$attrs.width !== null) {
       this.listContentWidth = this.$attrs.width;
     }
+  },
+  methods: {
+    routeToInvoice(type, id) {
+      // Route to invoices conditionally based on the current route
+      this.$router.push({
+        name: type,
+        params: { id },
+        force: true
+      });
+      if (this.$router.currentRoute.name === type) {
+        this.$router.go();
+      }
+    },
   }
 };
 </script>
