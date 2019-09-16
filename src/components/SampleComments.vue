@@ -17,7 +17,7 @@
       <v-card-text class="pa-0 pb-2">
         <div class="px-4 py-0">
           <v-textarea name="Customer notes" label="Customer notes" solo auto-grow v-model="notes"
-                      :loading="isNotesLoading" flat hide-details class="pb-1"></v-textarea>
+                      flat hide-details class="pb-1"></v-textarea>
 
           <v-btn block dark color="black" @click="saveCustomerNotes" :loading="isNotesSaving">
             Save notes
@@ -52,7 +52,6 @@ export default {
       showDrawer: false,
       isDataLoading: true,
       isNotesSaving: false,
-      isNotesLoading: true,
       notes: '',
       comments: []
     };
@@ -62,6 +61,7 @@ export default {
     const vm = this;
 
     vm.showDrawer = true;
+    vm.notes = vm.$attrs.data.notes;
     vm.$http.get(process.env.VUE_APP_REST_URL + '/customers/' + vm.$attrs.data.id + '/invoice_sample_comments',
       {
         headers: {
@@ -72,17 +72,6 @@ export default {
       vm.comments = response.data;
     }, (response) => {
       vm.isDataLoading = false;
-    });
-
-    vm.$http.get(process.env.VUE_APP_REST_URL + '/customers/' + vm.$attrs.data.id,
-      {
-        headers: {
-          'Content-Type': 'application/json; charset=utf-8'
-        }
-      }).then((response) => {
-      vm.notes = response.data.notes;
-      vm.isNotesLoading = false;
-    }, (response) => {
     });
   },
 
