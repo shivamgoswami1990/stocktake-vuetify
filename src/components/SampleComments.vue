@@ -26,16 +26,14 @@
 
         <v-list two-line v-if="comments.length > 0" dense>
           <template v-for="(comment, key) in comments">
-
-            <v-list-item :key="key">
-              <v-list-item-avatar color="success" class="white--text" size="40">
-                {{key + 1}}
-              </v-list-item-avatar>
-              <v-list-item-content>
-                <v-list-item-title>{{calendarDate(comment[1])}}</v-list-item-title>
-                <v-list-item-subtitle>{{comment[0]}}</v-list-item-subtitle>
-              </v-list-item-content>
-            </v-list-item>
+            <v-card tile flat :key="key" color="secondary" class="mx-2">
+              <v-card-title>
+                Entry {{key + 1}}
+                <v-spacer></v-spacer>
+                <small>{{calendarDate(comment[1])}}</small>
+              </v-card-title>
+              <v-card-text>{{comment[0]}}</v-card-text>
+            </v-card>
 
           </template>
         </v-list>

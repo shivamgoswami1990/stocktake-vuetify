@@ -265,12 +265,13 @@ export default {
 
   beforeRouteEnter(to, from, next) {
     next(
-      vm => vm.$http.get(process.env.VUE_APP_REST_URL + '/companies',
-        {
-          headers: {
-            'Content-Type': 'application/json; charset=utf-8'
-          }
-        }).then((response) => {
+      vm => vm.$http.get(process.env.VUE_APP_REST_URL + '/companies?financial_year='
+        + vm.currentlySelectedFinancialYear,
+      {
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8'
+        }
+      }).then((response) => {
         vm.setCompaniesData(response.data);
       }, (response) => {
       })

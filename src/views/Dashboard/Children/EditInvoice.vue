@@ -452,6 +452,26 @@
                   </v-btn>
                 </v-toolbar>
 
+                <v-fab-transition>
+                  <v-speed-dial v-scroll="onScroll" v-show="fab" bottom right fixed direction="top"
+                                open-on-hover style="bottom: 70px">
+                    <template v-slot:activator>
+                      <v-btn v-model="fab" color="primary" fab>
+                        <v-icon v-if="fab">mdi-dots-vertical</v-icon>
+                        <v-icon v-else>mdi-close</v-icon>
+                      </v-btn>
+                    </template>
+
+                    <v-btn fab color="primary" small @click="itemArray.push({})">
+                      <v-icon>mdi-plus</v-icon>
+                    </v-btn>
+
+                    <v-btn fab color="primary" small @click="printInvoice">
+                      <v-icon>mdi-printer</v-icon>
+                    </v-btn>
+                  </v-speed-dial>
+                </v-fab-transition>
+
                 <v-form v-model="editInvoiceFormValid" lazy-validation>
                   <v-simple-table :headers="headers" :items="itemArray" class="ma-4">
                     <thead>
@@ -1074,6 +1094,7 @@ export default {
       postageTextOptions: null,
       postageSelectedText: '',
       writtenNumberOptions: { lang: 'enIndian', baseSeparator: '-', unitSeparator: 'and ' },
+      fab: false,
       showToast: false,
       toastMessage: '',
       toastColor: '',
@@ -1104,6 +1125,12 @@ export default {
   },
 
   methods: {
+    onScroll(e) {
+      if (typeof window === 'undefined') return;
+      const top = window.pageYOffset || e.target.scrollTop || 0;
+      this.fab = top > 120;
+    },
+
     floatingPercentage(percent, number, significantDigits) {
       if (significantDigits !== undefined && significantDigits !== null) {
         return parseFloat(parseFloat((parseFloat(percent) / 100) * parseFloat(number)).toFixed(significantDigits));

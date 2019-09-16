@@ -360,12 +360,13 @@ export default {
 
   beforeRouteEnter(to, from, next) {
     next(
-      vm => vm.$http.get(process.env.VUE_APP_REST_URL + '/users',
-        {
-          headers: {
-            'Content-Type': 'application/json; charset=utf-8'
-          }
-        }).then((response) => {
+      vm => vm.$http.get(process.env.VUE_APP_REST_URL + '/users?financial_year='
+        + vm.currentlySelectedFinancialYear,
+      {
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8'
+        }
+      }).then((response) => {
         vm.setUsersData(response.data);
       }, (response) => {
       })

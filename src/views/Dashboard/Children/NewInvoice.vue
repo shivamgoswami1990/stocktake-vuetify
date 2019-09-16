@@ -17,21 +17,45 @@
           <v-card class="hidden-sm-and-down" v-if="stepValue > 1" flat tile>
 
             <v-list two-line subheader>
-              <v-subheader>Last invoice for customer</v-subheader>
+              <v-subheader><h3>Last invoice by date</h3></v-subheader>
               <p v-if="!isLastInvoiceForCustomerPresent" class="text-xs-center pl-4">No invoice present</p>
-              <template v-if="isLastInvoiceForCustomerPresent">
+              <template v-if="isLastInvoiceForCustomerPresent && lastInvoicesForCustomer.created_at.invoice_no">
                 <v-list-item ripple>
                   <v-list-item-content>
-                    <v-list-item-title>{{availableInvoiceNoForCustomer}}</v-list-item-title>
-                    <v-list-item-subtitle>{{companyDetailsForCustomerInvoice.name}}</v-list-item-subtitle>
+                    <v-list-item-title>{{lastInvoicesForCustomer.created_at.invoice_no}}</v-list-item-title>
+                    <v-list-item-subtitle>{{lastInvoicesForCustomer.created_at.company_details.name}}</v-list-item-subtitle>
                     <v-list-item-subtitle>
-                      {{companyDetailsForCustomerInvoice.city}}, {{companyDetailsForCustomerInvoice.state_name}} -
-                      {{companyDetailsForCustomerInvoice.postcode}}
+                      {{lastInvoicesForCustomer.created_at.company_details.city}},
+                      {{lastInvoicesForCustomer.created_at.company_details.state_name}} -
+                      {{lastInvoicesForCustomer.created_at.company_details.postcode}}
                     </v-list-item-subtitle>
                   </v-list-item-content>
 
                   <v-list-item-action>
-                    <v-list-item-action-text>{{calendarDate(createdDateForCustomerInvoice)}}</v-list-item-action-text>
+                    <v-list-item-action-text>{{calendarDate(lastInvoicesForCustomer.created_at.invoice_date)}}</v-list-item-action-text>
+                  </v-list-item-action>
+
+                </v-list-item>
+              </template>
+            </v-list>
+
+            <v-list two-line subheader>
+              <v-subheader><h3>Last invoice by invoice no</h3></v-subheader>
+              <p v-if="!isLastInvoiceForCustomerPresent" class="text-xs-center pl-4">No invoice present</p>
+              <template v-if="isLastInvoiceForCustomerPresent && lastInvoicesForCustomer.invoice_no.invoice_no">
+                <v-list-item ripple>
+                  <v-list-item-content>
+                    <v-list-item-title>{{lastInvoicesForCustomer.invoice_no.invoice_no}}</v-list-item-title>
+                    <v-list-item-subtitle>{{lastInvoicesForCustomer.invoice_no.company_details.name}}</v-list-item-subtitle>
+                    <v-list-item-subtitle>
+                      {{lastInvoicesForCustomer.invoice_no.company_details.city}},
+                      {{lastInvoicesForCustomer.invoice_no.company_details.state_name}} -
+                      {{lastInvoicesForCustomer.invoice_no.company_details.postcode}}
+                    </v-list-item-subtitle>
+                  </v-list-item-content>
+
+                  <v-list-item-action>
+                    <v-list-item-action-text>{{calendarDate(lastInvoicesForCustomer.invoice_no.invoice_date)}}</v-list-item-action-text>
                   </v-list-item-action>
 
                 </v-list-item>
@@ -192,7 +216,7 @@
                 <v-flex md6 v-if="checkIfValidInvoiceNo" class="pl-2">
 
                   <v-menu v-model="menu" :close-on-content-click="false"
-                          :nudge-right="40" transition="scale-transition" offset-y full-width
+                          :nudge-right="40" transition="scale-transition" offset-y
                           min-width="290px">
                     <template v-slot:activator="{ on }">
                       <v-text-field v-model="selectedDate" readonly v-on="on"
@@ -279,9 +303,7 @@ export default {
       isLastInvoiceForCompanyPresent: false,
       showToast: false,
       toastMessage: '',
-      availableInvoiceNoForCustomer: '',
-      createdDateForCustomerInvoice: '',
-      companyDetailsForCustomerInvoice: '',
+      lastInvoicesForCustomer: {},
       mostRecentInvoiceNoForCompany: '',
       createdDateForCompanyInvoice: '',
       recentInvoicesForCompany: [],
@@ -397,9 +419,7 @@ export default {
         }
       }).then((response) => {
         if (typeof response.data === 'object') {
-          vm.availableInvoiceNoForCustomer = response.data.invoice_no;
-          vm.createdDateForCustomerInvoice = response.data.invoice_date.split('T')[0];
-          vm.companyDetailsForCustomerInvoice = response.data.company_details;
+          vm.lastInvoicesForCustomer = response.data;
           vm.isLastInvoiceForCustomerPresent = true;
         } else {
           vm.isLastInvoiceForCustomerPresent = false;

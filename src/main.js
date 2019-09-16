@@ -77,9 +77,9 @@ Vue.prototype.formattedMonth = function (numericalMonth) {
 // Define postage, courier & labour charges list
 Vue.prototype.postageOptionsList = function () {
   return {
-    0: 'Postage charges',
-    1: 'Postage & courier charges',
-    2: 'Postage & courier & labour charges',
+    0: 'Postage & Courier charges',
+    1: 'Labour charges',
+    2: 'Postage & Courier & Labour charges',
   };
 };
 

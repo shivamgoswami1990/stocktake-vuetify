@@ -359,12 +359,13 @@ export default {
     getCustomersByPage(pageNo) {
       const vm = this;
       vm.isDataLoading = true;
-      vm.$http.get(process.env.VUE_APP_REST_URL + '/customers?page_no=' + pageNo,
-        {
-          headers: {
-            'Content-Type': 'application/json; charset=utf-8'
-          }
-        }).then((response) => {
+      vm.$http.get(process.env.VUE_APP_REST_URL + '/customers?page_no=' + pageNo
+        + '&financial_year=' + vm.currentlySelectedFinancialYear,
+      {
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8'
+        }
+      }).then((response) => {
         vm.setCustomersData(response.data.data);
         vm.totalRecords = response.data.total_records;
       }, (response) => {
