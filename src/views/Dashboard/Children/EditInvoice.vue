@@ -63,10 +63,10 @@
       <v-tabs fixed-tabs>
         <v-tabs-slider color="primary"></v-tabs-slider>
 
-        <v-tab href="#itemAndHSN">Item & HSN</v-tab>
         <v-tab href="#companyAndInvoice">Company & invoice</v-tab>
         <v-tab href="#consigneeAndDelivery">Consignee & delivery</v-tab>
         <v-tab href="#aadharAndPackage">Aadhar, bank & package</v-tab>
+        <v-tab href="#itemAndHSN">Item & HSN</v-tab>
 
         <v-tab-item value="companyAndInvoice">
 
