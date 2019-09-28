@@ -1,11 +1,6 @@
 <template>
   <v-navigation-drawer v-model="showDrawer" right fixed temporary width="500">
-
-    <v-layout align-center fill-height justify-center v-if="isDataLoading">
-      <v-progress-circular indeterminate color="primary" :size="70" :width="7"></v-progress-circular>
-    </v-layout>
-
-    <v-card v-else flat color="secondary">
+    <v-card flat color="secondary">
       <v-btn color="info" fab x-small depressed @click="exportToCSV"
              style="position: absolute; right: 50px; top: 10px">
         <v-icon>mdi-cloud-download</v-icon>
@@ -22,18 +17,35 @@
 
         <div class="px-4 py-0">
           <v-textarea name="Customer notes" label="Customer notes" solo auto-grow v-model="notes"
-                      flat hide-details class="pb-1"></v-textarea>
+                      flat hide-details class="pb-1" rows="1"></v-textarea>
 
           <v-btn block dark color="black" @click="saveCustomerNotes" :loading="isNotesSaving">
             Save notes
           </v-btn>
         </div>
 
-        <v-text-field placeholder="Filter by name ..." clearable v-model="searchTerm"
-                      autofocus class="px-4 pt-4 pb-0" color="black" hide-details
-                      v-if="filteredItems.length > 0">
-        </v-text-field>
+        <v-layout align-center fill-height justify-center v-if="isDataLoading">
+          <v-progress-circular indeterminate color="primary" :size="70"
+                               :width="7"></v-progress-circular>
+        </v-layout>
 
+        <div class="px-4">
+          <v-text-field placeholder="Filter by name ..." v-model="searchTerm"
+                        autofocus hide-details flat></v-text-field>
+          <h3 class="pt-2">Showing {{filteredItems.length}} of {{totalItemCount}} ordered items</h3>
+          <div class="pt-4 d-flex">
+            <a v-if="currentPageNo > 1" @click="loadPreviousNotifications">
+              <v-icon color="primary" class="d-inline-block mb-1" size="20">mdi-chevron-left
+              </v-icon>
+              Previous
+            </a>
+            <v-spacer></v-spacer>
+            <a @click="loadNextNotifications" class="d-inline-block">
+              Next
+              <v-icon color="primary" size="20">mdi-chevron-right</v-icon>
+            </a>
+          </div>
+        </div>
         <div v-if="filteredItems.length > 0">
           <div v-for="(item, key) in filteredItems" :key="key" class="px-4 pb-2">
 
@@ -41,189 +53,229 @@
               <v-card-title class="body-2">{{item.item_name}}</v-card-title>
 
               <v-card-text class="pa-0">
-                <v-data-table :headers="headers" :items="item.subitems" hide-default-footer light>
-                  <template v-slot:item.price_per_kg="{ item }">
-                    {{item.price_per_kg}}/{{item.units_for_display}}
-                  </template>
+                <v-simple-table light>
+                  <thead>
+                  <tr>
+                    <th v-for="header in headers" :key="header.value">{{header.text}}</th>
+                  </tr>
+                  </thead>
 
-                  <template v-slot:item.created_at="{ item }">
-                    {{calendarDate(item.created_at)}}
-                  </template>
-                </v-data-table>
+                  <tbody>
+                  <!-- Items row -->
+                  <tr v-for="(item, index) in item.subitems" :key="index">
+                    <td>{{item.price_per_kg}}/{{item.units_for_display}}</td>
+                    <td>{{calendarDate(item.created_at)}}</td>
+                  </tr>
+                  </tbody>
+                </v-simple-table>
               </v-card-text>
             </v-card>
           </div>
         </div>
 
-        <v-card-title primary-title v-else class="justify-center title">No items found</v-card-title>
+        <v-card-title primary-title v-else class="justify-center title">No items found
+        </v-card-title>
       </v-card-text>
     </v-card>
   </v-navigation-drawer>
 </template>
 
 <script>
-export default {
-  data() {
-    return {
-      showDrawer: false,
-      isDataLoading: true,
-      isNotesSaving: false,
-      isSampleCommentLoading: false,
-      notes: '',
-      items: [],
-      dataForExport: [],
-      searchTerm: '',
-      headers: [
-        {
-          text: 'Price(₹)',
-          value: 'price_per_kg',
-          sortable: false
-        },
-        {
-          text: 'Packaging',
-          value: 'packaging',
-          sortable: false
-        },
-        {
-          text: 'Date',
-          value: 'created_at',
-          sortable: false
-        }
-      ]
-    };
-  },
+  export default {
+    data() {
+      return {
+        showDrawer: false,
+        isDataLoading: true,
+        isNotesSaving: false,
+        isSampleCommentLoading: false,
+        isExportDataLoading: false,
+        notes: '',
+        items: [],
+        dataForExport: [],
+        searchTerm: '',
+        currentPageNo: 1,
+        totalItemCount: 0,
+        headers: [
+          {
+            text: 'Price(₹)',
+            value: 'price_per_kg'
+          },
+          {
+            text: 'Date',
+            value: 'created_at'
+          }
+        ]
+      };
+    },
 
-  computed: {
-    filteredItems() {
-      return this.items.filter(item => item.item_name.toLowerCase().indexOf(this.searchTerm.toLowerCase()) > -1);
-    }
-  },
+    computed: {
+      filteredItems() {
+        return this.items.filter(item => item.item_name.toLowerCase()
+          .indexOf(this.searchTerm.toLowerCase()) > -1);
+      }
+    },
 
-  mounted() {
-    const vm = this;
+    mounted() {
+      const vm = this;
 
-    // Remove the action column in data table for add item to invoice
-    if (!vm.$attrs.showAddItemBtn) {
-      vm.headers.splice(3, 1);
-    }
-    vm.showDrawer = true;
-    vm.notes = vm.$attrs.data.notes;
-    vm.$http.get(process.env.VUE_APP_REST_URL + '/customers/' + vm.$attrs.data.id + '/all_ordered_items',
-      {
-        headers: {
-          'Content-Type': 'application/json; charset=utf-8'
-        }
-      }).then((response) => {
-      vm.isDataLoading = false;
-      vm.items = vm.groupItemsByName(response.data);
-      vm.dataForExport = response.data;
-    }, (response) => {
-      vm.isDataLoading = false;
-    });
-  },
+      // Remove the action column in data table for add item to invoice
+      if (!vm.$attrs.showAddItemBtn) {
+        vm.headers.splice(3, 1);
+      }
+      vm.showDrawer = true;
+      vm.notes = vm.$attrs.data.notes;
+      vm.loadItemsByPageNo(vm.currentPageNo);
+    },
 
-  methods: {
-    groupItemsByName(items) {
-      const groupedItems = [];
-      items.forEach((item) => {
-        // Check grouped items list for any existing entries
-        if (groupedItems.length > 0) {
-          let itemMatched = false;
-          groupedItems.forEach((groupedItem) => {
-            if (groupedItem.item_name === item.item_name) {
-              groupedItem.subitems.push(item);
-              itemMatched = true;
+    methods: {
+      loadPreviousNotifications() {
+        this.currentPageNo -= 1;
+        this.loadItemsByPageNo(this.currentPageNo);
+      },
+
+      loadNextNotifications() {
+        this.currentPageNo += 1;
+        this.loadItemsByPageNo(this.currentPageNo);
+      },
+
+      loadItemsByPageNo(page_no) {
+        let vm = this;
+        vm.isDataLoading = true;
+        vm.$http.get(process.env.VUE_APP_REST_URL + '/customers/' + vm.$attrs.data.id +
+          '/all_ordered_items?page_no=' + page_no,
+          {
+            headers: {
+              'Content-Type': 'application/json; charset=utf-8'
             }
+          })
+          .then((response) => {
+            vm.isDataLoading = false;
+            vm.items = vm.groupItemsByName(response.data.data);
+            vm.totalItemCount = response.data.total_records;
+          }, (response) => {
+            vm.isDataLoading = false;
           });
+      },
 
-          if (!itemMatched) {
-            // Push as a new item
+      groupItemsByName(items) {
+        const groupedItems = [];
+        items.forEach((item) => {
+          // Check grouped items list for any existing entries
+          if (groupedItems.length > 0) {
+            let itemMatched = false;
+            groupedItems.forEach((groupedItem) => {
+              if (groupedItem.item_name === item.item_name) {
+                groupedItem.subitems.push(item);
+                itemMatched = true;
+              }
+            });
+
+            if (!itemMatched) {
+              // Push as a new item
+              groupedItems.push({
+                item_name: item.item_name,
+                subitems: [item]
+              });
+            }
+          } else {
             groupedItems.push({
               item_name: item.item_name,
               subitems: [item]
             });
           }
-        } else {
-          groupedItems.push({
-            item_name: item.item_name,
-            subitems: [item]
+        });
+        return groupedItems;
+      },
+
+      saveCustomerNotes() {
+        const vm = this;
+        vm.isNotesSaving = true;
+
+        this.$http.patch(process.env.VUE_APP_REST_URL + '/customers/' + vm.$attrs.data.id,
+          {
+            customer: {
+              notes: vm.notes
+            }
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json; charset=utf-8'
+            }
+          })
+          .then((response) => {
+            vm.isNotesSaving = false;
+          }, (response) => {
+            vm.isNotesSaving = false;
           });
-        }
-      });
-      return groupedItems;
-    },
+      },
 
-    saveCustomerNotes() {
-      const vm = this;
-      vm.isNotesSaving = true;
+      exportToCSV() {
+        const vm = this;
+        const selectedCustomer = vm.$attrs.data;
+        vm.isSampleCommentLoading = true;
 
-      this.$http.patch(process.env.VUE_APP_REST_URL + '/customers/' + vm.$attrs.data.id,
-        {
-          customer: {
-            notes: vm.notes
-          }
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json; charset=utf-8'
-          }
-        }).then((response) => {
-        vm.isNotesSaving = false;
-      }, (response) => {
-        vm.isNotesSaving = false;
-      });
-    },
+        vm.$http.get(process.env.VUE_APP_REST_URL + '/customers/' + selectedCustomer.id + '/invoice_sample_comments',
+          {
+            headers: {
+              'Content-Type': 'application/json; charset=utf-8'
+            }
+          })
+          .then((response) => {
+            // Reformat the selected array to a comma seperated nested array
+            const reformattedSelectedArray = [];
+            reformattedSelectedArray.push(['Customer name', 'St Address',
+              'City', 'State', 'Postcode',
+              'GST no', 'Pan no', 'Phone no',
+              'Code', 'Freight allowed', 'Freight type',
+              'Transport', 'Destination', 'Notes',
+              'Primary discount', 'Secondary discount', 'Contact email']);
+            reformattedSelectedArray.push([selectedCustomer.name, selectedCustomer.st_address,
+              selectedCustomer.city, selectedCustomer.state_name, selectedCustomer.postcode,
+              selectedCustomer.gstin_no, selectedCustomer.pan_no, selectedCustomer.phone_no,
+              selectedCustomer.code, selectedCustomer.freight_allowed ? 'Yes' : 'No', selectedCustomer.freight_type,
+              selectedCustomer.transport_name, selectedCustomer.destination, selectedCustomer.notes,
+              selectedCustomer.primary_discount, selectedCustomer.secondary_discount, selectedCustomer.contact_email]);
+            reformattedSelectedArray.push(['', '', '', '', '']);
+            reformattedSelectedArray.push(['Sample Comments']);
 
-    exportToCSV() {
-      const vm = this;
-      const selectedCustomer = vm.$attrs.data;
-      vm.isSampleCommentLoading = true;
+            let sample_comments = [];
+            response.data.forEach((row) => {
+              sample_comments.push(row[0]);
+            });
+            reformattedSelectedArray.push(sample_comments);
+            reformattedSelectedArray.push(['', '', '', '', '']);
 
-      vm.$http.get(process.env.VUE_APP_REST_URL + '/customers/' + selectedCustomer.id + '/invoice_sample_comments',
-        {
-          headers: {
-            'Content-Type': 'application/json; charset=utf-8'
-          }
-        }).then((response) => {
-        // Reformat the selected array to a comma seperated nested array
-        const reformattedSelectedArray = [];
-        reformattedSelectedArray.push(['Customer name', 'St Address',
-          'City', 'State', 'Postcode',
-          'GST no', 'Pan no', 'Phone no',
-          'Code', 'Freight allowed', 'Freight type',
-          'Transport', 'Destination', 'Notes',
-          'Primary discount', 'Secondary discount', 'Contact email']);
-        reformattedSelectedArray.push([selectedCustomer.name, selectedCustomer.st_address,
-          selectedCustomer.city, selectedCustomer.state_name, selectedCustomer.postcode,
-          selectedCustomer.gstin_no, selectedCustomer.pan_no, selectedCustomer.phone_no,
-          selectedCustomer.code, selectedCustomer.freight_allowed ? 'Yes' : 'No', selectedCustomer.freight_type,
-          selectedCustomer.transport_name, selectedCustomer.destination, selectedCustomer.notes,
-          selectedCustomer.primary_discount, selectedCustomer.secondary_discount, selectedCustomer.contact_email]);
-        reformattedSelectedArray.push(['', '', '', '', '']);
-        reformattedSelectedArray.push(['Sample Comments']);
+            reformattedSelectedArray.push(['Item name', 'Price per kg (₹)', 'Packaging', 'Date']);
 
-        let sample_comments = [];
-        response.data.forEach((row) => {
-          sample_comments.push(row[0]);
-        });
-        reformattedSelectedArray.push(sample_comments);
-        reformattedSelectedArray.push(['', '', '', '', '']);
+            // Load all the items for export
+            vm.isExportDataLoading = true;
+            vm.$http.get(process.env.VUE_APP_REST_URL + '/customers/' + vm.$attrs.data.id +
+              '/all_ordered_items',
+              {
+                headers: {
+                  'Content-Type': 'application/json; charset=utf-8'
+                }
+              })
+              .then((response) => {
+                vm.isExportDataLoading = false;
+                vm.dataForExport = response.data;
+                // Append only values sequentially
+                vm.dataForExport.forEach((row) => {
+                  reformattedSelectedArray.push([
+                    row.item_name, row.price_per_kg, row.packaging, vm.calendarDate(row.created_at)
+                  ]);
+                });
 
-        reformattedSelectedArray.push(['Item name', 'Price per kg (₹)', 'Packaging', 'Date']);
-        // Append only values sequentially
-        vm.dataForExport.forEach((row) => {
-          reformattedSelectedArray.push([
-            row.item_name, row.price_per_kg, row.packaging, vm.calendarDate(row.created_at)
-          ]);
-        });
-
-        vm.isSampleCommentLoading = false;
-        // Pass the reformatted array to the CSV fn
-        vm.convertToCSV(vm.$attrs.data.name + '.csv', reformattedSelectedArray);
-      }, (response) => {
-        vm.isDataLoading = false;
-      });
+                vm.isSampleCommentLoading = false;
+                // Pass the reformatted array to the CSV fn
+                vm.convertToCSV(vm.$attrs.data.name + '.csv', reformattedSelectedArray);
+              }, (response) => {
+                vm.isExportDataLoading = false;
+              });
+          }, (response) => {
+            vm.isDataLoading = false;
+          });
+      }
     }
-  }
-};
+  };
 </script>
