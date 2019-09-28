@@ -53,10 +53,10 @@
 
     <v-card-text>
       <v-tabs fixed-tabs>
-        <v-tab href="#itemAndHSN">Item & HSN</v-tab>
         <v-tab href="#aadharAndPackage">Aadhar, bank & package</v-tab>
         <v-tab href="#consigneeAndDelivery">Consignee & delivery</v-tab>
         <v-tab href="#companyAndInvoice">Company & invoice</v-tab>
+        <v-tab href="#itemAndHSN">Item & HSN</v-tab>
         <v-tab href="#invoiceNotifications" v-if="invoiceNotifications.length > 0">
           <v-badge color="primary" top>
             <template v-slot:badge>

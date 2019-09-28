@@ -170,7 +170,8 @@
                                         label="Invoice date"></v-text-field>
                         </template>
                         <v-date-picker v-model="invoiceDate" scrollable first-day-of-week="1"
-                                       color="primary" @input="invoiceDateMenu = false">
+                                       color="primary" @input="invoiceDateMenu = false"
+                                       :min="previousInvoiceDate" :max="nextInvoiceDate">
                         </v-date-picker>
                       </v-menu>
                     </v-flex>
@@ -1090,6 +1091,8 @@ export default {
       hsnSummary: [],
       hsnSummaryTotal: {},
       taxAmountInWords: '',
+      previousInvoiceDate: null,
+      nextInvoiceDate: null,
       invoiceFinancialYear: '',
       postageTextOptions: null,
       postageSelectedText: '',
@@ -1240,6 +1243,39 @@ export default {
       // Assign units to each item in itemArray on initialise
       this.itemArray.forEach((item) => {
         item.units_for_display = vm.setUnitForItem(item);
+      });
+
+      // Get previous & next invoice date
+      this.getPreviousAndNextInvoiceDate(this.id, invoiceData.company_id);
+    },
+
+    getPreviousAndNextInvoiceDate(invoice_id, company_id) {
+      let vm = this;
+      vm.$http.get(process.env.VUE_APP_REST_URL + '/previous_and_next_invoice?for_invoice_no_as_int='
+        + parseInt(invoice_id) + '&company_id=' + company_id + '&financial_year='
+        + vm.currentlySelectedFinancialYear,
+        {
+          headers: {
+            'Content-Type': 'application/json; charset=utf-8'
+          }
+        }).then((response) => {
+        if (response.data !== undefined && response.data !== null) {
+          if (typeof response.data === 'object') {
+            // Set previous & next invoice dates as min & max
+            if (response.data.previous_invoice !== undefined && response.data.previous_invoice !== null) {
+              vm.previousInvoiceDate = response.data.previous_invoice.invoice_date.split('T')[0];
+            } else {
+              vm.previousInvoiceDate = null;
+            }
+
+            if (response.data.next_invoice !== undefined && response.data.next_invoice !== null) {
+              vm.nextInvoiceDate = response.data.next_invoice.invoice_date.split('T')[0];
+            } else {
+              vm.nextInvoiceDate = null;
+            }
+          }
+        }
+      }, (response) => {
       });
     },
 
