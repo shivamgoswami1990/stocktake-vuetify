@@ -366,8 +366,8 @@ export default {
           'Content-Type': 'application/json; charset=utf-8'
         }
       }).then((response) => {
-        vm.setCustomersData(response.data.data);
-        vm.totalRecords = response.data.total_records;
+        vm.setCustomersData(response.data[1]);
+        vm.totalRecords = response.data[0].count;
       }, (response) => {
       });
     },
@@ -441,8 +441,8 @@ export default {
           headers: {
             'Content-Type': 'application/json; charset=utf-8'
           }
-        }).then((response) => {
-        this.currentCustomerInvoices = response.data.invoice_count;
+        }).then((response1) => {
+        this.currentCustomerInvoices = response1.data.invoice_count;
 
         if (this.currentCustomerInvoices === 0) {
           if (confirm('Are you sure you want to delete this customer?')) {
@@ -451,7 +451,7 @@ export default {
                 headers: {
                   'Content-Type': 'application/json; charset=utf-8'
                 }
-              }).then((response) => {
+              }).then((response2) => {
               const index = this.customers.indexOf(item);
               this.customers.splice(index, 1);
 
@@ -459,7 +459,7 @@ export default {
               this.showToast = true;
               this.toastMessage = 'Successfully deleted customer';
               this.toastColor = '';
-            }, (response) => {
+            }, (response2) => {
               this.showToast = true;
               this.toastMessage = 'Something went wrong';
               this.toastColor = 'error';
@@ -468,7 +468,7 @@ export default {
         } else if (this.currentCustomerInvoices > 0) {
           this.showDeleteCustomerDialog = true;
         }
-      }, (response) => {
+      }, (response1) => {
       });
     },
 
