@@ -25,6 +25,7 @@ module.exports = {
     "vue/no-async-in-computed-properties": 0,
     "prefer-template": 0,
     "func-names": 0,
+    "camelcase": 0,
     "comma-dangle": 0,
     "no-console": 0,
     "consistent-return": 0,
