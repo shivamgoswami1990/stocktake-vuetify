@@ -150,8 +150,8 @@ export default {
       })
         .then((response) => {
           vm.isDataLoading = false;
-          vm.items = vm.groupItemsByName(response.data.data);
-          vm.totalItemCount = response.data.total_records;
+          vm.items = vm.groupItemsByName(response.data[1]);
+          vm.totalItemCount = response.data[0].count;
         }, (response) => {
           vm.isDataLoading = false;
         });

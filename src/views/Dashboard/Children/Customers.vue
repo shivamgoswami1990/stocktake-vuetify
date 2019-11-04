@@ -603,7 +603,7 @@ export default {
                 'Content-Type': 'application/json; charset=utf-8'
               }
             }).then((response) => {
-            vm.setCustomersData(response.data.data);
+            vm.setCustomersData(response.data);
             this.hideDataTableFooter = true;
             vm.totalRecords = response.data.total_records;
           }, (response) => {
@@ -635,7 +635,7 @@ export default {
         ];
 
         // Append only values sequentially
-        response.data.data.forEach((row) => {
+        response.data.forEach((row) => {
           reformattedSelectedArray.push([
             row.name, row.st_address, row.city, row.state_name, row.postcode, row.code,
             row.phone_no, row.gstin_no, row.pan_no, row.contact_email, row.transport_name,

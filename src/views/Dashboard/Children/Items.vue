@@ -366,7 +366,7 @@ export default {
         ];
 
         // Append only values sequentially
-        response.data.data.forEach((row) => {
+        response.data.forEach((row) => {
           reformattedSelectedArray.push([
             row.name, row.series, row.one_tenth_price, row.quarter_price, row.half_price, row.bulk_price,
             row.dozen_price, row.litre_price, row.one_tenth_piece_price, row.quarter_piece_price, vm.calendarDate(row.created_at)
@@ -390,7 +390,7 @@ export default {
                 'Content-Type': 'application/json; charset=utf-8'
               }
             }).then((response) => {
-            vm.setItemsData(response.data.data);
+            vm.setItemsData(response.data);
             this.hideDataTableFooter = true;
             vm.totalRecords = response.data.total_records;
           }, (response) => {
