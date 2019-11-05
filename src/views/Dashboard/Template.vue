@@ -179,24 +179,31 @@ export default {
   },
   watch: {
     search(val) {
-      if (val !== undefined && val !== null) {
-        const vm = this;
-        vm.isSearchLoading = true;
+      // eslint-disable-next-line no-underscore-dangle
+      clearTimeout(this._searchTimerId);
+      // eslint-disable-next-line no-underscore-dangle
+      this._searchTimerId = setTimeout(() => {
+        if (val !== undefined && val !== null) {
+          if (val !== '') {
+            const vm = this;
+            vm.isSearchLoading = true;
 
-        this.$http.get(process.env.VUE_APP_REST_URL + '/past_invoices?search_term=' + val
-          + '&financial_year=' + vm.currentlySelectedFinancialYear,
-        {
-          headers: {
-            'Content-Type': 'application/json; charset=utf-8'
+            this.$http.get(process.env.VUE_APP_REST_URL + '/past_invoices?search_term=' + val
+              + '&financial_year=' + vm.currentlySelectedFinancialYear,
+            {
+              headers: {
+                'Content-Type': 'application/json; charset=utf-8'
+              }
+            }).then((response) => {
+              vm.searchItems = response.data;
+              vm.isSearchLoading = false;
+              return response.data;
+            }, (response) => {
+              vm.isSearchLoading = false;
+            });
           }
-        }).then((response) => {
-          vm.searchItems = response.data;
-          vm.isSearchLoading = false;
-          return response.data;
-        }, (response) => {
-          vm.isSearchLoading = false;
-        });
-      }
+        }
+      }, 1000); /* 1000ms throttle */
     }
   },
   methods: {

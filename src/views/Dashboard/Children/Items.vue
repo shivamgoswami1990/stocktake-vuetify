@@ -384,17 +384,22 @@ export default {
       const vm = this;
       if (vm.search !== '' && vm.search !== null) {
         if (vm.search.length > 2) {
-          vm.$http.get(process.env.VUE_APP_REST_URL + '/items?search_term=' + vm.search,
-            {
-              headers: {
-                'Content-Type': 'application/json; charset=utf-8'
-              }
-            }).then((response) => {
-            vm.setItemsData(response.data);
-            this.hideDataTableFooter = true;
-            vm.totalRecords = response.data.total_records;
-          }, (response) => {
-          });
+          // eslint-disable-next-line no-underscore-dangle
+          clearTimeout(this._searchTimerId);
+          // eslint-disable-next-line no-underscore-dangle
+          this._searchTimerId = setTimeout(() => {
+            vm.$http.get(process.env.VUE_APP_REST_URL + '/items?search_term=' + vm.search,
+              {
+                headers: {
+                  'Content-Type': 'application/json; charset=utf-8'
+                }
+              }).then((response) => {
+              vm.setItemsData(response.data);
+              this.hideDataTableFooter = true;
+              vm.totalRecords = response.data.total_records;
+            }, (response) => {
+            });
+          }, 1000); /* 1000ms throttle */
         } else {
           this.getItemsByPage(1);
           this.hideDataTableFooter = false;
