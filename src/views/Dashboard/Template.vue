@@ -33,7 +33,7 @@
         </template>
 
         <template v-slot:item="{ item }">
-          <invoice-display-list :data="[item]" width="450px"></invoice-display-list>
+          <invoice-display-list :data="[item]" width="450px" clickable-tile></invoice-display-list>
         </template>
       </v-autocomplete>
 

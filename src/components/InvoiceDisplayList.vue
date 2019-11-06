@@ -1,7 +1,7 @@
 <template>
   <v-list two-line v-if="$attrs.data.length > 0" dense>
     <template v-for="(item, key) in $attrs.data">
-      <v-list-item :key="item.id" dense>
+      <v-list-item :key="item.id" dense @click="conditionalRouteToInvoice(item.id)">
         <v-list-item-avatar color="primary" class="white--text font-weight-medium my-0" size="45" right>
           #{{item.invoice_no}}
         </v-list-item-avatar>
@@ -38,7 +38,7 @@
           <v-list-item-action-text class="font-weight-bold">{{ calendarDate(item.invoice_date) }}
           </v-list-item-action-text>
 
-          <v-list-item-action-text class="d-inline-flex">
+          <v-list-item-action-text class="d-inline-flex" v-if="!clickableTile">
             <a @click="routeToInvoice('viewInvoice', item.id)">
               View
             </a>
@@ -59,6 +59,12 @@
 
 <script>
 export default {
+  props: {
+    clickableTile: {
+      type: Boolean,
+      default: false
+    }
+  },
   beforeCreate() {
     this.listContentWidth = '100%';
     if (this.$attrs.width !== undefined && this.$attrs.width !== null) {
@@ -77,6 +83,11 @@ export default {
         this.$router.go();
       }
     },
+    conditionalRouteToInvoice(id) {
+      if (this.clickableTile) {
+        this.routeToInvoice('viewInvoice', id);
+      }
+    }
   }
 };
 </script>
