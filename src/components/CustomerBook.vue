@@ -32,19 +32,7 @@
         <div class="px-4">
           <v-text-field placeholder="Filter by name ..." v-model="searchTerm"
                         autofocus hide-details flat></v-text-field>
-          <h3 class="pt-2">Showing {{filteredItems.length}} of {{totalItemCount}} ordered items</h3>
-          <div class="pt-4 d-flex">
-            <a v-if="currentPageNo > 1" @click="loadPreviousNotifications">
-              <v-icon color="primary" class="d-inline-block mb-1" size="20">mdi-chevron-left
-              </v-icon>
-              Previous
-            </a>
-            <v-spacer></v-spacer>
-            <a @click="loadNextNotifications" class="d-inline-block">
-              Next
-              <v-icon color="primary" size="20">mdi-chevron-right</v-icon>
-            </a>
-          </div>
+          <h3 class="pt-2">Showing {{items.length}} ordered items</h3>
         </div>
         <div v-if="filteredItems.length > 0">
           <div v-for="(item, key) in filteredItems" :key="key" class="px-4 pb-2">
@@ -64,6 +52,7 @@
                   <!-- Items row -->
                   <tr v-for="(item, index) in item.subitems" :key="index">
                     <td>{{item.price_per_kg}}/{{item.units_for_display}}</td>
+                    <td>{{parseFloat(item.packaging, 10) < 1000 ? item.packaging + ' gm' : parseFloat(item.packaging, 10) / 1000  + ' kg'}}</td>
                     <td>{{calendarDate(item.created_at)}}</td>
                   </tr>
                   </tbody>
@@ -93,12 +82,14 @@ export default {
       items: [],
       dataForExport: [],
       searchTerm: '',
-      currentPageNo: 1,
-      totalItemCount: 0,
       headers: [
         {
           text: 'Price(₹)',
           value: 'price_per_kg'
+        },
+        {
+          text: 'Packaging',
+          value: 'packaging'
         },
         {
           text: 'Date',
@@ -124,25 +115,15 @@ export default {
     }
     vm.showDrawer = true;
     vm.notes = vm.$attrs.data.notes;
-    vm.loadItemsByPageNo(vm.currentPageNo);
+    vm.loadItems();
   },
 
   methods: {
-    loadPreviousNotifications() {
-      this.currentPageNo -= 1;
-      this.loadItemsByPageNo(this.currentPageNo);
-    },
-
-    loadNextNotifications() {
-      this.currentPageNo += 1;
-      this.loadItemsByPageNo(this.currentPageNo);
-    },
-
-    loadItemsByPageNo(page_no) {
+    loadItems() {
       const vm = this;
       vm.isDataLoading = true;
       vm.$http.get(process.env.VUE_APP_REST_URL + '/customers/' + vm.$attrs.data.id
-          + '/all_ordered_items?page_no=' + page_no,
+          + '/all_ordered_items',
       {
         headers: {
           'Content-Type': 'application/json; charset=utf-8'
@@ -150,8 +131,7 @@ export default {
       })
         .then((response) => {
           vm.isDataLoading = false;
-          vm.items = vm.groupItemsByName(response.data[1]);
-          vm.totalItemCount = response.data[0].count;
+          vm.items = vm.groupItemsByName(response.data);
         }, (response) => {
           vm.isDataLoading = false;
         });
