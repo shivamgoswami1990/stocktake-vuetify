@@ -352,6 +352,7 @@ export default {
 
   methods: {
     setCustomersData(data) {
+      console.log(data);
       this.customers = data;
       this.isDataLoading = false;
     },
@@ -366,8 +367,8 @@ export default {
           'Content-Type': 'application/json; charset=utf-8'
         }
       }).then((response) => {
-        vm.setCustomersData(response.data.data);
-        vm.totalRecords = response.data.total_records;
+        vm.setCustomersData(response.data[1]);
+        vm.totalRecords = response.data[0].count;
       }, (response) => {
       });
     },
@@ -603,9 +604,9 @@ export default {
                 'Content-Type': 'application/json; charset=utf-8'
               }
             }).then((response) => {
-            vm.setCustomersData(response.data.data);
+            vm.setCustomersData(response.data);
             this.hideDataTableFooter = true;
-            vm.totalRecords = response.data.total_records;
+            vm.totalRecords = response.data.length;
           }, (response) => {
           });
         } else {

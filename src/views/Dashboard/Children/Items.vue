@@ -226,8 +226,8 @@ export default {
             'Content-Type': 'application/json; charset=utf-8'
           }
         }).then((response) => {
-        vm.setItemsData(response.data.data);
-        vm.totalRecords = response.data.total_records;
+        vm.setItemsData(response.data[1]);
+        vm.totalRecords = response.data[0].count;
       }, (response) => {
       });
     },
@@ -390,9 +390,9 @@ export default {
                 'Content-Type': 'application/json; charset=utf-8'
               }
             }).then((response) => {
-            vm.setItemsData(response.data.data);
+            vm.setItemsData(response.data);
             this.hideDataTableFooter = true;
-            vm.totalRecords = response.data.total_records;
+            vm.totalRecords = response.data.length;
           }, (response) => {
           });
         } else {

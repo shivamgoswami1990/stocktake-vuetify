@@ -396,7 +396,7 @@ export default {
               }
             })
             .then((response) => {
-              vm.customersList = response.data.data;
+              vm.customersList = response.data;
               vm.isCustomerDataLoading = false;
               return response.data;
             }, (response) => {

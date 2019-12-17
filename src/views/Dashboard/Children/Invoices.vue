@@ -272,7 +272,7 @@ export default {
     },
 
     setCustomersData(data) {
-      this.customers = data.data;
+      this.customers = data;
       this.isCustomersDataLoading = false;
     },
 
