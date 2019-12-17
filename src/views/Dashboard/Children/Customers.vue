@@ -352,7 +352,6 @@ export default {
 
   methods: {
     setCustomersData(data) {
-      console.log(data);
       this.customers = data;
       this.isDataLoading = false;
     },
@@ -442,8 +441,8 @@ export default {
           headers: {
             'Content-Type': 'application/json; charset=utf-8'
           }
-        }).then((response) => {
-        this.currentCustomerInvoices = response.data.invoice_count;
+        }).then((response1) => {
+        this.currentCustomerInvoices = response1.data.invoice_count;
 
         if (this.currentCustomerInvoices === 0) {
           if (confirm('Are you sure you want to delete this customer?')) {
@@ -452,7 +451,7 @@ export default {
                 headers: {
                   'Content-Type': 'application/json; charset=utf-8'
                 }
-              }).then((response) => {
+              }).then((response2) => {
               const index = this.customers.indexOf(item);
               this.customers.splice(index, 1);
 
@@ -460,7 +459,7 @@ export default {
               this.showToast = true;
               this.toastMessage = 'Successfully deleted customer';
               this.toastColor = '';
-            }, (response) => {
+            }, (response2) => {
               this.showToast = true;
               this.toastMessage = 'Something went wrong';
               this.toastColor = 'error';
@@ -469,7 +468,7 @@ export default {
         } else if (this.currentCustomerInvoices > 0) {
           this.showDeleteCustomerDialog = true;
         }
-      }, (response) => {
+      }, (response1) => {
       });
     },
 
@@ -598,17 +597,22 @@ export default {
       const vm = this;
       if (vm.search !== '' && vm.search !== null) {
         if (vm.search.length > 2) {
-          vm.$http.get(process.env.VUE_APP_REST_URL + '/customers?search_term=' + vm.search,
-            {
-              headers: {
-                'Content-Type': 'application/json; charset=utf-8'
-              }
-            }).then((response) => {
-            vm.setCustomersData(response.data);
-            this.hideDataTableFooter = true;
-            vm.totalRecords = response.data.length;
-          }, (response) => {
-          });
+          // eslint-disable-next-line no-underscore-dangle
+          clearTimeout(this._searchTimerId);
+          // eslint-disable-next-line no-underscore-dangle
+          this._searchTimerId = setTimeout(() => {
+            vm.$http.get(process.env.VUE_APP_REST_URL + '/customers?search_term=' + vm.search,
+              {
+                headers: {
+                  'Content-Type': 'application/json; charset=utf-8'
+                }
+              }).then((response) => {
+              vm.setCustomersData(response.data);
+              this.hideDataTableFooter = true;
+              vm.totalRecords = response.data.total_records;
+            }, (response) => {
+            });
+          }, 1000); /* 1000ms throttle */
         } else {
           this.getCustomersByPage(1);
           this.hideDataTableFooter = false;
@@ -636,7 +640,7 @@ export default {
         ];
 
         // Append only values sequentially
-        response.data.data.forEach((row) => {
+        response.data.forEach((row) => {
           reformattedSelectedArray.push([
             row.name, row.st_address, row.city, row.state_name, row.postcode, row.code,
             row.phone_no, row.gstin_no, row.pan_no, row.contact_email, row.transport_name,

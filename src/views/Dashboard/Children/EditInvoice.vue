@@ -1189,7 +1189,7 @@ export default {
       this.sampleComments = invoiceData.sample_comments;
       this.itemArray = invoiceData.item_array;
       this.itemSummary = invoiceData.item_summary;
-      this.perfumesBeforeFormatting = itemData.data;
+      this.perfumesBeforeFormatting = itemData;
       this.hsnList = invoiceData.company.hsn_list;
       this.taxAmountInWords = invoiceData.tax_amount_in_words;
       this.invoiceFinancialYear = invoiceData.financial_year;
@@ -1250,15 +1250,15 @@ export default {
     },
 
     getPreviousAndNextInvoiceDate(invoice_id, company_id) {
-      let vm = this;
+      const vm = this;
       vm.$http.get(process.env.VUE_APP_REST_URL + '/previous_and_next_invoice?for_invoice_no_as_int='
-        + parseInt(invoice_id) + '&company_id=' + company_id + '&financial_year='
+        + parseInt(invoice_id, 10) + '&company_id=' + company_id + '&financial_year='
         + vm.currentlySelectedFinancialYear,
-        {
-          headers: {
-            'Content-Type': 'application/json; charset=utf-8'
-          }
-        }).then((response) => {
+      {
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8'
+        }
+      }).then((response) => {
         if (response.data !== undefined && response.data !== null) {
           if (typeof response.data === 'object') {
             // Set previous & next invoice dates as min & max

@@ -186,7 +186,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr v-for="(item, key, index) in itemArray">
+        <tr v-for="(item, key, index) in itemArray" :key="index">
           <td style="text-align: center; font-size: 7.5pt">{{key + 1}}</td>
 
           <!--- Conditional display --->
@@ -208,7 +208,7 @@
 
           <td style="text-align: center; font-size: 7.5pt">
             {{item.item_name}} <br>
-            <span v-for="subitem in item.subitems"
+            <span v-for="(subitem, index) in item.subitems" :key="index"
                   v-if="item.subitems !== undefined && item.subitems !== null && item.subitems.length > 0">
                                 ({{subitem.subitems + '. '}})
                             </span>
@@ -432,7 +432,7 @@
         <div style="width: 100%; display: block; border-collapse: collapse; padding: 0;">
           <div style="border-right: 1px solid black; border-bottom: 1px solid black; width: calc(50% - 1px);
                          border-collapse: collapse; float: left; font-size: 7pt;">
-                            <span v-for="row in hsnSummary" style="margin-left: 1px">
+                            <span v-for="(row, index) in hsnSummary" :key="index" style="margin-left: 1px">
                                 {{row.hsn}}<br>
                             </span>
           </div>
@@ -440,7 +440,7 @@
             style="border-bottom: 1px solid black; width: calc(50% - 1px); border-collapse: collapse; float: right; font-size: 7pt;">
             <div
               style="border-right: 1px solid black; text-align: right; width: calc(30% - 1px); float: left; font-size: 7pt;">
-                                <span v-for="row in hsnSummary" style="margin-right: 1px">
+                                <span v-for="(row, index) in hsnSummary" :key="index" style="margin-right: 1px">
                                     {{row.taxable_value}}<br>
                                 </span>
             </div>
@@ -448,19 +448,19 @@
             <div style="border-right: 1px solid black; width: calc(40% - 1px); float: left; font-size: 7pt;">
               <div style="border-right: 1px solid black; width: calc(50% - 1px); float: left;
                                  text-align: right; font-size: 7pt;">
-                                    <span v-for="row in hsnSummary">
+                                    <span v-for="(row, index) in hsnSummary" :key="index">
                                         {{row.igst_rate}} %<br>
                                     </span>
               </div>
               <div style="width: 50%; float: right; text-align: right; font-size: 7pt;">
-                                    <span v-for="row in hsnSummary">
+                                    <span v-for="(row, index) in hsnSummary" :key="index">
                                         {{row.amount}}<br>
                                     </span>
               </div>
             </div>
 
             <div style="text-align: right; width: calc(30%); float: left; font-size: 7pt;">
-                                <span v-for="row in hsnSummary" style="margin-right: 1px">
+                                <span v-for="(row, index) in hsnSummary" :key="index" style="margin-right: 1px">
                                     {{row.total_tax_amount}}<br>
                                 </span>
             </div>
@@ -545,7 +545,7 @@
         <div style="width: 100%; display: block; border-collapse: collapse; padding: 0;">
           <div style="border-right: 1px solid black; border-bottom: 1px solid black;
                          width: calc(50% - 1px); border-collapse: collapse; float: left; font-size: 7pt;">
-                            <span v-for="row in hsnSummary" style="margin-left: 1px">
+                            <span v-for="(row, index) in hsnSummary" :key="index" style="margin-left: 1px">
                                 {{row.hsn}}<br>
                             </span>
           </div>
@@ -554,7 +554,7 @@
                          float: right; font-size: 7pt;">
             <div style="border-right: 1px solid black; text-align: right; width: calc(30% - 1px);
                              float: left; font-size: 7pt;">
-                                <span v-for="row in hsnSummary" style="margin-right: 1px">
+                                <span v-for="(row, index) in hsnSummary" :key="index" style="margin-right: 1px">
                                     {{row.taxable_value}}<br>
                                 </span>
             </div>
@@ -562,13 +562,13 @@
             <div style="border-right: 1px solid black; width: calc(20% - 1px); float: left; font-size: 7pt;">
               <div style="border-right: 1px solid black; width: calc(50% - 1px); float: left;
                                  text-align: right; font-size: 7pt;">
-                                    <span v-for="row in hsnSummary">
+                                    <span v-for="(row, index) in hsnSummary" :key="index">
                                         {{row.cgst_rate}} %<br>
                                     </span>
               </div>
 
               <div style="width: 50%; float: right; text-align: right; font-size: 7pt;">
-                                    <span v-for="row in hsnSummary">
+                                    <span v-for="(row, index) in hsnSummary" :key="index">
                                         {{row.cgst_amount}}<br>
                                     </span>
               </div>
@@ -577,19 +577,19 @@
             <div style="border-right: 1px solid black; width: calc(20% - 1px); float: left; font-size: 7pt;">
               <div style="border-right: 1px solid black; width: calc(50% - 1px); float: left;
                                  text-align: right; font-size: 7pt;">
-                                    <span v-for="row in hsnSummary">
+                                    <span v-for="(row, index) in hsnSummary" :key="index">
                                         {{row.sgst_rate}} %<br>
                                     </span>
               </div>
               <div style="width: 50%; float: right; text-align: right; font-size: 7pt;">
-                                    <span v-for="row in hsnSummary">
+                                    <span v-for="(row, index) in hsnSummary" :key="index">
                                         {{row.sgst_amount}}<br>
                                     </span>
               </div>
             </div>
 
             <div style="text-align: right; width: calc(30%); float: left; font-size: 7pt;">
-                                <span v-for="row in hsnSummary" style="margin-right: 1px">
+                                <span v-for="(row, index) in hsnSummary" :key="index" style="margin-right: 1px">
                                     {{row.total_tax_amount}}<br>
                                 </span>
             </div>
@@ -738,7 +738,7 @@ export default {
     printWindow.document.close();
     printWindow.focus();
     printWindow.print();
-    printWindow.close();
+    // printWindow.close();
   },
 
   methods: {
@@ -765,7 +765,7 @@ export default {
     },
 
     getPackagingForPrint(packaging) {
-      if (parseInt(packaging) < 1000) {
+      if (parseInt(packaging, 10) < 1000) {
         return packaging + ' gms';
       }
       return (parseFloat(packaging) / 1000) + ' Kg';

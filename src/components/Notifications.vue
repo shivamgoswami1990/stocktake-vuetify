@@ -27,7 +27,7 @@
           </v-btn>
         </v-btn-toggle>
         <v-list two-line v-if="notifications.length > 0" light>
-          <template v-for="(notification, key, index) in notifications">
+          <template v-for="(notification, key) in notifications">
 
             <v-list-item :key="key" color="primary">
               <v-list-item-avatar
@@ -120,7 +120,7 @@ export default {
         'Content-Type': 'application/json; charset=utf-8'
       }
     }).then((response) => {
-      vm.notifications = response.data;
+      vm.notifications = response.data[1];
       vm.isNotificationsLoading = false;
     }, (response) => {
       vm.isNotificationsLoading = false;
@@ -197,7 +197,7 @@ export default {
           'Content-Type': 'application/json; charset=utf-8'
         }
       }).then((response) => {
-        vm.notifications = response.data;
+        vm.notifications = response.data[1];
         vm.isNotificationsLoading = false;
       }, (response) => {
         vm.isNotificationsLoading = false;

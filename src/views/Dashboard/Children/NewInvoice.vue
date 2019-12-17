@@ -386,22 +386,27 @@ export default {
     searchCustomer(val) {
       if (val !== undefined && val !== null) {
         if (val.length > 2) {
-          const vm = this;
-          vm.isCustomerDataLoading = true;
+          // eslint-disable-next-line no-underscore-dangle
+          clearTimeout(this._searchTimerId);
+          // eslint-disable-next-line no-underscore-dangle
+          this._searchTimerId = setTimeout(() => {
+            const vm = this;
+            vm.isCustomerDataLoading = true;
 
-          this.$http.get(process.env.VUE_APP_REST_URL + '/customers?search_term=' + val,
-            {
-              headers: {
-                'Content-Type': 'application/json; charset=utf-8'
-              }
-            })
-            .then((response) => {
-              vm.customersList = response.data;
-              vm.isCustomerDataLoading = false;
-              return response.data;
-            }, (response) => {
-              vm.isCustomerDataLoading = false;
-            });
+            this.$http.get(process.env.VUE_APP_REST_URL + '/customers?search_term=' + val,
+              {
+                headers: {
+                  'Content-Type': 'application/json; charset=utf-8'
+                }
+              })
+              .then((response) => {
+                vm.customersList = response.data;
+                vm.isCustomerDataLoading = false;
+                return response.data;
+              }, (response) => {
+                vm.isCustomerDataLoading = false;
+              });
+          }, 1000); /* 1000ms throttle */
         }
       }
     }
