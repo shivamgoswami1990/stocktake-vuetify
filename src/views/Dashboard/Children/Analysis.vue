@@ -126,17 +126,30 @@ export default {
     generateMonthAndYearRange(monthCount) {
       // Go back months according to month count
       let result = '';
-      for (let i = monthCount - 1; i >= -1; i--) {
-        const currentDate = new Date();
-        const subtractedDate = new Date(currentDate.setMonth(currentDate.getMonth() - i));
-        const dateSubString = '[' + subtractedDate.getMonth() + ',' + subtractedDate.getFullYear() + ']';
-        result = result + ',' + dateSubString;
+      for (let i = monthCount - 1; i > -1; i--) {
+        result = result + ',' + this.subtractMonthFromDate(i);
       }
       return ('[' + result.substr(1, result.length).trim() + ']').toString();
     },
 
     floatingAddition(number1, number2) {
       return parseFloat((parseFloat(number1) + parseFloat(number2)).toFixed(2));
+    },
+
+    subtractMonthFromDate(n) {
+      const d = new Date();
+
+      if (n === 0) {
+        // Same month. Extract month number & date
+        return '[' + (d.getMonth() + 1) + ',' + d.getFullYear() + ']';
+      } else {
+        const month = d.getMonth();
+        d.setMonth(d.getMonth() - n);
+        while (d.getMonth() === month) {
+          d.setDate(d.getDate() - n);
+        }
+        return '[' + (d.getMonth() + 1) + ',' + d.getFullYear() + ']';
+      }
     },
 
     setChartData(data) {

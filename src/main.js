@@ -60,11 +60,6 @@ Vue.prototype.financialYearList = () => {
 // Set current financial year from generated list
 Vue.prototype.currentlySelectedFinancialYear = localStorage['financial-year'];
 
-// Define display date formats using momentjs
-Vue.prototype.relativeDate = function (date) {
-  return date;
-};
-
 Vue.prototype.calendarDate = function (date) {
   const dateObj = new Date(date).toDateString().split(' ');
   return dateObj[2] + ' ' + dateObj[1] + ', ' + dateObj[3];
