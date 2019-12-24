@@ -853,7 +853,7 @@ export default {
 
   beforeRouteEnter(to, from, next) {
     next(
-      vm => vm.$http.get(process.env.VUE_APP_REST_URL + '/invoices/' + to.params.id,
+      (vm) => vm.$http.get(process.env.VUE_APP_REST_URL + '/invoices/' + to.params.id,
         {
           headers: {
             'Content-Type': 'application/json; charset=utf-8'
@@ -865,7 +865,7 @@ export default {
     );
 
     next(
-      vm => vm.$http.get(process.env.VUE_APP_REST_URL + '/invoice_notifications?invoice_id=' + to.params.id,
+      (vm) => vm.$http.get(process.env.VUE_APP_REST_URL + '/invoice_notifications?invoice_id=' + to.params.id,
         {
           headers: {
             'Content-Type': 'application/json; charset=utf-8'

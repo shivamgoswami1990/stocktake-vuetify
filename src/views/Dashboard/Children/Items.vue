@@ -234,7 +234,7 @@ export default {
 
     editItem(item) {
       this.editedIndex = this.perfumes.indexOf(item);
-      this.editedItem = Object.assign({}, item);
+      this.editedItem = { ...item };
       this.dialog = true;
     },
 
@@ -265,7 +265,7 @@ export default {
     close() {
       this.dialog = false;
       setTimeout(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
+        this.editedItem = { ...this.defaultItem };
         this.editedIndex = -1;
       }, 300);
     },

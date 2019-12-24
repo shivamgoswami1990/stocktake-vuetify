@@ -105,7 +105,7 @@ export default {
   beforeRouteEnter(to, from, next) {
     // Monthly Chart API
     next(
-      vm => vm.$http.post(process.env.VUE_APP_REST_URL + '/historical_data',
+      (vm) => vm.$http.post(process.env.VUE_APP_REST_URL + '/historical_data',
         JSON.stringify({
           date_list: vm.generateMonthAndYearRange(3)
         }),

@@ -241,7 +241,7 @@ export default {
 
   beforeRouteEnter(to, from, next) {
     next(
-      vm => vm.$http.get(process.env.VUE_APP_REST_URL + '/companies',
+      (vm) => vm.$http.get(process.env.VUE_APP_REST_URL + '/companies',
         {
           headers: {
             'Content-Type': 'application/json; charset=utf-8'
@@ -253,7 +253,7 @@ export default {
     );
 
     next(
-      vm => vm.$http.get(process.env.VUE_APP_REST_URL + '/customers',
+      (vm) => vm.$http.get(process.env.VUE_APP_REST_URL + '/customers',
         {
           headers: {
             'Content-Type': 'application/json; charset=utf-8'
@@ -447,10 +447,10 @@ export default {
               + parseFloat(invoice.tax_summary.hsn_summary_total.total_combined_tax_amount);
           }
 
-          if (invoice.tax_summary.hsn_summary_total.total_taxable_value !== undefined &&
-            invoice.tax_summary.hsn_summary_total.total_taxable_value !== null) {
-            vm.summary.taxable_value = parseFloat(vm.summary.taxable_value) +
-              parseFloat(invoice.tax_summary.hsn_summary_total.total_taxable_value);
+          if (invoice.tax_summary.hsn_summary_total.total_taxable_value !== undefined
+            && invoice.tax_summary.hsn_summary_total.total_taxable_value !== null) {
+            vm.summary.taxable_value = parseFloat(vm.summary.taxable_value)
+              + parseFloat(invoice.tax_summary.hsn_summary_total.total_taxable_value);
           } else {
             vm.summary.taxable_value = 0.00;
           }

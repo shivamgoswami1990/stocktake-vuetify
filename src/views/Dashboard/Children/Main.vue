@@ -71,7 +71,7 @@ export default {
   beforeRouteEnter(to, from, next) {
     // Statistics API
     next(
-      vm => vm.$http.get(process.env.VUE_APP_REST_URL + '/statistics?by_financial_year='
+      (vm) => vm.$http.get(process.env.VUE_APP_REST_URL + '/statistics?by_financial_year='
         + vm.currentlySelectedFinancialYear,
       {
         headers: {
@@ -88,7 +88,7 @@ export default {
     // Recent invoices API
     // If params - financial_year - is passed via login use that to make the API cal.
     next(
-      vm => vm.$http.get(process.env.VUE_APP_REST_URL + '/recent_invoices?by_user_id='
+      (vm) => vm.$http.get(process.env.VUE_APP_REST_URL + '/recent_invoices?by_user_id='
           + JSON.parse(localStorage.user_info).id + '&financial_year=' + vm.currentlySelectedFinancialYear,
       {
         headers: {

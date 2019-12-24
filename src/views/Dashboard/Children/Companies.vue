@@ -147,9 +147,9 @@ export default {
       valid: false,
       show: false,
       rules: {
-        required: value => !!value || 'Required.',
-        counter: value => value.length <= 30 || 'Max 30 characters',
-        min: v => v.length >= 8 || 'Min 8 characters',
+        required: (value) => !!value || 'Required.',
+        counter: (value) => value.length <= 30 || 'Max 30 characters',
+        min: (v) => v.length >= 8 || 'Min 8 characters',
         postcode: (v) => {
           if (v !== undefined && v !== null) {
             if (v.length > 0) {
@@ -159,8 +159,8 @@ export default {
           }
           return true;
         },
-        gstin: v => v.length === 15 || 'Exact 15 characters',
-        pan: v => v.length === 10 || 'Exact 10 characters',
+        gstin: (v) => v.length === 15 || 'Exact 15 characters',
+        pan: (v) => v.length === 10 || 'Exact 10 characters',
         email: (v) => {
           if (v !== undefined && v !== null) {
             if (v.length > 0) {
@@ -265,7 +265,7 @@ export default {
 
   beforeRouteEnter(to, from, next) {
     next(
-      vm => vm.$http.get(process.env.VUE_APP_REST_URL + '/companies?financial_year='
+      (vm) => vm.$http.get(process.env.VUE_APP_REST_URL + '/companies?financial_year='
         + vm.currentlySelectedFinancialYear,
       {
         headers: {
@@ -286,7 +286,7 @@ export default {
 
     editItem(item) {
       this.editedIndex = this.companies.indexOf(item);
-      this.editedCompany = Object.assign({}, item);
+      this.editedCompany = { ...item };
       this.dialog = true;
     },
 
@@ -324,7 +324,7 @@ export default {
     close() {
       this.dialog = false;
       setTimeout(() => {
-        this.editedCompany = Object.assign({}, this.defaultCompany);
+        this.editedCompany = { ...this.defaultCompany };
         this.editedIndex = -1;
       }, 300);
     },

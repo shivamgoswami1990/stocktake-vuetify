@@ -130,7 +130,7 @@ export default {
   beforeRouteEnter(to, from, next) {
     // Get the notification count
     next(
-      vm => vm.$http.get(process.env.VUE_APP_REST_URL + '/unread_notification_count?user_id='
+      (vm) => vm.$http.get(process.env.VUE_APP_REST_URL + '/unread_notification_count?user_id='
         + vm.userDetails().id,
       {
         headers: {

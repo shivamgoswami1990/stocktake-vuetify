@@ -101,7 +101,7 @@ export default {
 
   computed: {
     filteredItems() {
-      return this.items.filter(item => item.item_name.toLowerCase()
+      return this.items.filter((item) => item.item_name.toLowerCase()
         .indexOf(this.searchTerm.toLowerCase()) > -1);
     }
   },

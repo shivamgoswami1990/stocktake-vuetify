@@ -226,9 +226,9 @@ export default {
       valid: false,
       show: false,
       rules: {
-        required: value => !!value || 'Required.',
-        counter: value => this.validateFormRules(value, 'lte', 50, 'Max 50 characters'),
-        min: v => this.validateFormRules(v, 'gte', 8, 'Min 8 characters'),
+        required: (value) => !!value || 'Required.',
+        counter: (value) => this.validateFormRules(value, 'lte', 50, 'Max 50 characters'),
+        min: (v) => this.validateFormRules(v, 'gte', 8, 'Min 8 characters'),
         email: (value) => {
           const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
           return pattern.test(value) || 'Invalid e-mail.';
@@ -360,7 +360,7 @@ export default {
 
   beforeRouteEnter(to, from, next) {
     next(
-      vm => vm.$http.get(process.env.VUE_APP_REST_URL + '/users?financial_year='
+      (vm) => vm.$http.get(process.env.VUE_APP_REST_URL + '/users?financial_year='
         + vm.currentlySelectedFinancialYear,
       {
         headers: {
@@ -381,7 +381,7 @@ export default {
 
     editUser(item) {
       this.editedIndex = this.users.indexOf(item);
-      this.editedUser = Object.assign({}, item);
+      this.editedUser = { ...item };
       this.dialog = true;
     },
 
@@ -418,7 +418,7 @@ export default {
     close() {
       this.dialog = false;
       setTimeout(() => {
-        this.editedUser = Object.assign({}, this.defaultUser);
+        this.editedUser = { ...this.defaultUser };
         this.editedIndex = -1;
       }, 300);
     },

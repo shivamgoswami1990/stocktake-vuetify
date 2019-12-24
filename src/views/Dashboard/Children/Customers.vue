@@ -212,9 +212,9 @@ export default {
       valid: false,
       show: false,
       rules: {
-        required: value => !!value || 'Required.',
-        counter: v => this.validateFormRules(v, 'lte', 20, 'Max 20 characters'),
-        min: v => this.validateFormRules(v, 'gte', 8, 'Min 8 characters'),
+        required: (value) => !!value || 'Required.',
+        counter: (v) => this.validateFormRules(v, 'lte', 20, 'Max 20 characters'),
+        min: (v) => this.validateFormRules(v, 'gte', 8, 'Min 8 characters'),
         postcode: (v) => {
           if (v !== undefined && v !== null) {
             if (v.length > 0) {
@@ -233,7 +233,7 @@ export default {
           }
           return true;
         },
-        pan: v => this.validatePan(v, 10, 'Exact 10 digits'),
+        pan: (v) => this.validatePan(v, 10, 'Exact 10 digits'),
         email: (v) => {
           if (v !== undefined && v !== null) {
             if (v.length > 0) {
@@ -384,7 +384,7 @@ export default {
 
     editItem(item) {
       this.editedIndex = this.customers.indexOf(item);
-      this.editedCustomer = Object.assign({}, item);
+      this.editedCustomer = { ...item };
       this.dialog = true;
     },
 
@@ -475,7 +475,7 @@ export default {
     close() {
       this.dialog = false;
       setTimeout(() => {
-        this.editedCustomer = Object.assign({}, this.defaultCustomer);
+        this.editedCustomer = { ...this.defaultCustomer };
         this.editedIndex = -1;
       }, 300);
     },

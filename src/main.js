@@ -170,7 +170,7 @@ Vue.prototype.convertToCSV = (filename, rows) => {
 new Vue({
   router,
   vuetify,
-  render: h => h(App),
+  render: (h) => h(App),
 }).$mount('#app');
 
 /* check for logged in user details before any transition */

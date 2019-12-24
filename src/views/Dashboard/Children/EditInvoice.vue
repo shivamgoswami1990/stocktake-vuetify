@@ -943,7 +943,7 @@ export default {
     return {
       editInvoiceFormValid: false,
       rules: {
-        required: value => !!value || 'Required.'
+        required: (value) => !!value || 'Required.'
       },
       printInvoiceComponent: null,
       customerBookComponent: null,
@@ -1107,7 +1107,7 @@ export default {
 
   beforeRouteEnter(to, from, next) {
     next(
-      vm1 => vm1.$http.get(process.env.VUE_APP_REST_URL + '/invoices/' + to.params.id,
+      (vm1) => vm1.$http.get(process.env.VUE_APP_REST_URL + '/invoices/' + to.params.id,
         {
           headers: {
             'Content-Type': 'application/json; charset=utf-8'
