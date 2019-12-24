@@ -169,7 +169,7 @@ export default {
             fill: false
           },
           {
-            label: 'Mazic Fragrances',
+            label: 'Mazic Fragrances Delhi',
             borderColor: '#2196F3',
             data: [],
             pointBorderWidth: 4,
@@ -183,7 +183,15 @@ export default {
             pointBorderWidth: 4,
             pointBackgroundColor: '#4CAF50',
             fill: false
-          }
+          },
+          {
+            label: 'Mazic Fragrances Loni',
+            borderColor: '#FF5252',
+            data: [],
+            pointBorderWidth: 4,
+            pointBackgroundColor: '#FF5252',
+            fill: false
+          },
         ]
       };
       vm.monthlyRevenueData = {
@@ -198,7 +206,7 @@ export default {
             fill: false
           },
           {
-            label: 'Mazic Fragrances',
+            label: 'Mazic Fragrances Delhi',
             borderColor: '#2196F3',
             data: [],
             pointBorderWidth: 4,
@@ -212,7 +220,15 @@ export default {
             pointBorderWidth: 4,
             pointBackgroundColor: '#4CAF50',
             fill: false
-          }
+          },
+          {
+            label: 'Mazic Fragrances Loni',
+            borderColor: '#FF5252',
+            data: [],
+            pointBorderWidth: 4,
+            pointBackgroundColor: '#FF5252',
+            fill: false
+          },
         ]
       };
 
@@ -233,6 +249,9 @@ export default {
           } else if (stat.company_id === 3) {
             vm.monthlyCountData.datasets[2].data.push(stat.invoice_count);
             vm.monthlyRevenueData.datasets[2].data.push(stat.invoice_revenue);
+          } else if (stat.company_id === 4) {
+            vm.monthlyCountData.datasets[3].data.push(stat.invoice_count);
+            vm.monthlyRevenueData.datasets[3].data.push(stat.invoice_revenue);
           }
         });
       });
