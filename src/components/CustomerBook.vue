@@ -17,53 +17,58 @@
 
         <div class="px-4 py-0">
           <v-textarea name="Customer notes" label="Customer notes" solo auto-grow v-model="notes"
-                      flat hide-details class="pb-1" rows="1"></v-textarea>
+                      flat hide-details class="pb-1" rows="3"></v-textarea>
 
           <v-btn block dark color="black" @click="saveCustomerNotes" :loading="isNotesSaving">
             Save notes
           </v-btn>
         </div>
 
-        <v-layout align-center fill-height justify-center v-if="isDataLoading">
-          <v-progress-circular indeterminate color="primary" :size="70"
-                               :width="7"></v-progress-circular>
-        </v-layout>
+        <!-- Recently ordered items -->
+        <div class="pt-5">
+          <v-layout align-center fill-height justify-center v-if="isRecentItemsDataLoading">
+            <v-progress-circular indeterminate color="primary" :size="70"
+                                 :width="7"></v-progress-circular>
+          </v-layout>
 
-        <div class="px-4">
-          <v-text-field placeholder="Filter by name ..." v-model="searchTerm"
-                        autofocus hide-details flat></v-text-field>
-          <h3 class="pt-2">Showing {{items.length}} ordered items</h3>
-        </div>
-        <div v-if="filteredItems.length > 0">
-          <div v-for="(item, key) in filteredItems" :key="key" class="px-4 pb-2">
+          <v-divider></v-divider>
+          <h3 class="text-center headline black--text py-2">Recently ordered items</h3>
 
-            <v-card color="black" dark tile>
-              <v-card-title class="body-2">{{item.item_name}}</v-card-title>
+          <div v-if="recentlyOrderedItems.length > 0">
+            <div v-for="(item, key) in recentlyOrderedItems" :key="key" class="px-4 pb-2">
 
-              <v-card-text class="pa-0">
-                <v-simple-table light>
-                  <thead>
-                  <tr>
-                    <th v-for="header in headers" :key="header.value">{{header.text}}</th>
-                  </tr>
-                  </thead>
+              <v-card color="black" dark tile>
+                <v-card-title class="body-2">{{item[0].item_name}}</v-card-title>
 
-                  <tbody>
-                  <!-- Items row -->
-                  <tr v-for="(item, index) in item.subitems" :key="index">
-                    <td>{{item.price_per_kg}}/{{item.units_for_display}}</td>
-                    <td>{{parseFloat(item.packaging, 10) < 1000 ? item.packaging + ' gm' : parseFloat(item.packaging, 10) / 1000  + ' kg'}}</td>
-                    <td>{{calendarDate(item.created_at)}}</td>
-                  </tr>
-                  </tbody>
-                </v-simple-table>
-              </v-card-text>
-            </v-card>
+                <v-card-text class="pa-0">
+                  <v-simple-table light>
+                    <thead>
+                    <tr>
+                      <th v-for="header in headers" :key="header.value">{{header.text}}</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <!-- Items row -->
+                    <tr v-for="(subitem, index) in item" :key="index">
+                      <td>{{subitem.price_per_kg}}</td>
+                      <td>{{parseFloat(subitem.packaging, 10) < 1000 ? subitem.packaging + ' gm' : parseFloat(subitem.packaging, 10) / 1000  + ' kg'}}</td>
+                      <td>{{calendarDate(subitem.order_date)}}</td>
+                    </tr>
+                    </tbody>
+                  </v-simple-table>
+                </v-card-text>
+              </v-card>
+            </div>
           </div>
-        </div>
 
-        <v-card-title primary-title v-else class="justify-center title">No items found
-        </v-card-title>
+          <v-card-title primary-title v-else class="justify-center title">
+            No items found
+          </v-card-title>
+        </div>
+        <!-- Recently ordered items -->
+
+
       </v-card-text>
     </v-card>
   </v-navigation-drawer>
@@ -74,17 +79,17 @@ export default {
   data() {
     return {
       showDrawer: false,
-      isDataLoading: true,
+      isRecentItemsDataLoading: true,
       isNotesSaving: false,
       isSampleCommentLoading: false,
       isExportDataLoading: false,
       notes: '',
-      items: [],
+      recentlyOrderedItems: [],
       dataForExport: [],
       searchTerm: '',
       headers: [
         {
-          text: 'Price(₹)',
+          text: 'Price(₹)/kg',
           value: 'price_per_kg'
         },
         {
@@ -99,13 +104,6 @@ export default {
     };
   },
 
-  computed: {
-    filteredItems() {
-      return this.items.filter((item) => item.item_name.toLowerCase()
-        .indexOf(this.searchTerm.toLowerCase()) > -1);
-    }
-  },
-
   mounted() {
     const vm = this;
 
@@ -115,56 +113,27 @@ export default {
     }
     vm.showDrawer = true;
     vm.notes = vm.$attrs.data.notes;
-    vm.loadItems();
+    vm.loadOrderedItems();
   },
 
   methods: {
-    loadItems() {
+    loadOrderedItems() {
       const vm = this;
-      vm.isDataLoading = true;
-      vm.$http.get(process.env.VUE_APP_REST_URL + '/customers/' + vm.$attrs.data.id
-          + '/all_ordered_items',
+      vm.isRecentItemsDataLoading = true;
+      vm.$http.get(process.env.VUE_APP_REST_URL + '/ordered_items?customer_id='
+        + vm.$attrs.data.id + '&recent_items=true',
       {
         headers: {
           'Content-Type': 'application/json; charset=utf-8'
         }
       })
         .then((response) => {
-          vm.isDataLoading = false;
-          vm.items = vm.groupItemsByName(response.data);
+          vm.isRecentItemsDataLoading = false;
+          vm.recentlyOrderedItems = Object.values(response.data);
+          console.log(response.data);
         }, (response) => {
-          vm.isDataLoading = false;
+          vm.isRecentItemsDataLoading = false;
         });
-    },
-
-    groupItemsByName(items) {
-      const groupedItems = [];
-      items.forEach((item) => {
-        // Check grouped items list for any existing entries
-        if (groupedItems.length > 0) {
-          let itemMatched = false;
-          groupedItems.forEach((groupedItem) => {
-            if (groupedItem.item_name === item.item_name) {
-              groupedItem.subitems.push(item);
-              itemMatched = true;
-            }
-          });
-
-          if (!itemMatched) {
-            // Push as a new item
-            groupedItems.push({
-              item_name: item.item_name,
-              subitems: [item]
-            });
-          }
-        } else {
-          groupedItems.push({
-            item_name: item.item_name,
-            subitems: [item]
-          });
-        }
-      });
-      return groupedItems;
     },
 
     saveCustomerNotes() {
@@ -253,7 +222,7 @@ export default {
               vm.isExportDataLoading = false;
             });
         }, (response) => {
-          vm.isDataLoading = false;
+          vm.isRecentItemsDataLoading = false;
         });
     }
   }
