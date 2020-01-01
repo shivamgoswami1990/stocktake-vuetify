@@ -1,73 +1,64 @@
 <template>
   <v-navigation-drawer v-model="showDrawer" right fixed temporary width="500">
     <v-card flat color="secondary">
-      <v-btn color="info" fab x-small depressed @click="exportToCSV"
-             style="position: absolute; right: 50px; top: 10px">
-        <v-icon>mdi-cloud-download</v-icon>
-      </v-btn>
+<!--      <v-btn color="info" fab x-small depressed @click="exportToCSV"-->
+<!--             style="position: absolute; right: 50px; top: 10px">-->
+<!--        <v-icon>mdi-cloud-download</v-icon>-->
+<!--      </v-btn>-->
       <v-btn dark color="black" x-small fab depressed @click="showDrawer = false"
              style="position: absolute; right: 10px; top: 10px">
         <v-icon>mdi-close</v-icon>
       </v-btn>
 
-      <v-card-title class="justify-center title">Customer book</v-card-title>
       <v-card-title class="justify-center title">{{$attrs.data.name}}</v-card-title>
 
-      <v-card-text class="pa-0 pb-2">
+      <v-card-text>
 
-        <div class="px-4 py-0">
-          <v-textarea name="Customer notes" label="Customer notes" solo auto-grow v-model="notes"
-                      flat hide-details class="pb-1" rows="3"></v-textarea>
+        <v-tabs v-model="tabs" centered dark icons-and-text>
+          <v-tabs-slider></v-tabs-slider>
 
-          <v-btn block dark color="black" @click="saveCustomerNotes" :loading="isNotesSaving">
-            Save notes
-          </v-btn>
-        </div>
+          <v-tab href="#search-items">
+            Search
+            <v-icon>mdi-card-search</v-icon>
+          </v-tab>
 
-        <!-- Recently ordered items -->
-        <div class="pt-5">
-          <v-layout align-center fill-height justify-center v-if="isRecentItemsDataLoading">
-            <v-progress-circular indeterminate color="primary" :size="70"
-                                 :width="7"></v-progress-circular>
-          </v-layout>
+          <v-tab href="#recent-items" @click="recentOrderedItemsTabClicked">
+            Recent
+            <v-icon>mdi-history</v-icon>
+          </v-tab>
 
-          <v-divider></v-divider>
-          <h3 class="text-center headline black--text py-2">Recently ordered items</h3>
+          <v-tab href="#notes">
+            Notes
+            <v-icon>mdi-clipboard-text</v-icon>
+          </v-tab>
+        </v-tabs>
 
-          <div v-if="recentlyOrderedItems.length > 0">
-            <div v-for="(item, key) in recentlyOrderedItems" :key="key" class="px-4 pb-2">
+        <v-tabs-items v-model="tabs">
+          <v-tab-item value="search-items">
+            <v-text-field label="Search ordered items" v-model="searchTerm" flat color="black"
+                          :loading="isSearchedItemsLoading" solo hide-details clearable
+                          @input="searchRecentlyOrderedItems">
+            </v-text-field>
+            <customer-book-item-results :items="searchedOrderedItems" :is-search-list="true"
+                                        :loading="isSearchedItemsLoading" />
+          </v-tab-item>
 
-              <v-card color="black" dark tile>
-                <v-card-title class="body-2">{{item[0].item_name}}</v-card-title>
+          <v-tab-item value="recent-items">
+            <customer-book-item-results :items="recentlyOrderedItems" :is-search-list="false"
+                                        :loading="isRecentItemsDataLoading" />
+          </v-tab-item>
 
-                <v-card-text class="pa-0">
-                  <v-simple-table light>
-                    <thead>
-                    <tr>
-                      <th v-for="header in headers" :key="header.value">{{header.text}}</th>
-                    </tr>
-                    </thead>
+          <v-tab-item value="notes">
+            <v-textarea name="Customer notes" label="Customer notes" solo auto-grow v-model="notes"
+                        flat hide-details class="pb-1" rows="10">
+            </v-textarea>
 
-                    <tbody>
-                    <!-- Items row -->
-                    <tr v-for="(subitem, index) in item" :key="index">
-                      <td>{{subitem.price_per_kg}}</td>
-                      <td>{{parseFloat(subitem.packaging, 10) < 1000 ? subitem.packaging + ' gm' : parseFloat(subitem.packaging, 10) / 1000  + ' kg'}}</td>
-                      <td>{{calendarDate(subitem.order_date)}}</td>
-                    </tr>
-                    </tbody>
-                  </v-simple-table>
-                </v-card-text>
-              </v-card>
-            </div>
-          </div>
-
-          <v-card-title primary-title v-else class="justify-center title">
-            No items found
-          </v-card-title>
-        </div>
-        <!-- Recently ordered items -->
-
+            <v-btn block dark color="black" @click="saveCustomerNotes" tile
+                   :loading="isNotesSaving">
+              Save notes
+            </v-btn>
+          </v-tab-item>
+        </v-tabs-items>
 
       </v-card-text>
     </v-card>
@@ -75,49 +66,36 @@
 </template>
 
 <script>
+import CustomerBookItemResults from './CustomerBookItemResults.vue';
+
 export default {
   data() {
     return {
       showDrawer: false,
+      tabs: null,
+      recentlyOrderedItems: [],
       isRecentItemsDataLoading: true,
+      notes: '',
       isNotesSaving: false,
+      searchTerm: '',
+      isSearchedItemsLoading: false,
+      searchedOrderedItems: [],
+
       isSampleCommentLoading: false,
       isExportDataLoading: false,
-      notes: '',
-      recentlyOrderedItems: [],
       dataForExport: [],
-      searchTerm: '',
-      headers: [
-        {
-          text: 'Price(₹)/kg',
-          value: 'price_per_kg'
-        },
-        {
-          text: 'Packaging',
-          value: 'packaging'
-        },
-        {
-          text: 'Date',
-          value: 'created_at'
-        }
-      ]
     };
   },
 
+  components: { CustomerBookItemResults },
+
   mounted() {
     const vm = this;
-
-    // Remove the action column in data table for add item to invoice
-    if (!vm.$attrs.showAddItemBtn) {
-      vm.headers.splice(3, 1);
-    }
     vm.showDrawer = true;
-    vm.notes = vm.$attrs.data.notes;
-    vm.loadOrderedItems();
   },
 
   methods: {
-    loadOrderedItems() {
+    recentOrderedItemsTabClicked() {
       const vm = this;
       vm.isRecentItemsDataLoading = true;
       vm.$http.get(process.env.VUE_APP_REST_URL + '/ordered_items?customer_id='
@@ -130,10 +108,37 @@ export default {
         .then((response) => {
           vm.isRecentItemsDataLoading = false;
           vm.recentlyOrderedItems = Object.values(response.data);
-          console.log(response.data);
         }, (response) => {
           vm.isRecentItemsDataLoading = false;
         });
+    },
+
+    searchRecentlyOrderedItems() {
+      const vm = this;
+
+      if (vm.searchTerm !== undefined && vm.searchTerm !== null) {
+        if (vm.searchTerm.length > 2) {
+          vm.isSearchedItemsLoading = true;
+          vm.$http.get(process.env.VUE_APP_REST_URL + '/ordered_items?customer_id='
+            + vm.$attrs.data.id + '&search_term=' + vm.searchTerm,
+          {
+            headers: {
+              'Content-Type': 'application/json; charset=utf-8'
+            }
+          })
+            .then((response) => {
+              vm.isSearchedItemsLoading = false;
+              vm.searchedOrderedItems = Object.values(response.data);
+              console.log(response.data);
+            }, (response) => {
+              vm.isSearchedItemsLoading = false;
+            });
+        } else {
+          vm.searchedOrderedItems = [];
+        }
+      } else {
+        vm.searchedOrderedItems = [];
+      }
     },
 
     saveCustomerNotes() {
