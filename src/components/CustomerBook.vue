@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer v-model="showDrawer" right fixed temporary width="500">
+  <v-navigation-drawer v-model="showDrawer" right fixed temporary width="800">
     <v-card flat color="secondary">
 <!--      <v-btn color="info" fab x-small depressed @click="exportToCSV"-->
 <!--             style="position: absolute; right: 50px; top: 10px">-->
