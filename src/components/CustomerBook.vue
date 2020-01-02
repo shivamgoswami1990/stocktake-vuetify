@@ -40,12 +40,14 @@
                           @input="searchRecentlyOrderedItems">
             </v-text-field>
             <customer-book-item-results :items="searchedOrderedItems" :is-search-list="true"
-                                        :loading="isSearchedItemsLoading" />
+                                        :loading="isSearchedItemsLoading"
+                                        :customer_id="$attrs.data.id"/>
           </v-tab-item>
 
           <v-tab-item value="recent-items">
             <customer-book-item-results :items="recentlyOrderedItems" :is-search-list="false"
-                                        :loading="isRecentItemsDataLoading" />
+                                        :loading="isRecentItemsDataLoading"
+                                        :customer_id="$attrs.data.id" />
           </v-tab-item>
 
           <v-tab-item value="notes">
@@ -129,7 +131,6 @@ export default {
             .then((response) => {
               vm.isSearchedItemsLoading = false;
               vm.searchedOrderedItems = Object.values(response.data);
-              console.log(response.data);
             }, (response) => {
               vm.isSearchedItemsLoading = false;
             });

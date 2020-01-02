@@ -5,7 +5,78 @@
       </v-progress-circular>
     </v-layout>
 
-    <v-overlay opacity="0.8" :value="false"></v-overlay>
+    <!-- Add new item form -->
+    <v-overlay opacity="0.8" :value="showAddNewItemForm">
+      <v-layout align-center justify-center fill-height wrap>
+        <v-form ref="form" v-model="valid" lazy-validation @submit.prevent="save">
+          <v-card flat light tile width="500px">
+            <v-card-title class="text-center">Add new item</v-card-title>
+            <v-card-text>
+
+              <v-container>
+                <v-layout wrap>
+
+                  <v-flex sm8 md8>
+                    <v-text-field v-model="newSubitem.item_name" :rules="[rules.required]"
+                                  label="Name" clearable class="pa-1">
+                    </v-text-field>
+                  </v-flex>
+
+                  <v-flex sm4 md4>
+                    <v-text-field v-model="newSubitem.item_price" type="number"
+                                  label="Price" clearable class="pa-1">
+                    </v-text-field>
+                  </v-flex>
+
+                  <v-flex sm6 md6>
+                    <v-text-field v-model="newSubitem.packaging" type="number" :rules="[rules.required]"
+                                  label="Packaging" clearable class="pa-1">
+                    </v-text-field>
+                  </v-flex>
+
+                  <v-flex sm6 md6>
+                    <v-text-field v-model="newSubitem.no_of_items" type="number"
+                                  label="No of items" clearable class="pa-1">
+                    </v-text-field>
+                  </v-flex>
+
+                  <v-flex sm6 md6>
+                    <v-text-field v-model="newSubitem.price_per_kg" type="number" :rules="[rules.required]"
+                                  label="Price/kg" clearable class="pa-1">
+                    </v-text-field>
+                  </v-flex>
+
+                  <v-flex sm6 md6>
+                    <v-text-field v-model="newSubitem.item_hsn"
+                                  label="HSN" clearable class="pa-1">
+                    </v-text-field>
+                  </v-flex>
+
+                  <v-flex sm6 md6>
+                    <v-text-field v-model="newSubitem.item_amount" type="number"
+                                  label="Amount" clearable class="pa-1">
+                    </v-text-field>
+                  </v-flex>
+                </v-layout>
+              </v-container>
+
+            </v-card-text>
+
+            <v-card-actions>
+              <v-btn color="secondary" depressed width="49%"
+                     @click.native="showAddNewItemForm = false">Cancel</v-btn>
+              <v-btn color="primary" depressed width="50%"
+                     @click.native="createNewItem(true)">Save</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-form>
+      </v-layout>
+    </v-overlay>
+    <!-- Add new item form -->
+
+    <v-btn block tile color="gray" dark @click="addNewSubitemForItem(null)">
+      Add new item
+    </v-btn>
     <div v-if="$attrs.items.length > 0">
       <div v-for="(item, itemIndex) in $attrs.items" :key="itemIndex">
 
@@ -13,7 +84,8 @@
           <v-card-title class="body-2">
             {{item[0].item_name}}
             <v-spacer/>
-            <a style="text-decoration: underline" class="white--text">
+            <a style="text-decoration: underline" class="white--text"
+               @click="addNewSubitemForItem(itemIndex)">
               Add new - {{item[0].item_name}}
             </a>
           </v-card-title>
@@ -82,9 +154,12 @@
 
                 <td>{{subitem.user.first_name}}</td>
 
-                <td>{{subitem.company.name}}</td>
                 <td>
-                  <a style="text-decoration: underline"
+                  <span v-if="subitem.company">{{subitem.company.name}}</span>
+                </td>
+
+                <td>
+                  <a style="text-decoration: underline" v-if="subitem.invoice_id"
                      @click="$router.push({ name: 'viewInvoice', params: { id: subitem.invoice_id}})">
                     View
                   </a>
@@ -98,7 +173,7 @@
                   </v-btn>
 
                   <v-btn tile elevation="0" small color="primary" class="ma-2"
-                         @click="saveOrderedItem(subitem, subitem.price_per_kg, subitem.packaging)"
+                         @click="saveOrderedItem(subitem)"
                          v-if="subitem.id === editedItemId && subitem.id !== deletedItemId">
                     Save
                   </v-btn>
@@ -186,20 +261,24 @@ export default {
       isEditButtonClicked: false,
       deletedItemId: null,
       isDeleteButtonClicked: false,
+      rules: {
+        required: (value) => !!value || 'Required.'
+      },
       toastMessage: '',
       toastTimeout: 5000,
       toastColor: '',
       showToast: false,
+      newSubitem: {},
+      valid: false,
+      showAddNewItemForm: false
     };
   },
   methods: {
     editButtonClicked(subitemId) {
       this.editedItemId = subitemId;
-      console.log(this.editedItemId);
     },
     deleteButtonClicked(subitemId) {
       this.deletedItemId = subitemId;
-      console.log(this.deletedItemId);
     },
     setEditAndDeleteButtonInitialState() {
       this.editedItemId = null;
@@ -239,9 +318,12 @@ export default {
           vm.toastMessage = 'Successfully deleted item';
           vm.toastColor = 'success';
         }, (response) => {
+          this.showToast = true;
+          this.toastMessage = 'Something went wrong';
+          this.toastColor = 'error';
         });
     },
-    saveOrderedItem(subitem, pricePerKg, packaging) {
+    saveOrderedItem(subitem) {
       const vm = this;
 
       vm.$http.patch(process.env.VUE_APP_REST_URL + '/ordered_items/' + subitem.id,
@@ -266,7 +348,80 @@ export default {
           vm.toastMessage = 'Successfully updated item';
           vm.toastColor = 'success';
         }, (response) => {
+          this.showToast = true;
+          this.toastMessage = 'Something went wrong';
+          this.toastColor = 'error';
         });
+    },
+    addNewSubitemForItem(itemIndex) {
+      // Copy item name & key from the current item
+      const currentDate = new Date();
+
+      this.newSubitem = {
+        item_name: null,
+        name_key: null,
+        item_price: 0,
+        packaging: 0,
+        no_of_items: 0,
+        price_per_kg: 0,
+        item_hsn: '',
+        item_amount: 0,
+        order_date: currentDate.toISOString().split('T')[0],
+        user_id: this.userDetails().id,
+        customer_id: this.$attrs.customer_id,
+        invoice_id: null,
+        parent_item_index: null
+      };
+
+      if (itemIndex !== undefined && itemIndex !== null) {
+        this.newSubitem.item_name = this.$attrs.items[itemIndex][0].item_name;
+        this.newSubitem.name_key = this.$attrs.items[itemIndex][0].name_key;
+        this.newSubitem.parent_item_index = itemIndex;
+      }
+
+      this.showAddNewItemForm = true;
+    },
+    createNewItem() {
+      const vm = this;
+      if (this.$refs.form.validate()) {
+        vm.$http.post(process.env.VUE_APP_REST_URL + '/ordered_items',
+          {
+            item_name: vm.newSubitem.item_name,
+            name_key: vm.newSubitem.item_name.replace(/\s/g, '').toLowerCase(),
+            item_price: parseFloat(vm.newSubitem.item_price),
+            packaging: parseFloat(vm.newSubitem.packaging),
+            no_of_items: parseInt(vm.newSubitem.no_of_items, 10),
+            price_per_kg: parseFloat(vm.newSubitem.price_per_kg),
+            item_hsn: vm.newSubitem.item_hsn,
+            item_amount: parseFloat(vm.newSubitem.item_amount),
+            order_date: vm.newSubitem.order_date,
+            user_id: vm.newSubitem.user_id,
+            customer_id: vm.newSubitem.customer_id,
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json; charset=utf-8'
+            }
+          })
+          .then((response) => {
+            // Check if the item needs to be added to parent
+            if (vm.newSubitem.parent_item_index !== undefined && vm.newSubitem.parent_item_index !== null) {
+              vm.$attrs.items[vm.newSubitem.parent_item_index].push(response.data);
+            }
+
+            // Close the modal
+            vm.showAddNewItemForm = false;
+
+            // Show success toast
+            vm.showToast = true;
+            vm.toastMessage = 'Successfully created item';
+            vm.toastColor = 'success';
+          }, (response) => {
+            this.showToast = true;
+            this.toastMessage = 'Something went wrong';
+            this.toastColor = 'error';
+          });
+      }
     }
   }
 };
