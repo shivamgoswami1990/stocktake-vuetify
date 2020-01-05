@@ -1,10 +1,10 @@
 <template>
   <v-navigation-drawer v-model="showDrawer" right fixed temporary width="90%">
     <v-card flat color="secondary">
-<!--      <v-btn color="info" fab x-small depressed @click="exportToCSV"-->
-<!--             style="position: absolute; right: 50px; top: 10px">-->
-<!--        <v-icon>mdi-cloud-download</v-icon>-->
-<!--      </v-btn>-->
+      <v-btn color="info" fab x-small depressed @click="exportToCSV"
+             style="position: absolute; right: 50px; top: 10px">
+        <v-icon>mdi-cloud-download</v-icon>
+      </v-btn>
       <v-btn dark color="black" x-small fab depressed @click="showDrawer = false"
              style="position: absolute; right: 10px; top: 10px">
         <v-icon>mdi-close</v-icon>
@@ -39,13 +39,13 @@
                           :loading="isSearchedItemsLoading" solo hide-details clearable
                           @input="searchRecentlyOrderedItems">
             </v-text-field>
-            <customer-book-item-results :items="searchedOrderedItems" :is-search-list="true"
+            <customer-book-item-results :items="searchedOrderedItems"
                                         :loading="isSearchedItemsLoading"
                                         :customer_id="$attrs.data.id"/>
           </v-tab-item>
 
           <v-tab-item value="recent-items">
-            <customer-book-item-results :items="recentlyOrderedItems" :is-search-list="false"
+            <customer-book-item-results :items="recentlyOrderedItems"
                                         :loading="isRecentItemsDataLoading"
                                         :customer_id="$attrs.data.id" />
           </v-tab-item>
@@ -204,27 +204,27 @@ export default {
 
           // Load all the items for export
           vm.isExportDataLoading = true;
-          vm.$http.get(process.env.VUE_APP_REST_URL + '/customers/' + vm.$attrs.data.id
-              + '/all_ordered_items',
+          vm.$http.get(process.env.VUE_APP_REST_URL + '/all_ordered_items?customer_id='
+            + vm.$attrs.data.id,
           {
             headers: {
               'Content-Type': 'application/json; charset=utf-8'
             }
           })
-            .then((response) => {
+            .then((response1) => {
               vm.isExportDataLoading = false;
-              vm.dataForExport = response.data;
+              vm.dataForExport = response1.data;
               // Append only values sequentially
               vm.dataForExport.forEach((row) => {
                 reformattedSelectedArray.push([
-                  row.item_name, row.price_per_kg, row.packaging, vm.calendarDate(row.created_at)
+                  row.item_name, row.price_per_kg, row.packaging, vm.calendarDate(row.order_date)
                 ]);
               });
 
               vm.isSampleCommentLoading = false;
               // Pass the reformatted array to the CSV fn
               vm.convertToCSV(vm.$attrs.data.name + '.csv', reformattedSelectedArray);
-            }, (response) => {
+            }, (response1) => {
               vm.isExportDataLoading = false;
             });
         }, (response) => {

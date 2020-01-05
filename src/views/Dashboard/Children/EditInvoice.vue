@@ -1,5 +1,5 @@
 <template>
-  <v-card color="secondary" flat>
+  <v-card color="secondary" flat tile>
     <component :is="sampleCommentsComponent" :data="customer" />
     <component :is="customerBookComponent" :data="customer" :showAddItemBtn="false"/>
     <component :is="printInvoiceComponent" :data="printData" />
@@ -505,7 +505,8 @@
                               </v-list-item-content>
                             </template>
                             <template slot="prepend" v-if="item.wasItemPreviouslyOrdered">
-                              <v-menu v-if="item.previousOrderDetails.length > 0">
+                              <v-menu v-if="item.previousOrderDetails.length > 0"
+                                      :close-on-content-click="false">
                                 <template v-slot:activator="{ on }">
                                   <v-btn v-on="on" icon small color="primary">
                                     <v-icon size="20">mdi-emoticon-outline</v-icon>
@@ -518,32 +519,10 @@
                                     Ordered {{item.previousOrderDetails.length}} times
                                   </v-card-title>
                                   <v-card-text>
-                                    <v-list two-line dense color="secondary">
-                                      <v-list-item
-                                        v-for="(item, index) in item.previousOrderDetails"
-                                        :key="index">
-                                        <v-list-item-avatar color="primary"
-                                                            class="white--text font-weight-bold"
-                                                            size="40">
-                                          {{index+1}}
-                                        </v-list-item-avatar>
-
-                                        <v-list-item-content>
-                                          <v-list-item-title>
-                                            Price - ₹ {{item.price_per_kg}}
-                                          </v-list-item-title>
-                                          <v-list-item-subtitle>
-                                            Packaging - {{item.packaging}}
-                                          </v-list-item-subtitle>
-                                        </v-list-item-content>
-
-                                        <v-list-item-action>
-                                          <v-list-item-action-text class="font-weight-bold">
-                                            {{ calendarDate(item.created_at) }}
-                                          </v-list-item-action-text>
-                                        </v-list-item-action>
-                                      </v-list-item>
-                                    </v-list>
+                                    <customer-book-item-results :items="item.previousOrderDetails"
+                                                                :loading="false"
+                                                                :hide-add-btn="true"
+                                                                :customer_id="customer.id"/>
                                   </v-card-text>
                                 </v-card>
                                 <!-- Menu popover content -->
@@ -561,7 +540,7 @@
                         <td style="width: 15%;">
                           <v-combobox v-model="item.item_price" :items="item.price_list"
                                       item-text="price" item-value="name" type="number" hide-details
-                                      @input="setItemPriceObjectAndInitPackagingAndUnits(item)"
+                                      @change="setItemPriceObjectAndInitPackagingAndUnits(item)"
                                       prefix="₹" return-object :rules="[rules.required]">
                             <template slot="item" slot-scope="{ item }">
                               <v-list-item-content
@@ -936,6 +915,8 @@
 </template>
 
 <script>
+import CustomerBookItemResults from '../../../components/CustomerBookItemResults.vue';
+
 const writtenNumber = require('written-number');
 
 export default {
@@ -1105,6 +1086,8 @@ export default {
     };
   },
 
+  components: { CustomerBookItemResults },
+
   beforeRouteEnter(to, from, next) {
     next(
       (vm1) => vm1.$http.get(process.env.VUE_APP_REST_URL + '/invoices/' + to.params.id,
@@ -1228,7 +1211,7 @@ export default {
               // Delete all prices except litre price
               Object.keys(value).forEach((v) => {
                 if (v === 'one_tenth_price' || v === 'quarter_price' || v === 'half_price'
-                    || v === 'bulk_price' || v === 'one_tenth_piece_price  ' || v === 'quarter_piece_price'
+                    || v === 'bulk_price' || v === 'one_tenth_piece_price' || v === 'quarter_piece_price'
                     || v === 'dozen_price') {
                   delete value[v];
                 }
@@ -1330,11 +1313,11 @@ export default {
           }
 
           if (item.item_obj.quarter_piece_price !== undefined && item.item_obj.quarter_piece_price !== null) {
-            priceList.push({ name: '25gm/piece', price: item.item_obj.quarter_piece_price, weight: 25 });
+            priceList.push({ name: '100gm/piece', price: item.item_obj.quarter_piece_price, weight: 100 });
           }
 
           if (item.item_obj.one_tenth_piece_price !== undefined && item.item_obj.one_tenth_piece_price !== null) {
-            priceList.push({ name: '100gm/piece', price: item.item_obj.one_tenth_piece_price, weight: 100 });
+            priceList.push({ name: '25gm/piece', price: item.item_obj.one_tenth_piece_price, weight: 25 });
           }
 
           if (item.item_obj.litre_price !== undefined && item.item_obj.litre_price !== null) {
@@ -1353,21 +1336,15 @@ export default {
 
       // Check if this item was previously ordered by this customer
       const vm = this;
-      this.$http.get(process.env.VUE_APP_REST_URL + '/previous_ordered_item_search_for_customer?customer_id='
-          + vm.customer.id + '&item_name=' + item.item_name,
+      this.$http.get(process.env.VUE_APP_REST_URL + '/ordered_items?customer_id='
+        + vm.customer.id + '&search_term=' + item.item_name,
       {
         headers: {
           'Content-Type': 'application/json; charset=utf-8'
         }
       }).then((response) => {
         // Match name of the entered item with the response
-        response.data.forEach((row) => {
-          if (item !== undefined && item !== null) {
-            if (item.item_name.toLowerCase().replace(/\s/g, '') === row.item_name.toLowerCase().replace(/\s/g, '')) {
-              item.previousOrderDetails.push(row);
-            }
-          }
-        });
+        item.previousOrderDetails = Object.values(response.data);
         item.wasItemPreviouslyOrdered = true;
       }, (response) => {
       });
@@ -1486,10 +1463,12 @@ export default {
           // Per kg calculation
           if (item.units_for_display === 'kg') {
             // Check if the packaging is more than 1000 gm
-            if (parseInt(item.packaging, 10) < 1000 && parseInt(item.packaging, 10) !== 500) {
+            if (parseInt(item.packaging, 10) > 0 && parseInt(item.packaging, 10) <= 100) {
               item.price_per_kg = this.floatingDivision(
                 this.floatingMultiplication(1000, item.item_price), item.packaging
               );
+            } else if (parseInt(item.packaging, 10) >= 101 && parseInt(item.packaging, 10) < 1000) {
+              item.price_per_kg = item.item_price;
             } else {
               item.price_per_kg = item.item_price;
             }

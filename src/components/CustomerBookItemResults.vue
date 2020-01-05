@@ -74,7 +74,7 @@
     </v-overlay>
     <!-- Add new item form -->
 
-    <v-btn block tile color="gray" dark @click="addNewSubitemForItem(null)">
+    <v-btn block tile color="gray" dark @click="addNewSubitemForItem(null)" v-if="!$attrs['hide-add-btn']">
       Add new item
     </v-btn>
     <div v-if="$attrs.items.length > 0">
@@ -85,7 +85,7 @@
             {{item[0].item_name}}
             <v-spacer/>
             <a style="text-decoration: underline" class="white--text"
-               @click="addNewSubitemForItem(itemIndex)">
+               @click="addNewSubitemForItem(itemIndex)" v-if="!$attrs['hide-add-btn']">
               Add new - {{item[0].item_name}}
             </a>
           </v-card-title>
@@ -159,10 +159,9 @@
                 </td>
 
                 <td>
-                  <a style="text-decoration: underline" v-if="subitem.invoice_id"
-                     @click="$router.push({ name: 'viewInvoice', params: { id: subitem.invoice_id}})">
-                    View
-                  </a>
+                  <router-link :to="{ name: 'viewInvoice', params: { id: subitem.invoice_id}}"
+                               target="_blank" v-if="subitem.invoice_id">View
+                  </router-link>
                 </td>
 
                 <td>
@@ -276,6 +275,7 @@ export default {
   methods: {
     editButtonClicked(subitemId) {
       this.editedItemId = subitemId;
+      console.log(this.$attrs);
     },
     deleteButtonClicked(subitemId) {
       this.deletedItemId = subitemId;
