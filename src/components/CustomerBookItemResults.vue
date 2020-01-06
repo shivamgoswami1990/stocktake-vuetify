@@ -103,15 +103,17 @@
               <tr v-for="(subitem, subitemIndex) in item" :key="subitemIndex"
                   :style="rowActionBackgroundColor(subitem.id, editedItemId, deletedItemId)">
 
-                <td style="width: 10%">
-                  <v-text-field v-model="subitem.item_price" v-if="subitem.id === editedItemId" solo
-                                type="number" outlined dense hide-details color="black" prefix="₹">
+                <td style="width: 12%">
+                  <v-text-field v-model="subitem.price_per_kg" v-if="subitem.id === editedItemId"
+                                solo @input="calculateItemPrice(subitem)"
+                                type="number" outlined dense hide-details color="black" suffix="/kg">
                   </v-text-field>
-                  <span v-else>{{subitem.item_price}}</span>
+                  <span v-else>{{subitem.price_per_kg}}/kg</span>
                 </td>
 
                 <td style="width: 12%">
-                  <v-text-field v-model="subitem.packaging" v-if="subitem.id === editedItemId" solo
+                  <v-text-field v-model="subitem.packaging" v-if="subitem.id === editedItemId"
+                                solo @input="calculateItemPrice(subitem)"
                                 type="number" outlined dense hide-details color="black" suffix="/gm">
                   </v-text-field>
                   <span v-else>
@@ -120,18 +122,16 @@
                   </span>
                 </td>
 
+                <td style="width: 10%">
+                  {{subitem.item_price}}
+                </td>
+
                 <td style="width: 8%">
-                  <v-text-field v-model="subitem.no_of_items" v-if="subitem.id === editedItemId" solo
+                  <v-text-field v-model="subitem.no_of_items" v-if="subitem.id === editedItemId"
+                                solo @input="calculateItemPrice(subitem)"
                                 type="number" outlined dense hide-details color="black">
                   </v-text-field>
                   <span v-else>{{subitem.no_of_items}}</span>
-                </td>
-
-                <td style="width: 12%">
-                  <v-text-field v-model="subitem.price_per_kg" v-if="subitem.id === editedItemId" solo
-                                type="number" outlined dense hide-details color="black" suffix="/gm">
-                  </v-text-field>
-                  <span v-else>{{subitem.price_per_kg}}/kg</span>
                 </td>
 
                 <td style="width: 10%">
@@ -142,10 +142,7 @@
                 </td>
 
                 <td style="width: 12%">
-                  <v-text-field v-model="subitem.item_amount" v-if="subitem.id === editedItemId" solo
-                                type="number" outlined dense hide-details color="black" prefix="₹">
-                  </v-text-field>
-                  <span v-else>{{subitem.item_amount}}</span>
+                  {{subitem.item_amount}}
                 </td>
 
                 <td>{{subitem.financial_year}}</td>
@@ -220,16 +217,16 @@ export default {
     return {
       headers: [
         {
-          text: 'Price(₹)'
+          text: 'Price(₹)/kg'
         },
         {
           text: 'Packaging'
         },
         {
-          text: 'Qty'
+          text: 'Price(₹)/bottle'
         },
         {
-          text: 'Price(₹)/kg'
+          text: 'Qty'
         },
         {
           text: 'HSN'
@@ -273,9 +270,35 @@ export default {
     };
   },
   methods: {
+    calculateItemPrice(subitem) {
+      let current_price_per_kg = 0;
+      let current_packaging = 0;
+      let current_no_of_items = 0;
+      if (subitem !== undefined && subitem !== null) {
+        if (subitem.price_per_kg !== undefined && subitem.price_per_kg !== null) {
+          if (subitem.price_per_kg !== '') {
+            current_price_per_kg = parseFloat(subitem.price_per_kg);
+          }
+        }
+
+        if (subitem.packaging !== undefined && subitem.packaging !== null) {
+          if (subitem.packaging !== '') {
+            current_packaging = parseFloat(subitem.packaging);
+          }
+        }
+
+        if (subitem.no_of_items !== undefined && subitem.no_of_items !== null) {
+          if (subitem.no_of_items !== '') {
+            current_no_of_items = parseFloat(subitem.no_of_items);
+          }
+        }
+      }
+
+      subitem.item_price = parseFloat((current_price_per_kg * current_packaging) / 1000).toFixed(2);
+      subitem.item_amount = parseFloat(subitem.item_price * current_no_of_items).toFixed(2);
+    },
     editButtonClicked(subitemId) {
       this.editedItemId = subitemId;
-      console.log(this.$attrs);
     },
     deleteButtonClicked(subitemId) {
       this.deletedItemId = subitemId;
