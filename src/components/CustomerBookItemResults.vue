@@ -16,45 +16,52 @@
               <v-container>
                 <v-layout wrap>
 
-                  <v-flex sm8 md8>
+                  <v-flex sm6 md6>
                     <v-text-field v-model="newSubitem.item_name" :rules="[rules.required]"
                                   label="Name" clearable class="pa-1">
                     </v-text-field>
                   </v-flex>
 
+                  <v-flex sm6 md6>
+                    <v-select v-model="newSubitem.units_for_display" :rules="[rules.required]"
+                              :items="packagingTypes" label="Packaging" class="pa-1">
+                    </v-select>
+                  </v-flex>
+
                   <v-flex sm4 md4>
-                    <v-text-field v-model="newSubitem.item_price" type="number"
-                                  label="Price" clearable class="pa-1">
+                    <v-text-field v-model="newSubitem.price_per_kg" type="number"
+                                  :rules="[rules.required]" @input="calculateItemPrice(newSubitem)"
+                                  label="Price/unit" clearable class="pa-1">
                     </v-text-field>
                   </v-flex>
 
-                  <v-flex sm6 md6>
-                    <v-text-field v-model="newSubitem.packaging" type="number" :rules="[rules.required]"
+                  <v-flex sm4 md4>
+                    <v-text-field v-model="newSubitem.packaging" type="number"
+                                  :rules="[rules.required]" @input="calculateItemPrice(newSubitem)"
                                   label="Packaging" clearable class="pa-1">
                     </v-text-field>
                   </v-flex>
 
-                  <v-flex sm6 md6>
+                  <v-flex sm4 md4>
                     <v-text-field v-model="newSubitem.no_of_items" type="number"
+                                  @input="calculateItemPrice(newSubitem)"
                                   label="No of items" clearable class="pa-1">
                     </v-text-field>
                   </v-flex>
 
-                  <v-flex sm6 md6>
-                    <v-text-field v-model="newSubitem.price_per_kg" type="number" :rules="[rules.required]"
-                                  label="Price/kg" clearable class="pa-1">
-                    </v-text-field>
+                  <v-flex sm4 md4>
+                    <p class="subtitle-1 font-weight-bold mb-0">Price/bottle</p>
+                    <p class="subtitle-1 mb-0">{{newSubitem.item_price}}</p>
                   </v-flex>
 
-                  <v-flex sm6 md6>
+                  <v-flex sm4 md4>
+                    <p class="subtitle-1 font-weight-bold mb-0">Amount</p>
+                    <p class="subtitle-1 mb-0">{{newSubitem.item_amount}}</p>
+                  </v-flex>
+
+                  <v-flex sm4 md4>
                     <v-text-field v-model="newSubitem.item_hsn"
                                   label="HSN" clearable class="pa-1">
-                    </v-text-field>
-                  </v-flex>
-
-                  <v-flex sm6 md6>
-                    <v-text-field v-model="newSubitem.item_amount" type="number"
-                                  label="Amount" clearable class="pa-1">
                     </v-text-field>
                   </v-flex>
                 </v-layout>
@@ -77,6 +84,7 @@
     <v-btn block tile color="gray" dark @click="addNewSubitemForItem(null)" v-if="!$attrs['hide-add-btn']">
       Add new item
     </v-btn>
+
     <div v-if="$attrs.items.length > 0">
       <div v-for="(item, itemIndex) in $attrs.items" :key="itemIndex">
 
@@ -106,19 +114,23 @@
                 <td style="width: 12%">
                   <v-text-field v-model="subitem.price_per_kg" v-if="subitem.id === editedItemId"
                                 solo @input="calculateItemPrice(subitem)"
-                                type="number" outlined dense hide-details color="black" suffix="/kg">
+                                type="number" outlined dense hide-details color="black"
+                                :suffix="'/' + subitem.units_for_display">
                   </v-text-field>
-                  <span v-else>{{subitem.price_per_kg}}/kg</span>
+                  <span v-else>{{subitem.price_per_kg}}/{{subitem.units_for_display}}</span>
                 </td>
 
                 <td style="width: 12%">
                   <v-text-field v-model="subitem.packaging" v-if="subitem.id === editedItemId"
                                 solo @input="calculateItemPrice(subitem)"
-                                type="number" outlined dense hide-details color="black" suffix="/gm">
+                                type="number" outlined dense hide-details color="black"
+                                :suffix="subitem.units_for_display === 'ℓ' ? '/ml' : '/gm'">
                   </v-text-field>
                   <span v-else>
-                    {{parseFloat(subitem.packaging, 10) < 1000 ? subitem.packaging + ' gm' :
-                    parseFloat(subitem.packaging, 10) / 1000  + ' kg'}}
+                    {{parseFloat(subitem.packaging, 10) < 1000 ? subitem.packaging +
+                    (subitem.units_for_display === 'ℓ' ? ' ml' : ' gm') :
+                    parseFloat(subitem.packaging, 10) / 1000  + ' '
+                    + (subitem.units_for_display === 'ℓ' ? ' ℓ' : ' kg')}}
                   </span>
                 </td>
 
@@ -217,7 +229,7 @@ export default {
     return {
       headers: [
         {
-          text: 'Price(₹)/kg'
+          text: 'Price(₹)/unit'
         },
         {
           text: 'Packaging'
@@ -253,6 +265,7 @@ export default {
           text: 'Actions'
         }
       ],
+      packagingTypes: ['ℓ', 'kg'],
       editedItemId: null,
       isEditButtonClicked: false,
       deletedItemId: null,
@@ -384,6 +397,7 @@ export default {
         item_name: null,
         name_key: null,
         item_price: 0,
+        units_for_display: null,
         packaging: 0,
         no_of_items: 0,
         price_per_kg: 0,
@@ -412,6 +426,7 @@ export default {
             item_name: vm.newSubitem.item_name,
             name_key: vm.newSubitem.item_name.replace(/\s/g, '').toLowerCase(),
             item_price: parseFloat(vm.newSubitem.item_price),
+            units_for_display: vm.newSubitem.units_for_display,
             packaging: parseFloat(vm.newSubitem.packaging),
             no_of_items: parseInt(vm.newSubitem.no_of_items, 10),
             price_per_kg: parseFloat(vm.newSubitem.price_per_kg),
