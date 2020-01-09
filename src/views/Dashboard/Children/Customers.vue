@@ -176,7 +176,9 @@
           <v-icon small class="mr-2" @click="showSampleComments(item)" color="primary"
                   v-if="userDetails().permissions.customer.edit">mdi-message-reply</v-icon>
           <v-icon small @click="deleteItem(item)"
-                  v-if="userDetails().permissions.customer.delete">mdi-delete</v-icon>
+                  v-if="userDetails().permissions.customer.delete && item.invoice_count === 0">
+            mdi-delete
+          </v-icon>
         </template>
       </v-data-table>
     </v-card-text>
@@ -436,40 +438,27 @@ export default {
     },
 
     deleteItem(item) {
-      this.$http.get(process.env.VUE_APP_REST_URL + '/customers/' + item.id + '/invoice_count',
-        {
-          headers: {
-            'Content-Type': 'application/json; charset=utf-8'
-          }
-        }).then((response1) => {
-        this.currentCustomerInvoices = response1.data.invoice_count;
+      if (confirm('Are you sure you want to delete this customer ?')) {
+        this.$http.delete(process.env.VUE_APP_REST_URL + '/customers/' + item.id,
+          {
+            headers: {
+              'Content-Type': 'application/json; charset=utf-8'
+            }
+          })
+          .then((response2) => {
+            const index = this.customers.indexOf(item);
+            this.customers.splice(index, 1);
 
-        if (this.currentCustomerInvoices === 0) {
-          if (confirm('Are you sure you want to delete this customer?')) {
-            this.$http.delete(process.env.VUE_APP_REST_URL + '/customers/' + item.id,
-              {
-                headers: {
-                  'Content-Type': 'application/json; charset=utf-8'
-                }
-              }).then((response2) => {
-              const index = this.customers.indexOf(item);
-              this.customers.splice(index, 1);
-
-              // Show success toast
-              this.showToast = true;
-              this.toastMessage = 'Successfully deleted customer';
-              this.toastColor = '';
-            }, (response2) => {
-              this.showToast = true;
-              this.toastMessage = 'Something went wrong';
-              this.toastColor = 'error';
-            });
-          }
-        } else if (this.currentCustomerInvoices > 0) {
-          this.showDeleteCustomerDialog = true;
-        }
-      }, (response1) => {
-      });
+            // Show success toast
+            this.showToast = true;
+            this.toastMessage = 'Successfully deleted customer';
+            this.toastColor = '';
+          }, (response2) => {
+            this.showToast = true;
+            this.toastMessage = 'Something went wrong';
+            this.toastColor = 'error';
+          });
+      }
     },
 
     close() {

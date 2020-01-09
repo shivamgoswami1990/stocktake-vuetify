@@ -11,9 +11,10 @@
         </v-avatar>
       </a>
 
-      <v-select :items="this.financialYearList().financial_year" background-color="primary" color="primary"
-                dark dense :filled="true" append-icon="" hide-details v-model="selectedYear"
-                class="financial-year-selector hidden-sm-and-down" @change="setFinancialYear">
+      <v-select :items="this.financialYearList().financial_year" background-color="primary"
+                color="primary"
+                dark :filled="false" append-icon="" hide-details v-model="selectedYear"
+                class="hidden-sm-and-down" @change="setFinancialYear">
       </v-select>
 
       <v-spacer></v-spacer>
