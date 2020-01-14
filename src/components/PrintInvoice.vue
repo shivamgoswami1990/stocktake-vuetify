@@ -82,8 +82,8 @@
                 <p style="margin: 0 0 0 3px; font-weight: bold">{{termsOfPayment}}</p>
               </div>
               <div style="width: 100%;height: 33px;">
-                <b style="margin-left: 1px">Other Reference(s)</b>
-                <p style="margin: 0 0 0 3px; font-weight: bold">{{otherReferences}}</p>
+                <b style="margin-left: 1px">Transport GST</b>
+                <p style="margin: 0 0 0 3px; font-weight: bold">{{despatchedThroughGST}}</p>
               </div>
             </div>
           </div>
@@ -150,8 +150,8 @@
                 <p style="margin: 0 0 0 3px; font-weight: bold">{{grossWeight}}</p>
               </div>
               <div style="width: 100%; height: 42px">
-                <b style="margin-left: 1px">Transport GST</b>
-                <p style="margin: 0 0 0 3px; font-weight: bold">{{despatchedThroughGST}}</p>
+                <b style="margin-left: 1px">Vehicle No</b>
+                <p style="margin: 0 0 0 3px; font-weight: bold">{{vehicleNo}}</p>
               </div>
             </div>
           </div>
