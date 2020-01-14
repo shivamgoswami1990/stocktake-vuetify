@@ -80,6 +80,9 @@
       <v-btn :to="{ name: 'items'}">
         <h3 class="white--text">Items</h3><v-icon class="white--text">mdi-briefcase</v-icon>
       </v-btn>
+      <v-btn :to="{ name: 'transports'}">
+        <h3 class="white--text">Transports</h3><v-icon class="white--text">mdi-truck</v-icon>
+      </v-btn>
       <v-btn :to="{ name: 'users'}">
         <h3 class="white--text">Users</h3><v-icon class="white--text">mdi-account-box</v-icon>
       </v-btn>

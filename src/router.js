@@ -28,6 +28,11 @@ export default new Router({
           component: () => import(/* webpackChunkName: "about" */ './views/Dashboard/Children/Items.vue')
         },
         {
+          path: 'transports',
+          name: 'transports',
+          component: () => import(/* webpackChunkName: "about" */ './views/Dashboard/Children/Transports.vue')
+        },
+        {
           path: 'users',
           name: 'users',
           component: () => import(/* webpackChunkName: "about" */ './views/Dashboard/Children/Users.vue')
