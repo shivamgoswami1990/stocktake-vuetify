@@ -150,8 +150,8 @@
                 <p style="margin: 0 0 0 3px; font-weight: bold">{{grossWeight}}</p>
               </div>
               <div style="width: 100%; height: 42px">
-                <b style="margin-left: 1px">Vehicle no</b>
-                <p style="margin: 0 0 0 3px; font-weight: bold">{{vehicleNo}}</p>
+                <b style="margin-left: 1px">Transport GST</b>
+                <p style="margin: 0 0 0 3px; font-weight: bold">{{despatchedThroughGST}}</p>
               </div>
             </div>
           </div>
@@ -705,6 +705,7 @@ export default {
     this.buyersOrderNo = this.$attrs.data.buyers_order_no;
     this.despatchDocumentNo = this.$attrs.data.despatch_document_no;
     this.despatchedThrough = this.$attrs.data.despatched_through;
+    this.despatchedThroughGST = this.$attrs.data.despatched_through_gst;
 
     this.dated = this.$attrs.data.dated;
     this.deliveryNoteDate = this.$attrs.data.delivery_note_date;

@@ -329,15 +329,31 @@
                     </v-flex>
 
                     <v-flex xs12 sm6 md6>
-                      <v-text-field label="Despatched through" clearable v-model="despatchThrough">
-                      </v-text-field>
+                      <v-combobox v-model="despatchThrough" label="Despatched through"
+                                  :items="transports" item-text="name" item-value="id"
+                                  hide-details return-object @input="setDespatchDetails">
+                        <template slot="item" slot-scope="{ item }">
+                          <v-list-item-content>
+                            <v-list-item-title v-text="item.name"></v-list-item-title>
+                            <v-list-item-subtitle>
+                              <b>Location</b> - {{item.location}} |
+                              <b>GST No</b> - {{item.gst_no}}
+                            </v-list-item-subtitle>
+                          </v-list-item-content>
+                        </template>
+                      </v-combobox>
                     </v-flex>
                     <v-flex xs12 sm6 md6>
                       <v-text-field label="Destination" clearable v-model="destination">
                       </v-text-field>
                     </v-flex>
+
                     <v-flex xs12 sm6 md6>
                       <v-text-field label="Vehicle no" clearable v-model="vehicleNo">
+                      </v-text-field>
+                    </v-flex>
+                    <v-flex xs12 sm6 md6>
+                      <v-text-field label="Transport GST No" clearable v-model="despatchThroughGST">
                       </v-text-field>
                     </v-flex>
 
@@ -950,7 +966,9 @@ export default {
       despatchDocumentNo: '',
       despatchDate: '',
       despatchDateMenu: false,
+      transports: [],
       despatchThrough: '',
+      despatchThroughGST: '',
       destination: '',
       vehicleNo: '',
       buyerAadhar: '',
@@ -1108,6 +1126,19 @@ export default {
       }, (response) => {
       })
     );
+
+    // Transports API
+    next(
+      (vm) => vm.$http.get(process.env.VUE_APP_REST_URL + '/transports',
+        {
+          headers: {
+            'Content-Type': 'application/json; charset=utf-8'
+          }
+        }).then((response) => {
+        vm.setIncomingTransportsData(response.data);
+      }, (response) => {
+      })
+    );
   },
 
   methods: {
@@ -1160,6 +1191,7 @@ export default {
       this.despatchDocumentNo = invoiceData.despatch_document_no;
       this.despatchDate = invoiceData.delivery_note_date.split('T')[0];
       this.despatchThrough = invoiceData.despatched_through;
+      this.despatchThroughGST = invoiceData.despatched_through_gst;
       this.destination = invoiceData.destination;
       this.vehicleNo = invoiceData.vehicle_no;
       this.pmNo = invoiceData.pm_no;
@@ -1232,6 +1264,10 @@ export default {
       this.getPreviousAndNextInvoiceDate(this.id, invoiceData.company_id);
     },
 
+    setIncomingTransportsData(transportsData) {
+      this.transports = transportsData;
+    },
+
     getPreviousAndNextInvoiceDate(invoice_id, company_id) {
       const vm = this;
       vm.$http.get(process.env.VUE_APP_REST_URL + '/previous_and_next_invoice?for_invoice_no_as_int='
@@ -1274,6 +1310,16 @@ export default {
           || rowItem.no_of_items === undefined || rowItem.no_of_items === null
           || rowItem.item_hsn === undefined || rowItem.item_hsn === null);
       });
+    },
+
+    setDespatchDetails() {
+      if (this.despatchThrough !== undefined && this.despatchThrough !== null) {
+        if (typeof this.despatchThrough === 'object') {
+          this.despatchThroughGST = this.despatchThrough.gst_no;
+          this.destination = this.despatchThrough.location;
+          this.despatchThrough = this.despatchThrough.name;
+        }
+      }
     },
 
     setItemNameObjectAndInitPriceList(item) {
@@ -1811,6 +1857,7 @@ export default {
               despatch_document_no: vm.despatchDocumentNo,
               delivery_note_date: vm.despatchDate,
               despatched_through: vm.despatchThrough,
+              despatched_through_gst: vm.despatchThroughGST,
               destination: vm.destination,
               vehicle_no: vm.vehicleNo,
               pm_no: vm.pmNo,
@@ -1872,6 +1919,7 @@ export default {
         despatch_document_no: vm.despatchDocumentNo,
         delivery_note_date: vm.despatchDate,
         despatched_through: vm.despatchThrough,
+        despatched_through_gst: vm.despatchThroughGST,
         destination: vm.destination,
         vehicle_no: vm.vehicleNo,
         pm_no: vm.pmNo,
