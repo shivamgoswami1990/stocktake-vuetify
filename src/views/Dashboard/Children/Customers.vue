@@ -99,9 +99,19 @@
                   </v-flex>
 
                   <v-flex xs4 sm4 md6>
-                    <v-text-field v-model="editedCustomer.transport_name" label="Transport name"
-                                  clearable class="pa-1">
-                    </v-text-field>
+                    <v-combobox v-model="editedCustomer.transport_name" label="Transport name"
+                                :items="transports" item-text="name" item-value="id" class="pa-1"
+                                hide-details return-object @input="setTransportDetails">
+                      <template slot="item" slot-scope="{ item }">
+                        <v-list-item-content>
+                          <v-list-item-title v-text="item.name"/>
+                          <v-list-item-subtitle>
+                            <b>Location</b> - {{item.location}} |
+                            <b>GST No</b> - {{item.gst_no}}
+                          </v-list-item-subtitle>
+                        </v-list-item-content>
+                      </template>
+                    </v-combobox>
                   </v-flex>
                   <v-flex xs4 sm4 md6>
                     <v-text-field v-model="editedCustomer.destination" label="Destination"
@@ -333,8 +343,24 @@ export default {
       ],
       customers: [],
       showDeleteCustomerDialog: false,
-      currentCustomerInvoices: 0
+      currentCustomerInvoices: 0,
+      transports: []
     };
+  },
+
+  beforeRouteEnter(to, from, next) {
+    // Transports API
+    next(
+      (vm) => vm.$http.get(process.env.VUE_APP_REST_URL + '/transports',
+        {
+          headers: {
+            'Content-Type': 'application/json; charset=utf-8'
+          }
+        }).then((response) => {
+        vm.setIncomingTransportsData(response.data);
+      }, (response) => {
+      })
+    );
   },
 
   computed: {
@@ -356,6 +382,10 @@ export default {
     setCustomersData(data) {
       this.customers = data;
       this.isDataLoading = false;
+    },
+
+    setIncomingTransportsData(transportsData) {
+      this.transports = transportsData;
     },
 
     getCustomersByPage(pageNo) {
@@ -433,7 +463,16 @@ export default {
       // As gstin no is typed, except the first two digits,
       // set pan no model to typed value up till 12th index.
       if (this.editedCustomer.gstin_no.length > 2 && this.editedCustomer.gstin_no.length < 13) {
-        this.editedCustomer.pan_no = this.editedCustomer.pan_no + this.editedCustomer.gstin_no.slice(-1);
+        this.editedCustomer.pan_no += this.editedCustomer.gstin_no.slice(-1);
+      }
+    },
+
+    setTransportDetails() {
+      if (this.editedCustomer.transport_name !== undefined && this.editedCustomer.transport_name !== null) {
+        if (typeof this.editedCustomer.transport_name === 'object') {
+          this.editedCustomer.destination = this.editedCustomer.transport_name.location;
+          this.editedCustomer.transport_name = this.editedCustomer.transport_name.name;
+        }
       }
     },
 
