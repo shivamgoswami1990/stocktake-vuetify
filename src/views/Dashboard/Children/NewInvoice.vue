@@ -416,6 +416,7 @@ export default {
     getLastCreatedInvoiceForCustomer() {
       const vm = this;
       vm.customerButtonLoading = true;
+      console.log(vm.selectedCustomer);
       this.$http.get(process.env.VUE_APP_REST_URL + '/customers/' + vm.selectedCustomer.id
         + '/last_created_invoice?financial_year=' + vm.currentlySelectedFinancialYear,
       {
@@ -588,6 +589,7 @@ export default {
             company_id: companyId,
             last_edited_by_id: JSON.parse(localStorage.user_info).id,
             despatched_through: consigneeDetails.transport_name,
+            despatched_through_gst: consigneeDetails.transport_gst_no,
             destination: consigneeDetails.destination,
             financial_year: vm.currentlySelectedFinancialYear
           }

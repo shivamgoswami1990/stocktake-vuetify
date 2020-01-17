@@ -98,7 +98,7 @@
                     </v-text-field>
                   </v-flex>
 
-                  <v-flex xs4 sm4 md6>
+                  <v-flex xs4 sm4 md4>
                     <v-combobox v-model="editedCustomer.transport_name" label="Transport name"
                                 :items="transports" item-text="name" item-value="id" class="pa-1"
                                 hide-details return-object @input="setTransportDetails">
@@ -113,9 +113,14 @@
                       </template>
                     </v-combobox>
                   </v-flex>
-                  <v-flex xs4 sm4 md6>
+                  <v-flex xs4 sm4 md4>
                     <v-text-field v-model="editedCustomer.destination" label="Destination"
                                   clearable class="pa-1">
+                    </v-text-field>
+                  </v-flex>
+                  <v-flex xs4 sm4 md4>
+                    <v-text-field v-model="editedCustomer.transport_gst_no" label="Transport GST No"
+                                  :rules="[rules.gstin]" clearable class="pa-1">
                     </v-text-field>
                   </v-flex>
 
@@ -279,6 +284,7 @@ export default {
         aadhar_no: '',
         transport_name: '',
         destination: '',
+        transport_gst_no: '',
         notes: ''
       },
       editedCustomer: {
@@ -302,6 +308,7 @@ export default {
         aadhar_no: '',
         transport_name: '',
         destination: '',
+        transport_gst_no: '',
         notes: ''
       },
       headers: [
@@ -471,6 +478,7 @@ export default {
       if (this.editedCustomer.transport_name !== undefined && this.editedCustomer.transport_name !== null) {
         if (typeof this.editedCustomer.transport_name === 'object') {
           this.editedCustomer.destination = this.editedCustomer.transport_name.location;
+          this.editedCustomer.transport_gst_no = this.editedCustomer.transport_name.gst_no;
           this.editedCustomer.transport_name = this.editedCustomer.transport_name.name;
         }
       }
@@ -528,6 +536,7 @@ export default {
                 primary_discount: this.editedCustomer.primary_discount,
                 secondary_discount: this.editedCustomer.secondary_discount,
                 transport_name: this.editedCustomer.transport_name,
+                transport_gst_no: this.editedCustomer.transport_gst_no,
                 destination: this.editedCustomer.destination,
                 notes: this.editedCustomer.notes,
                 freight_allowed: this.editedCustomer.freight_allowed,
@@ -572,6 +581,7 @@ export default {
                 primary_discount: this.editedCustomer.primary_discount,
                 secondary_discount: this.editedCustomer.secondary_discount,
                 transport_name: this.editedCustomer.transport_name,
+                transport_gst_no: this.editedCustomer.transport_gst_no,
                 destination: this.editedCustomer.destination,
                 notes: this.editedCustomer.notes,
                 freight_allowed: this.editedCustomer.freight_allowed,
