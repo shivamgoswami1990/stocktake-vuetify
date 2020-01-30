@@ -1,18 +1,9 @@
 <template>
   <v-app>
 
-    <v-app-bar app short elevate-on-scroll color="primary" dense>
-      <v-avatar color="white" size="35">{{userInitials}}</v-avatar>
-      <v-divider vertical class="white ml-3"></v-divider>
-
-      <a @click="$router.push({name: 'main'})">
-        <v-avatar>
-          <v-img :src="logoImage" contain height="40" alt="logo" ></v-img>
-        </v-avatar>
-      </a>
-
+    <v-app-bar app short elevate-on-scroll color="primary">
       <v-select :items="this.financialYearList().financial_year" background-color="primary"
-                color="primary"
+                color="primary" prefix="FY :"
                 dark :filled="false" append-icon="" hide-details v-model="selectedYear"
                 class="hidden-sm-and-down" @change="setFinancialYear">
       </v-select>
@@ -24,7 +15,7 @@
                       hide-details hide-no-data v-if="isLoggedIn()" class="hidden-md-and-down global-search"
                       v-model="searchModel" :loading="isSearchLoading" :items="searchItems"
                       :search-input.sync="search" item-value="id" no-filter append-icon=""
-                      chips deletable-chips return-object style="max-width: 550px">
+                      chips deletable-chips return-object>
 
         <template v-slot:selection="{ item, on }" v-on="on">
           <v-chip close>
@@ -38,19 +29,167 @@
         </template>
       </v-autocomplete>
 
-      <div v-if="isLoggedIn()">
-        <v-btn height="48px" color="primary" :ripple="false" depressed tile elevation="0"
-               class="hidden-sm-and-down" :to="{ name: 'newInvoice'}">Create</v-btn>
-        <v-btn height="48px" color="primary" :ripple="false" depressed tile elevation="0"
-               class="hidden-sm-and-down" :to="{ name: 'hsnSummary'}">HSN</v-btn>
-        <v-btn height="48px" color="primary" :ripple="false" depressed tile elevation="0"
-               class="hidden-sm-and-down" :to="{ name: 'invoices'}">History</v-btn>
-        <v-btn height="48px" color="primary" :ripple="false" depressed tile elevation="0"
-               class="hidden-sm-and-down" :to="{ name: 'analysis'}">Analysis</v-btn>
-        <v-btn height="48px" color="primary" :ripple="false" depressed tile elevation="0"
-               @click="logoutUser()">LOGOUT</v-btn>
-      </div>
+      <v-divider vertical class="white mx-3"></v-divider>
+
+      <v-btn @click="loadNotificationDrawer" icon>
+        <v-badge :content="notificationCount" :value="notificationCount" color="success" overlap>
+          <v-icon color="white">mdi-bell-alert</v-icon>
+        </v-badge>
+      </v-btn>
+
+      <v-divider vertical class="white mx-3"></v-divider>
+
+      <v-btn height="48px" color="primary" :ripple="false" depressed tile elevation="0"
+             v-if="isLoggedIn()" @click="logoutUser()">LOGOUT</v-btn>
     </v-app-bar>
+
+    <v-navigation-drawer dark permanent color="white" app width="200" v-if="isLoggedIn()" class="elevation-1">
+      <v-responsive>
+        <v-avatar class="mx-auto d-flex my-2">
+          <v-img :src="logoImage" contain height="40" alt="logo" ></v-img>
+        </v-avatar>
+      </v-responsive>
+
+      <v-list light class="my-5">
+        <router-link :to="{ name: 'main'}">
+          <v-list-item>
+            <v-list-item-icon>
+              <v-icon>mdi-view-dashboard</v-icon>
+            </v-list-item-icon>
+
+            <v-list-item-content>
+              <v-list-item-title class="font-weight-medium title">Dashboard</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </router-link>
+
+        <router-link :to="{ name: 'companies'}">
+          <v-list-item>
+            <v-list-item-icon>
+              <v-icon>mdi-domain</v-icon>
+            </v-list-item-icon>
+
+            <v-list-item-content>
+              <v-list-item-title class="font-weight-medium title">Companies</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </router-link>
+
+        <router-link :to="{ name: 'customers'}">
+          <v-list-item>
+            <v-list-item-icon>
+              <v-icon>mdi-home-variant</v-icon>
+            </v-list-item-icon>
+
+            <v-list-item-content>
+              <v-list-item-title class="font-weight-medium title">Customers</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </router-link>
+
+        <router-link :to="{ name: 'items'}">
+          <v-list-item>
+            <v-list-item-icon>
+              <v-icon>mdi-briefcase</v-icon>
+            </v-list-item-icon>
+
+            <v-list-item-content>
+              <v-list-item-title class="font-weight-medium title">Items</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </router-link>
+
+        <router-link :to="{ name: 'transports'}">
+          <v-list-item>
+            <v-list-item-icon>
+              <v-icon>mdi-truck</v-icon>
+            </v-list-item-icon>
+
+            <v-list-item-content>
+              <v-list-item-title class="font-weight-medium title">Transports</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </router-link>
+
+        <router-link :to="{ name: 'users'}">
+          <v-list-item>
+            <v-list-item-icon>
+              <v-icon>mdi-account-box</v-icon>
+            </v-list-item-icon>
+
+            <v-list-item-content>
+              <v-list-item-title class="font-weight-medium title">Users</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </router-link>
+
+        <router-link :to="{ name: 'hsnSummary'}">
+          <v-list-item>
+            <v-list-item-icon>
+              <v-icon>mdi-finance</v-icon>
+            </v-list-item-icon>
+
+            <v-list-item-content>
+              <v-list-item-title class="font-weight-medium title">HSN</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </router-link>
+
+        <router-link :to="{ name: 'invoices'}">
+          <v-list-item>
+            <v-list-item-icon>
+              <v-icon>mdi-history</v-icon>
+            </v-list-item-icon>
+
+            <v-list-item-content>
+              <v-list-item-title class="font-weight-medium title">History</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </router-link>
+
+        <router-link :to="{ name: 'analysis'}">
+          <v-list-item>
+            <v-list-item-icon>
+              <v-icon>mdi-google-analytics</v-icon>
+            </v-list-item-icon>
+
+            <v-list-item-content>
+              <v-list-item-title class="font-weight-medium title">Analysis</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </router-link>
+      </v-list>
+
+      <template v-slot:append>
+        <v-card color="white" light tile elevation="1" width="100%" class="pa-4">
+          <v-card-text>
+            <v-avatar color="primary" size="45"
+                      class="d-flex mx-auto white--text font-weight-medium title">
+              {{userInitials}}
+            </v-avatar>
+
+            <p class="text-center title mt-2 py-0 mb-0">
+              {{userDetails().first_name + ' ' + userDetails().last_name}}
+            </p>
+
+            <p class="text-center subtitle-1 my-0 py-0">
+              {{userDetails().email}}
+            </p>
+
+            <p class="text-center subtitle-1 my-0 py-0">
+              {{userDetails().invoice_count + ' invoices'}}
+            </p>
+          </v-card-text>
+
+          <v-card-actions>
+            <v-btn block tile elevation="0" color="primary" :to="{ name: 'newInvoice'}">
+              Create invoice
+            </v-btn>
+          </v-card-actions>
+
+        </v-card>
+      </template>
+    </v-navigation-drawer>
 
     <v-content>
       <v-container fluid>
@@ -60,33 +199,6 @@
 
     <component :is="notificationDrawerComponent" @reduceNotificationsCount="reduceNotificationsCount"
     @clearNotificationsCount = "clearNotificationsCount"/>
-
-    <v-bottom-navigation app background-color="primary" color="white" height="48px"
-                         v-if="isLoggedIn()" class="bottom-navigation">
-      <v-btn :to="{ name: 'companies'}">
-        <h3 class="white--text">Companies</h3><v-icon class="white--text">mdi-domain</v-icon>
-      </v-btn>
-      <v-btn :to="{ name: 'customers'}">
-        <h3 class="white--text">Customers</h3><v-icon class="white--text">mdi-home-variant</v-icon>
-      </v-btn>
-
-      <v-btn @click="loadNotificationDrawer">
-        <h3 class="white--text">Alerts</h3><v-icon class="white--text">mdi-bell-alert</v-icon>
-        <v-badge color="success" left overlap v-if="notificationCount > 0">
-          <template v-slot:badge class="font-weight-bold">{{notificationCount}}</template>
-        </v-badge>
-      </v-btn>
-
-      <v-btn :to="{ name: 'items'}">
-        <h3 class="white--text">Items</h3><v-icon class="white--text">mdi-briefcase</v-icon>
-      </v-btn>
-      <v-btn :to="{ name: 'transports'}">
-        <h3 class="white--text">Transports</h3><v-icon class="white--text">mdi-truck</v-icon>
-      </v-btn>
-      <v-btn :to="{ name: 'users'}">
-        <h3 class="white--text">Users</h3><v-icon class="white--text">mdi-account-box</v-icon>
-      </v-btn>
-    </v-bottom-navigation>
   </v-app>
 </template>
 
@@ -105,6 +217,29 @@
           & > div {
             font-size: 14px;
           }
+        }
+      }
+    }
+  }
+
+  nav {
+    a {
+      text-decoration: unset;
+    }
+    .router-link-exact-active.router-link-active {
+      text-decoration: unset;
+      background-color: #673ab7;
+      color: white;
+
+      .v-list-item {
+        background-color: inherit;
+
+        i.v-icon {
+          color: white;
+        }
+
+        .v-list-item__title {
+          color: white;
         }
       }
     }

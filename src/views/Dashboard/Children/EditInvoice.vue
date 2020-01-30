@@ -505,6 +505,8 @@
                       <!-- Items row -->
                       <tr v-for="(item, index) in itemArray" :key="index">
                         <td>
+                          </v-text-field>
+
                           <v-combobox v-model="item.item_name" :items="perfumesAfterFormatting"
                                       hide-details item-text="name" return-object item-value="id"
                                       :rules="[rules.required]"

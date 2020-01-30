@@ -280,7 +280,7 @@
 export default {
   data() {
     return {
-      stepValue: 0,
+      stepValue: 1,
       searchCustomer: null,
       customersList: [],
       isCustomerDataLoading: false,
