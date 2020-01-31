@@ -504,55 +504,84 @@
                     <tbody>
                       <!-- Items row -->
                       <tr v-for="(item, index) in itemArray" :key="index">
-                        <td>
+                        <td style="position: relative">
+                          <v-text-field v-model="item.item_name" hide-details return-object
+                                        :items="item.returned_items" @input="itemTyped(item)"
+                                        @blur="closeSearchCard(item, index)"
+                                        @focusout="closeSearchCard(item, index)"
+                                        @focusin="showSearchCard(item, index)"
+                                        @click="showSearchCard(item, index)"
+                                        item-text="name" item-value="id" :loading="item.isItemsLoading">
                           </v-text-field>
 
-                          <v-combobox v-model="item.item_name" :items="perfumesAfterFormatting"
-                                      hide-details item-text="name" return-object item-value="id"
-                                      :rules="[rules.required]"
-                                      @input="setItemNameObjectAndInitPriceList(item)">
-                            <template slot="item" slot-scope="{ item }">
-                              <v-list-item-avatar color="primary"
-                                                  class="headline font-weight-light white--text">
-                                {{ item.name.charAt(0) }}
-                              </v-list-item-avatar>
-                              <v-list-item-content>
-                                <v-list-item-title v-text="item.name"></v-list-item-title>
-                                <v-list-item-subtitle
-                                  v-text="'Series - ' + item.series"></v-list-item-subtitle>
-                              </v-list-item-content>
-                            </template>
-                            <template slot="prepend" v-if="item.wasItemPreviouslyOrdered">
-                              <v-menu v-if="item.previousOrderDetails.length > 0"
-                                      :close-on-content-click="false">
-                                <template v-slot:activator="{ on }">
-                                  <v-btn v-on="on" icon small color="primary">
-                                    <v-icon size="20">mdi-emoticon-outline</v-icon>
-                                  </v-btn>
-                                </template>
+                          <!-- Show items list & recently ordered items -->
+                          <v-card class="item-search-card overflow-auto" tile width="100%"
+                                  color="secondary" v-if="item.showSearchCard" max-height="300"
+                                  :id="'search-card-' + index">
+                            <v-card-text class="pa-0">
+                              <v-list dense>
+                                <v-list-item v-for="(val, key) in item.returned_items" :key="key"
+                                             @click="setItemNameObjectAndInitPriceList(val)">
+                                  <v-list-item-avatar color="primary"
+                                                      class="headline font-weight-light white--text">
+                                    {{ val.name.charAt(0) }}
+                                  </v-list-item-avatar>
+                                  <v-list-item-content>
+                                    <v-list-item-title v-text="val.name"></v-list-item-title>
+                                    <v-list-item-subtitle
+                                      v-text="'Series - ' + val.series"></v-list-item-subtitle>
+                                  </v-list-item-content>
+                                </v-list-item>
+                              </v-list>
+                            </v-card-text>
+                          </v-card>
 
-                                <!-- Menu popover content -->
-                                <v-card flat color="secondary" tile>
-                                  <v-card-title>
-                                    Ordered {{item.previousOrderDetails.length}} times
-                                  </v-card-title>
-                                  <v-card-text>
-                                    <customer-book-item-results :items="item.previousOrderDetails"
-                                                                :loading="false"
-                                                                :hide-add-btn="true"
-                                                                :customer_id="customer.id"/>
-                                  </v-card-text>
-                                </v-card>
-                                <!-- Menu popover content -->
+<!--                          <v-combobox v-model="item.item_name" :items="perfumesAfterFormatting"-->
+<!--                                      hide-details item-text="name" return-object item-value="id"-->
+<!--                                      :rules="[rules.required]"-->
+<!--                                      @input="setItemNameObjectAndInitPriceList(item)">-->
+<!--                            <template slot="item" slot-scope="{ item }">-->
+<!--                              <v-list-item-avatar color="primary"-->
+<!--                                                  class="headline font-weight-light white&#45;&#45;text">-->
+<!--                                {{ item.name.charAt(0) }}-->
+<!--                              </v-list-item-avatar>-->
+<!--                              <v-list-item-content>-->
+<!--                                <v-list-item-title v-text="item.name"></v-list-item-title>-->
+<!--                                <v-list-item-subtitle-->
+<!--                                  v-text="'Series - ' + item.series"></v-list-item-subtitle>-->
+<!--                              </v-list-item-content>-->
+<!--                            </template>-->
+<!--                            <template slot="prepend" v-if="item.wasItemPreviouslyOrdered">-->
+<!--                              <v-menu v-if="item.previousOrderDetails.length > 0"-->
+<!--                                      :close-on-content-click="false">-->
+<!--                                <template v-slot:activator="{ on }">-->
+<!--                                  <v-btn v-on="on" icon small color="primary">-->
+<!--                                    <v-icon size="20">mdi-emoticon-outline</v-icon>-->
+<!--                                  </v-btn>-->
+<!--                                </template>-->
 
-                              </v-menu>
-                            </template>
-                          </v-combobox>
-                          <v-combobox v-model="item.subitems" placeholder="item tags ..."
-                                      item-text="subitems"
-                                      multiple small-chips dense deletable-chips return-object
-                                      hide-details @input="formatSubItems(item)">
-                          </v-combobox>
+<!--                                &lt;!&ndash; Menu popover content &ndash;&gt;-->
+<!--                                <v-card flat color="secondary" tile>-->
+<!--                                  <v-card-title>-->
+<!--                                    Ordered {{item.previousOrderDetails.length}} times-->
+<!--                                  </v-card-title>-->
+<!--                                  <v-card-text>-->
+<!--                                    <customer-book-item-results :items="item.previousOrderDetails"-->
+<!--                                                                :loading="false"-->
+<!--                                                                :hide-add-btn="true"-->
+<!--                                                                :customer_id="customer.id"/>-->
+<!--                                  </v-card-text>-->
+<!--                                </v-card>-->
+<!--                                &lt;!&ndash; Menu popover content &ndash;&gt;-->
+
+<!--                              </v-menu>-->
+<!--                            </template>-->
+<!--                          </v-combobox>-->
+<!--                          <v-combobox v-model="item.subitems" placeholder="item tags ..."-->
+<!--                                      item-text="subitems"-->
+<!--                                      multiple small-chips dense deletable-chips return-object-->
+<!--                                      hide-details @input="formatSubItems(item)">-->
+<!--                          </v-combobox>-->
                         </td>
 
                         <td style="width: 15%;">
@@ -932,6 +961,13 @@
   </v-card>
 </template>
 
+<style lang="scss">
+  .item-search-card {
+    position: absolute;
+    z-index: 999;
+  }
+</style>
+
 <script>
 import CustomerBookItemResults from '../../../components/CustomerBookItemResults.vue';
 
@@ -1143,6 +1179,12 @@ export default {
     );
   },
 
+  computed: {
+    computedItem() {
+      return this.itemArray;
+    }
+  },
+
   methods: {
     onScroll(e) {
       if (typeof window === 'undefined') return;
@@ -1320,6 +1362,40 @@ export default {
           this.despatchThroughGST = this.despatchThrough.gst_no;
           this.destination = this.despatchThrough.location;
           this.despatchThrough = this.despatchThrough.name;
+        }
+      }
+    },
+
+    showSearchCard(item, index) {
+      if (document.getElementById('search-card-' + index)) {
+        document.getElementById('search-card-' + index).style.visibility = 'visible';
+      }
+    },
+
+    closeSearchCard(item, index) {
+      if (document.getElementById('search-card-' + index)) {
+        document.getElementById('search-card-' + index).style.visibility = 'hidden';
+      }
+    },
+
+    itemTyped(item) {
+      // Search for an item via API
+      const vm = this;
+      const query = item.item_name;
+      item.isItemsLoading = true;
+      if (query !== '' && query !== null) {
+        if (query.length > 2) {
+          vm.$http.get(process.env.VUE_APP_REST_URL + '/items?search_term=' + query,
+            {
+              headers: {
+                'Content-Type': 'application/json; charset=utf-8'
+              }
+            }).then((response) => {
+            item.returned_items = response.data;
+            item.isItemsLoading = false;
+            item.showSearchCard = true;
+          }, (response) => {
+          });
         }
       }
     },
