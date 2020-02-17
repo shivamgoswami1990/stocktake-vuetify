@@ -119,21 +119,23 @@ export default {
       const vm = this;
 
       if (vm.searchTerm !== undefined && vm.searchTerm !== null) {
-        if (vm.searchTerm.length > 2) {
+        if (vm.searchTerm.length > 1) {
           vm.isSearchedItemsLoading = true;
-          vm.$http.get(process.env.VUE_APP_REST_URL + '/ordered_items?customer_id='
-            + vm.$attrs.data.id + '&search_term=' + vm.searchTerm,
-          {
-            headers: {
-              'Content-Type': 'application/json; charset=utf-8'
-            }
-          })
-            .then((response) => {
-              vm.isSearchedItemsLoading = false;
-              vm.searchedOrderedItems = Object.values(response.data);
-            }, (response) => {
-              vm.isSearchedItemsLoading = false;
-            });
+          vm.$http.post(process.env.VUE_APP_REST_URL + '/search_ordered_items_by_name',
+            {
+              customer_id: vm.$attrs.data.id,
+              search_term: vm.searchTerm
+            },
+            {
+              headers: {
+                'Content-Type': 'application/json; charset=utf-8'
+              }
+            }).then((response) => {
+            vm.isSearchedItemsLoading = false;
+            vm.searchedOrderedItems = Object.values(response.data);
+          }, (response) => {
+            vm.isSearchedItemsLoading = false;
+          });
         } else {
           vm.searchedOrderedItems = [];
         }

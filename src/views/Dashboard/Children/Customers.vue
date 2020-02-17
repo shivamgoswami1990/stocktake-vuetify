@@ -477,7 +477,6 @@ export default {
     setTransportDetails() {
       if (this.editedCustomer.transport_name !== undefined && this.editedCustomer.transport_name !== null) {
         if (typeof this.editedCustomer.transport_name === 'object') {
-          this.editedCustomer.destination = this.editedCustomer.transport_name.location;
           this.editedCustomer.transport_gst_no = this.editedCustomer.transport_name.gst_no;
           this.editedCustomer.transport_name = this.editedCustomer.transport_name.name;
         }

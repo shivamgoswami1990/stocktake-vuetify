@@ -1359,7 +1359,6 @@ export default {
       if (this.despatchThrough !== undefined && this.despatchThrough !== null) {
         if (typeof this.despatchThrough === 'object') {
           this.despatchThroughGST = this.despatchThrough.gst_no;
-          this.destination = this.despatchThrough.location;
           this.despatchThrough = this.despatchThrough.name;
         }
       }
