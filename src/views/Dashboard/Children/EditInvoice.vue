@@ -511,6 +511,12 @@
                                         :loading="item.isItemsLoading">
                           </v-text-field>
 
+                          <v-combobox v-model="item.subitems" placeholder="item tags ..."
+                                      item-text="subitems"
+                                      multiple small-chips dense deletable-chips return-object
+                                      hide-details @input="formatSubItems(item)">
+                          </v-combobox>
+
                           <!-- Show items list & recently ordered items -->
                           <v-card class="item-search-card overflow-auto" tile width="600" max-width="600"
                                   color="secondary" v-if="item.showSearchCard" max-height="300"
@@ -553,8 +559,34 @@
                                       <v-list-item-content>
                                         <v-list-item-title v-text="val.item_name"></v-list-item-title>
                                         <v-list-item-subtitle
-                                          v-text="'Price - ' + val.item_price"></v-list-item-subtitle>
+                                          v-text="'Price - ₹ ' + val.item_price">
+                                        </v-list-item-subtitle>
+                                        <v-list-item-subtitle
+                                          v-text="'Price/kg - ₹ ' + val.price_per_kg">
+                                        </v-list-item-subtitle>
+                                        <v-list-item-subtitle v-if="val.units_for_display === 'kg'">
+                                          Packaging -
+                                          {{parseFloat(val.packaging)}}
+                                          {{parseFloat(val.packaging) < 1000.0 ? 'gm' : 'kg'}}
+                                        </v-list-item-subtitle>
                                       </v-list-item-content>
+
+                                      <v-list-item-action class="my-0 py-2">
+                                        <v-list-item-action-text class="font-weight-bold">
+                                          Qty : {{ val.no_of_items }}
+                                        </v-list-item-action-text>
+                                        <v-list-item-action-text class="font-weight-bold">
+                                          {{ calendarDate(val.order_date) }}
+                                        </v-list-item-action-text>
+                                        <v-list-item-action-text
+                                          class="font-weight-bold"
+                                          v-if="val.units_for_display === 'kg'">
+                                          <a style="text-decoration: underline"
+                                             @click="addOrderedItemToInvoice(val, index)">
+                                            Add to invoice
+                                          </a>
+                                        </v-list-item-action-text>
+                                      </v-list-item-action>
                                     </v-list-item>
                                   </v-list>
                                 </v-col>
@@ -603,11 +635,6 @@
 
 <!--                              </v-menu>-->
 <!--                            </template>-->
-<!--                          </v-combobox>-->
-<!--                          <v-combobox v-model="item.subitems" placeholder="item tags ..."-->
-<!--                                      item-text="subitems"-->
-<!--                                      multiple small-chips dense deletable-chips return-object-->
-<!--                                      hide-details @input="formatSubItems(item)">-->
 <!--                          </v-combobox>-->
                         </td>
 
@@ -1392,7 +1419,7 @@ export default {
     },
 
     reformatOrderedItemsForDisplay(data) {
-      let result = [];
+      const result = [];
       Object.values(data).forEach((group) => {
         group.forEach((ordered_item) => {
           result.push(ordered_item);
@@ -1451,6 +1478,25 @@ export default {
           });
         }
       }
+    },
+
+    addOrderedItemToInvoice(orderedItem, index) {
+      const resultingItem = {
+        item_name: orderedItem.item_name,
+        item_price: orderedItem.item_price,
+        units_for_display: orderedItem.units_for_display,
+        total_quantity: parseFloat(orderedItem.total_quantity),
+        packaging: parseFloat(orderedItem.packaging),
+        no_of_items: parseInt(orderedItem.no_of_items, 10),
+        item_hsn: orderedItem.item_hsn,
+        price_per_kg: parseFloat(orderedItem.price_per_kg),
+        item_amount: parseFloat(orderedItem.item_amount),
+        subitems: []
+      };
+
+      this.itemArray[index] = resultingItem;
+      this.closeSearchCard(index);
+      this.setItemPriceObjectAndInitPackagingAndUnits(resultingItem);
     },
 
     setItemNameObjectAndInitPriceList(item, selectedItemFromSearch, index) {
