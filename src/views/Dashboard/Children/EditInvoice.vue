@@ -505,34 +505,61 @@
                       <!-- Items row -->
                       <tr v-for="(item, index) in itemArray" :key="index">
                         <td style="position: relative">
-                          <v-text-field v-model="item.item_name" hide-details return-object
-                                        :items="item.returned_items" @input="itemTyped(item)"
-                                        @blur="closeSearchCard(item, index)"
-                                        @focusout="closeSearchCard(item, index)"
+                          <v-text-field v-model="item.item_name" hide-details @input="itemTyped(item)"
                                         @focusin="showSearchCard(item, index)"
                                         @click="showSearchCard(item, index)"
-                                        item-text="name" item-value="id" :loading="item.isItemsLoading">
+                                        :loading="item.isItemsLoading">
                           </v-text-field>
 
                           <!-- Show items list & recently ordered items -->
-                          <v-card class="item-search-card overflow-auto" tile width="100%"
+                          <v-card class="item-search-card overflow-auto" tile width="600" max-width="600"
                                   color="secondary" v-if="item.showSearchCard" max-height="300"
                                   :id="'search-card-' + index">
                             <v-card-text class="pa-0">
-                              <v-list dense>
-                                <v-list-item v-for="(val, key) in item.returned_items" :key="key"
-                                             @click="setItemNameObjectAndInitPriceList(val)">
-                                  <v-list-item-avatar color="primary"
-                                                      class="headline font-weight-light white--text">
-                                    {{ val.name.charAt(0) }}
-                                  </v-list-item-avatar>
-                                  <v-list-item-content>
-                                    <v-list-item-title v-text="val.name"></v-list-item-title>
-                                    <v-list-item-subtitle
-                                      v-text="'Series - ' + val.series"></v-list-item-subtitle>
-                                  </v-list-item-content>
-                                </v-list-item>
-                              </v-list>
+                              <v-row no-gutters>
+
+                                <!-- Items from item list API -->
+                                <v-col cols="12" md="5" class="px-1">
+                                  <h2 class="py-2 text-center">Stored items</h2>
+                                  <v-list dense v-if="item.returned_items.length > 0" tile>
+                                    <v-list-item v-for="(val, key) in item.returned_items" :key="key">
+                                      <v-list-item-avatar color="primary"
+                                                          class="headline font-weight-light white--text">
+                                        {{ val.name.charAt(0) }}
+                                      </v-list-item-avatar>
+                                      <v-list-item-content
+                                        @click="setItemNameObjectAndInitPriceList(item, val, index)">
+                                        <v-list-item-title v-text="val.name"></v-list-item-title>
+                                        <v-list-item-subtitle
+                                          v-text="'Series - ' + val.series"></v-list-item-subtitle>
+                                      </v-list-item-content>
+                                    </v-list-item>
+                                  </v-list>
+                                </v-col>
+                                <!-- Items from item list API -->
+
+                                <!-- Items from recently ordered items API -->
+                                <v-col cols="12" md="7" class="px-1">
+                                  <h2 class="py-2 text-center">Ordered items</h2>
+                                  <p class="py-2 text-center" v-if="!item.wasItemPreviouslyOrdered">
+                                    No previously ordered items found
+                                  </p>
+                                  <v-list dense v-if="item.previousOrderDetails.length > 0" tile>
+                                    <v-list-item v-for="(val, key) in item.previousOrderDetails" :key="key">
+                                      <v-list-item-avatar color="primary"
+                                                          class="headline font-weight-light white--text">
+                                        {{ val.item_name.charAt(0) }}
+                                      </v-list-item-avatar>
+                                      <v-list-item-content>
+                                        <v-list-item-title v-text="val.item_name"></v-list-item-title>
+                                        <v-list-item-subtitle
+                                          v-text="'Price - ' + val.item_price"></v-list-item-subtitle>
+                                      </v-list-item-content>
+                                    </v-list-item>
+                                  </v-list>
+                                </v-col>
+                                <!-- Items from recently ordered items API -->
+                              </v-row>
                             </v-card-text>
                           </v-card>
 
@@ -1016,8 +1043,6 @@ export default {
       grossWeight: '',
       termsOfDelivery: '',
       customer: {},
-      perfumesBeforeFormatting: [],
-      perfumesAfterFormatting: [],
       headers: [
         {
           text: 'Name',
@@ -1146,21 +1171,13 @@ export default {
 
   beforeRouteEnter(to, from, next) {
     next(
-      (vm1) => vm1.$http.get(process.env.VUE_APP_REST_URL + '/invoices/' + to.params.id,
+      (vm) => vm.$http.get(process.env.VUE_APP_REST_URL + '/invoices/' + to.params.id,
         {
           headers: {
             'Content-Type': 'application/json; charset=utf-8'
           }
-        }).then((response1) => {
-        vm1.$http.get(process.env.VUE_APP_REST_URL + '/items',
-          {
-            headers: {
-              'Content-Type': 'application/json; charset=utf-8'
-            }
-          }).then((response2) => {
-          vm1.setIncomingData(response1.data, response2.data);
-        }, (response) => {
-        });
+        }).then((response) => {
+        vm.setIncomingData(response.data);
       }, (response) => {
       })
     );
@@ -1177,12 +1194,6 @@ export default {
       }, (response) => {
       })
     );
-  },
-
-  computed: {
-    computedItem() {
-      return this.itemArray;
-    }
   },
 
   methods: {
@@ -1215,7 +1226,7 @@ export default {
       return parseFloat((parseFloat(number1) / parseFloat(number2)).toFixed(2));
     },
 
-    setIncomingData(invoiceData, itemData) {
+    setIncomingData(invoiceData) {
       this.id = invoiceData.id;
       this.invoiceNo = invoiceData.invoice_no;
       this.invoiceStatus = invoiceData.invoice_status;
@@ -1248,7 +1259,6 @@ export default {
       this.sampleComments = invoiceData.sample_comments;
       this.itemArray = invoiceData.item_array;
       this.itemSummary = invoiceData.item_summary;
-      this.perfumesBeforeFormatting = itemData;
       this.hsnList = invoiceData.company.hsn_list;
       this.taxAmountInWords = invoiceData.tax_amount_in_words;
       this.invoiceFinancialYear = invoiceData.financial_year;
@@ -1260,46 +1270,8 @@ export default {
         this.hsnSummaryTotal = invoiceData.tax_summary.hsn_summary_total;
       }
 
-      // Based on packaging type remove item prices. Also remove prices for undefined or null prices
-      // #1. kg/dozen/piece
-      // #2. litre
-
-      // TODO: Remove the items GET request on page load and use autocomplete search item API
-      const vm = this;
-      if (this.packagingType === 1) {
-        this.perfumesBeforeFormatting.forEach((value) => {
-          // Remove the keys which are undefined or null from the value
-          Object.keys(value).forEach((v) => {
-            if (value[v] === undefined || value[v] === null) {
-              delete value[v];
-            }
-          });
-
-          // Remove litre price from this item
-          delete value.litre_price;
-          vm.perfumesAfterFormatting.push(value);
-        });
-      } else if (this.packagingType === 2) {
-        this.perfumesBeforeFormatting.forEach((value) => {
-          // Remove items which don't have a litre price
-          if ('litre_price' in value) {
-            if (value.litre_price !== undefined && value.litre_price !== null) {
-              // Delete all prices except litre price
-              Object.keys(value).forEach((v) => {
-                if (v === 'one_tenth_price' || v === 'quarter_price' || v === 'half_price'
-                    || v === 'bulk_price' || v === 'one_tenth_piece_price' || v === 'quarter_piece_price'
-                    || v === 'dozen_price') {
-                  delete value[v];
-                }
-              });
-
-              vm.perfumesAfterFormatting.push(value);
-            }
-          }
-        });
-      }
-
       // Assign units to each item in itemArray on initialise
+      const vm = this;
       this.itemArray.forEach((item) => {
         item.units_for_display = vm.setUnitForItem(item);
       });
@@ -1372,10 +1344,61 @@ export default {
       }
     },
 
-    closeSearchCard(item, index) {
+    closeSearchCard(index) {
       if (document.getElementById('search-card-' + index)) {
         document.getElementById('search-card-' + index).style.visibility = 'hidden';
       }
+    },
+
+    cleanIncomingItemSearchData(perfumesBeforeFormatting) {
+      // Based on packaging type remove item prices. Also remove prices for undefined or null prices
+      // #1. kg/dozen/piece
+      // #2. litre
+      const vm = this;
+      const perfumesAfterFormatting = [];
+      if (this.packagingType === 1) {
+        perfumesBeforeFormatting.forEach((value) => {
+          // Remove the keys which are undefined or null from the value
+          Object.keys(value).forEach((v) => {
+            if (value[v] === undefined || value[v] === null) {
+              delete value[v];
+            }
+          });
+
+          // Remove litre price from this item
+          delete value.litre_price;
+          perfumesAfterFormatting.push(value);
+        });
+      } else if (this.packagingType === 2) {
+        perfumesBeforeFormatting.forEach((value) => {
+          // Remove items which don't have a litre price
+          if ('litre_price' in value) {
+            if (value.litre_price !== undefined && value.litre_price !== null) {
+              // Delete all prices except litre price
+              Object.keys(value).forEach((v) => {
+                if (v === 'one_tenth_price' || v === 'quarter_price' || v === 'half_price'
+                  || v === 'bulk_price' || v === 'one_tenth_piece_price' || v === 'quarter_piece_price'
+                  || v === 'dozen_price') {
+                  delete value[v];
+                }
+              });
+
+              perfumesAfterFormatting.push(value);
+            }
+          }
+        });
+      }
+      return perfumesAfterFormatting;
+    },
+
+    reformatOrderedItemsForDisplay(data) {
+      let result = [];
+      Object.values(data).forEach((group) => {
+        group.forEach((ordered_item) => {
+          result.push(ordered_item);
+        });
+      });
+      return result;
     },
 
     itemTyped(item) {
@@ -1385,93 +1408,105 @@ export default {
       item.isItemsLoading = true;
       if (query !== '' && query !== null) {
         if (query.length > 2) {
+          // Search for items
           vm.$http.get(process.env.VUE_APP_REST_URL + '/items?search_term=' + query,
             {
               headers: {
                 'Content-Type': 'application/json; charset=utf-8'
               }
             }).then((response) => {
-            item.returned_items = response.data;
-            item.isItemsLoading = false;
-            item.showSearchCard = true;
+            if (response.data.length > 0) {
+              item.returned_items = vm.cleanIncomingItemSearchData(response.data);
+              item.isItemsLoading = false;
+              item.showSearchCard = true;
+            } else {
+              delete item.returned_items;
+              delete item.isItemsLoading;
+              delete item.showSearchCard;
+            }
+
+            // Search for previously ordered items
+            // Add fields for showing if individual item was ordered by a customer in the past
+            item.wasItemPreviouslyOrdered = false;
+            item.previousOrderDetails = [];
+
+            vm.$http.post(process.env.VUE_APP_REST_URL + '/search_ordered_items_by_name',
+              {
+                customer_id: vm.customer.id,
+                search_term: query
+              },
+              {
+                headers: {
+                  'Content-Type': 'application/json; charset=utf-8'
+                }
+              }).then((response1) => {
+              // Match name of the entered item with the response
+              item.previousOrderDetails = vm.reformatOrderedItemsForDisplay(response1.data);
+              if (item.previousOrderDetails.length > 0) {
+                item.wasItemPreviouslyOrdered = true;
+              }
+            }, (response1) => {
+            });
           }, (response) => {
           });
         }
       }
     },
 
-    setItemNameObjectAndInitPriceList(item) {
-      if (item.item_name !== undefined && item.item_name !== null) {
-        if (typeof item.item_name === 'object') {
-          item.item_obj = item.item_name;
-          item.item_name = item.item_name.name;
+    setItemNameObjectAndInitPriceList(item, selectedItemFromSearch, index) {
+      item.item_obj = selectedItemFromSearch;
+      item.item_name = selectedItemFromSearch.name;
 
-          // Set a price list for this item
-          const priceList = [];
-          if (item.item_obj.one_tenth_price !== undefined && item.item_obj.one_tenth_price !== null) {
-            priceList.push({ name: '25 gm', price: item.item_obj.one_tenth_price, weight: 25 });
-          }
-
-          if (item.item_obj.quarter_price !== undefined && item.item_obj.quarter_price !== null) {
-            priceList.push({ name: '100 gm', price: item.item_obj.quarter_price, weight: 100 });
-          }
-
-          if (item.item_obj.half_price !== undefined && item.item_obj.half_price !== null) {
-            priceList.push({ name: '500gm', price: item.item_obj.half_price, weight: 500 });
-          }
-
-          if (item.item_obj.half_price !== undefined && item.item_obj.half_price !== null) {
-            priceList.push({ name: '1Kg', price: item.item_obj.half_price, weight: 1000 });
-          }
-
-          if (item.item_obj.bulk_price !== undefined && item.item_obj.bulk_price !== null) {
-            priceList.push({ name: '5kg', price: item.item_obj.bulk_price, weight: 5000 });
-          }
-
-          if (item.item_obj.bulk_price !== undefined && item.item_obj.bulk_price !== null) {
-            priceList.push({ name: '30Kg', price: item.item_obj.bulk_price, weight: 30000 });
-          }
-
-          if (item.item_obj.dozen_price !== undefined && item.item_obj.dozen_price !== null) {
-            priceList.push({ name: 'dozen', price: item.item_obj.dozen_price, weight: 25 });
-          }
-
-          if (item.item_obj.quarter_piece_price !== undefined && item.item_obj.quarter_piece_price !== null) {
-            priceList.push({ name: '100gm/piece', price: item.item_obj.quarter_piece_price, weight: 100 });
-          }
-
-          if (item.item_obj.one_tenth_piece_price !== undefined && item.item_obj.one_tenth_piece_price !== null) {
-            priceList.push({ name: '25gm/piece', price: item.item_obj.one_tenth_piece_price, weight: 25 });
-          }
-
-          if (item.item_obj.litre_price !== undefined && item.item_obj.litre_price !== null) {
-            priceList.push({ name: 'litre', price: item.item_obj.litre_price, weight: 1 });
-          }
-          item.price_list = priceList;
-        } else {
-          delete item.item_obj;
-          delete item.price_list;
-        }
+      // Set a price list for this item
+      const priceList = [];
+      if (item.item_obj.one_tenth_price !== undefined && item.item_obj.one_tenth_price !== null) {
+        priceList.push({ name: '25 gm', price: item.item_obj.one_tenth_price, weight: 25 });
       }
 
-      // Add fields for showing if individual item was ordered by a customer in the past
-      item.wasItemPreviouslyOrdered = false;
-      item.previousOrderDetails = [];
+      if (item.item_obj.quarter_price !== undefined && item.item_obj.quarter_price !== null) {
+        priceList.push({ name: '100 gm', price: item.item_obj.quarter_price, weight: 100 });
+      }
 
-      // Check if this item was previously ordered by this customer
-      const vm = this;
-      this.$http.get(process.env.VUE_APP_REST_URL + '/ordered_items?customer_id='
-        + vm.customer.id + '&search_term=' + item.item_name,
-      {
-        headers: {
-          'Content-Type': 'application/json; charset=utf-8'
-        }
-      }).then((response) => {
-        // Match name of the entered item with the response
-        item.previousOrderDetails = Object.values(response.data);
-        item.wasItemPreviouslyOrdered = true;
-      }, (response) => {
-      });
+      if (item.item_obj.half_price !== undefined && item.item_obj.half_price !== null) {
+        priceList.push({ name: '500gm', price: item.item_obj.half_price, weight: 500 });
+      }
+
+      if (item.item_obj.half_price !== undefined && item.item_obj.half_price !== null) {
+        priceList.push({ name: '1Kg', price: item.item_obj.half_price, weight: 1000 });
+      }
+
+      if (item.item_obj.bulk_price !== undefined && item.item_obj.bulk_price !== null) {
+        priceList.push({ name: '5kg', price: item.item_obj.bulk_price, weight: 5000 });
+      }
+
+      if (item.item_obj.bulk_price !== undefined && item.item_obj.bulk_price !== null) {
+        priceList.push({ name: '30Kg', price: item.item_obj.bulk_price, weight: 30000 });
+      }
+
+      if (item.item_obj.dozen_price !== undefined && item.item_obj.dozen_price !== null) {
+        priceList.push({ name: 'dozen', price: item.item_obj.dozen_price, weight: 25 });
+      }
+
+      if (item.item_obj.quarter_piece_price !== undefined && item.item_obj.quarter_piece_price !== null) {
+        priceList.push({ name: '100gm/piece', price: item.item_obj.quarter_piece_price, weight: 100 });
+      }
+
+      if (item.item_obj.one_tenth_piece_price !== undefined && item.item_obj.one_tenth_piece_price !== null) {
+        priceList.push({ name: '25gm/piece', price: item.item_obj.one_tenth_piece_price, weight: 25 });
+      }
+
+      if (item.item_obj.litre_price !== undefined && item.item_obj.litre_price !== null) {
+        priceList.push({ name: 'litre', price: item.item_obj.litre_price, weight: 1 });
+      }
+      item.price_list = priceList;
+
+      // Remove the keys added to item which were applied in - this.itemTyped(item) - function
+      delete item.returned_items;
+      delete item.isItemsLoading;
+      delete item.showSearchCard;
+
+      // Close the search card once the item is selected & price list has been formed
+      this.closeSearchCard(index);
     },
 
     checkIfDiscountEnabled(item) {
