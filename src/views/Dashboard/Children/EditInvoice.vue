@@ -1546,11 +1546,6 @@ export default {
       }
       item.price_list = priceList;
 
-      // Remove the keys added to item which were applied in - this.itemTyped(item) - function
-      delete item.returned_items;
-      delete item.isItemsLoading;
-      delete item.showSearchCard;
-
       // Close the search card once the item is selected & price list has been formed
       this.closeSearchCard(index);
     },
@@ -1997,6 +1992,14 @@ export default {
 
         delete item.wasItemPreviouslyOrdered;
         delete item.previousOrderDetails;
+        delete item.item_obj;
+        delete item.item_price_obj;
+        delete item.price_list;
+
+        // Remove the keys added to item which were applied in - this.itemTyped(item) - function
+        delete item.returned_items;
+        delete item.isItemsLoading;
+        delete item.showSearchCard;
       });
 
       if (vm.editInvoiceFormValid) {

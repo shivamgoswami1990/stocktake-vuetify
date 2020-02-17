@@ -1,17 +1,33 @@
 <template>
   <v-app>
 
-    <v-app-bar app short elevate-on-scroll color="primary">
-      <v-select :items="this.financialYearList().financial_year" background-color="primary"
-                color="primary" prefix="FY :"
-                dark :filled="false" append-icon="" hide-details v-model="selectedYear"
-                class="hidden-sm-and-down" @change="setFinancialYear">
-      </v-select>
+    <v-app-bar app elevate-on-scroll color="primary">
+      <div style="width: 150px">
+        <v-select :items="this.financialYearList().financial_year"
+                  prefix="FY :" rounded height="40" dark
+                  :filled="false" append-icon="" hide-details v-model="selectedYear"
+                  class="hidden-sm-and-down" @change="setFinancialYear">
+        </v-select>
+      </div>
+
+      <v-avatar>
+        <v-img :src="logoImage" contain height="40" alt="logo" ></v-img>
+      </v-avatar>
+
+      <v-btn @click="loadNotificationDrawer" icon>
+        <v-badge :content="notificationCount" :value="notificationCount" color="success">
+          <span class="subtitle-1 white--text">{{userInitials}}</span>
+        </v-badge>
+      </v-btn>
+
+      <v-btn elevation="0" :to="{ name: 'newInvoice' }" rounded class="ml-7" height="40">
+        Create Invoice
+      </v-btn>
 
       <v-spacer></v-spacer>
 
-      <!-- Hide nav bar buttons if not logged in -->
-      <v-autocomplete background-color="white" flat rounded placeholder="Search invoice ..."
+      <div style="width: 450px">
+        <v-autocomplete background-color="white" flat rounded placeholder="Search invoice ..."
                       hide-details hide-no-data v-if="isLoggedIn()" class="hidden-md-and-down global-search"
                       v-model="searchModel" :loading="isSearchLoading" :items="searchItems"
                       :search-input.sync="search" item-value="id" no-filter append-icon=""
@@ -28,168 +44,23 @@
           <invoice-display-list :data="[item]" width="450px" clickable-tile></invoice-display-list>
         </template>
       </v-autocomplete>
-
-      <v-divider vertical class="white mx-3"></v-divider>
-
-      <v-btn @click="loadNotificationDrawer" icon>
-        <v-badge :content="notificationCount" :value="notificationCount" color="success" overlap>
-          <v-icon color="white">mdi-bell-alert</v-icon>
-        </v-badge>
-      </v-btn>
-
-      <v-divider vertical class="white mx-3"></v-divider>
+      </div>
 
       <v-btn height="48px" color="primary" :ripple="false" depressed tile elevation="0"
-             v-if="isLoggedIn()" @click="logoutUser()">LOGOUT</v-btn>
-    </v-app-bar>
+             v-if="isLoggedIn()" @click="logoutUser()" class="subtitle-1">
+        LOGOUT
+      </v-btn>
 
-    <v-navigation-drawer dark permanent color="white" app width="200" v-if="isLoggedIn()" class="elevation-1">
-      <v-responsive>
-        <v-avatar class="mx-auto d-flex my-2">
-          <v-img :src="logoImage" contain height="40" alt="logo" ></v-img>
-        </v-avatar>
-      </v-responsive>
-
-      <v-list light class="my-5">
-        <router-link :to="{ name: 'main'}">
-          <v-list-item>
-            <v-list-item-icon>
-              <v-icon>mdi-view-dashboard</v-icon>
-            </v-list-item-icon>
-
-            <v-list-item-content>
-              <v-list-item-title class="font-weight-medium title">Dashboard</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-        </router-link>
-
-        <router-link :to="{ name: 'companies'}">
-          <v-list-item>
-            <v-list-item-icon>
-              <v-icon>mdi-domain</v-icon>
-            </v-list-item-icon>
-
-            <v-list-item-content>
-              <v-list-item-title class="font-weight-medium title">Companies</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-        </router-link>
-
-        <router-link :to="{ name: 'customers'}">
-          <v-list-item>
-            <v-list-item-icon>
-              <v-icon>mdi-home-variant</v-icon>
-            </v-list-item-icon>
-
-            <v-list-item-content>
-              <v-list-item-title class="font-weight-medium title">Customers</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-        </router-link>
-
-        <router-link :to="{ name: 'items'}">
-          <v-list-item>
-            <v-list-item-icon>
-              <v-icon>mdi-briefcase</v-icon>
-            </v-list-item-icon>
-
-            <v-list-item-content>
-              <v-list-item-title class="font-weight-medium title">Items</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-        </router-link>
-
-        <router-link :to="{ name: 'transports'}">
-          <v-list-item>
-            <v-list-item-icon>
-              <v-icon>mdi-truck</v-icon>
-            </v-list-item-icon>
-
-            <v-list-item-content>
-              <v-list-item-title class="font-weight-medium title">Transports</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-        </router-link>
-
-        <router-link :to="{ name: 'users'}">
-          <v-list-item>
-            <v-list-item-icon>
-              <v-icon>mdi-account-box</v-icon>
-            </v-list-item-icon>
-
-            <v-list-item-content>
-              <v-list-item-title class="font-weight-medium title">Users</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-        </router-link>
-
-        <router-link :to="{ name: 'hsnSummary'}">
-          <v-list-item>
-            <v-list-item-icon>
-              <v-icon>mdi-finance</v-icon>
-            </v-list-item-icon>
-
-            <v-list-item-content>
-              <v-list-item-title class="font-weight-medium title">HSN</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-        </router-link>
-
-        <router-link :to="{ name: 'invoices'}">
-          <v-list-item>
-            <v-list-item-icon>
-              <v-icon>mdi-history</v-icon>
-            </v-list-item-icon>
-
-            <v-list-item-content>
-              <v-list-item-title class="font-weight-medium title">History</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-        </router-link>
-
-        <router-link :to="{ name: 'analysis'}">
-          <v-list-item>
-            <v-list-item-icon>
-              <v-icon>mdi-google-analytics</v-icon>
-            </v-list-item-icon>
-
-            <v-list-item-content>
-              <v-list-item-title class="font-weight-medium title">Analysis</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-        </router-link>
-      </v-list>
-
-      <template v-slot:append>
-        <v-card color="white" light tile elevation="1" width="100%" class="pa-4">
-          <v-card-text>
-            <v-avatar color="primary" size="45"
-                      class="d-flex mx-auto white--text font-weight-medium title">
-              {{userInitials}}
-            </v-avatar>
-
-            <p class="text-center title mt-2 py-0 mb-0">
-              {{userDetails().first_name + ' ' + userDetails().last_name}}
+      <template v-slot:extension>
+        <div class="menu-extension-list">
+          <router-link v-for="(item, index) in menuItems" :key="index" :to="{ name: item.linkTo}">
+            <p class="font-weight-medium title">
+              <v-icon>mdi-{{item.icon}}</v-icon> {{item.name}}
             </p>
-
-            <p class="text-center subtitle-1 my-0 py-0">
-              {{userDetails().email}}
-            </p>
-
-            <p class="text-center subtitle-1 my-0 py-0">
-              {{userDetails().invoice_count + ' invoices'}}
-            </p>
-          </v-card-text>
-
-          <v-card-actions>
-            <v-btn block tile elevation="0" color="primary" :to="{ name: 'newInvoice'}">
-              Create invoice
-            </v-btn>
-          </v-card-actions>
-
-        </v-card>
+          </router-link>
+        </div>
       </template>
-    </v-navigation-drawer>
+    </v-app-bar>
 
     <v-content>
       <v-container fluid>
@@ -203,43 +74,29 @@
 </template>
 
 <style lang="scss">
-  .financial-year-selector {
-    width: 90px;
-    height: 80px;
+  .menu-extension-list {
+    width: 100%;
+    display: flex;
+    list-style: none;
+    justify-content: center;
 
-    & .v-input__control {
-      width: 90px;
-
-      & > div {
-        width: 90px;
-
-        & .v-select__selections {
-          & > div {
-            font-size: 14px;
-          }
+    a {
+      text-decoration: none;
+      &.router-link-active {
+        background-color: #CFD8DC;
+        p, i {
+          color: black !important;
         }
       }
-    }
-  }
-
-  nav {
-    a {
-      text-decoration: unset;
-    }
-    .router-link-exact-active.router-link-active {
-      text-decoration: unset;
-      background-color: #673ab7;
-      color: white;
-
-      .v-list-item {
-        background-color: inherit;
-
-        i.v-icon {
-          color: white;
-        }
-
-        .v-list-item__title {
-          color: white;
+      p {
+        padding: 10px 15px;
+        margin: 0;
+        color: white;
+        display: flex;
+        align-content: center;
+        i {
+          margin-right: 10px;
+          color: white !important;
         }
       }
     }
@@ -264,7 +121,54 @@ export default {
     userInitials: null,
     selectedYear: null,
     notificationDrawerComponent: null,
-    notificationCount: 0
+    notificationCount: 0,
+    menuItems: [
+      {
+        name: 'Dashboard',
+        icon: 'view-dashboard',
+        linkTo: 'main'
+      },
+      {
+        name: 'Companies',
+        icon: 'domain',
+        linkTo: 'companies'
+      },
+      {
+        name: 'Customers',
+        icon: 'home-variant',
+        linkTo: 'customers'
+      },
+      {
+        name: 'Items',
+        icon: 'briefcase',
+        linkTo: 'items'
+      },
+      {
+        name: 'Transports',
+        icon: 'truck',
+        linkTo: 'transports'
+      },
+      {
+        name: 'Users',
+        icon: 'account-box',
+        linkTo: 'users'
+      },
+      {
+        name: 'HSN',
+        icon: 'finance',
+        linkTo: 'hsnSummary'
+      },
+      {
+        name: 'History',
+        icon: 'history',
+        linkTo: 'invoices'
+      },
+      {
+        name: 'Analysis',
+        icon: 'google-analytics',
+        linkTo: 'analysis'
+      }
+    ]
   }),
   beforeRouteEnter(to, from, next) {
     // Get the notification count
