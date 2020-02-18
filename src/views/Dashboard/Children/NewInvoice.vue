@@ -6,7 +6,8 @@
       <v-layout wrap>
 
         <v-flex md4>
-          <v-card color="white" height="100%" justify-center v-if="stepValue <= 1" tile flat>
+          <v-card color="white" height="100%" justify-center tile flat
+                  v-if="stepValue <= 1 && selectedCustomer === ''">
             <v-container fluid fill-height>
               <v-layout justify-center align-center>
                 Choose customer to start
@@ -14,12 +15,12 @@
             </v-container>
           </v-card>
 
-          <v-card class="hidden-sm-and-down" v-if="stepValue > 1" flat tile>
+          <v-card class="hidden-sm-and-down" v-if="selectedCustomer" flat tile>
 
             <v-list two-line subheader>
               <v-subheader><h3>Last invoice by date</h3></v-subheader>
               <p v-if="!isLastInvoiceForCustomerPresent" class="text-xs-center pl-4">No invoice present</p>
-              <template v-if="isLastInvoiceForCustomerPresent && lastInvoicesForCustomer.created_at.invoice_no">
+              <template v-if="isLastInvoiceForCustomerPresent && checkDisplayConditionsForPrefillAlert">
                 <v-list-item ripple>
                   <v-list-item-content>
                     <v-list-item-title>{{lastInvoicesForCustomer.created_at.invoice_no}}</v-list-item-title>
@@ -118,7 +119,6 @@
 
             <v-stepper-content step="1">
               <v-flex>
-
                 <v-autocomplete hide-no-data v-model="selectedCustomer"
                                 :loading="isCustomerDataLoading" :items="customersList"
                                 :search-input.sync="searchCustomer" item-text="name"
@@ -128,13 +128,34 @@
                     <v-list-item-avatar color="primary" class="headline font-weight-light white--text">
                       {{ item.name.charAt(0) }}
                     </v-list-item-avatar>
-                    <v-list-item-content>
+                    <v-list-item-content @click="customerClicked(item)">
                       <v-list-item-title v-text="item.name"></v-list-item-title>
                       <v-list-item-subtitle v-text="item.city + ', ' + item.state_name"></v-list-item-subtitle>
                     </v-list-item-content>
                   </template>
                 </v-autocomplete>
               </v-flex>
+
+              <v-alert color="primary" type="info" outlined dense
+                       class="subtitle-1" v-if="checkDisplayConditionsForPrefillAlert">
+                Quickly create invoice for
+                <b>
+                  {{lastInvoicesForCustomer.created_at.company_details.name}},
+                  {{lastInvoicesForCustomer.created_at.company_details.city}}.
+                </b>
+                <br>
+                Choose packaging -
+                <a class="font-weight-bold" @click="preSelectSteps(0)"
+                   style="text-decoration: underline">
+                  kg/dozen/piece
+                </a>
+                OR
+                <a class="font-weight-bold" @click="preSelectSteps(1)"
+                   style="text-decoration: underline">
+                  litre
+                </a>
+              </v-alert>
+
               <v-btn color="primary" @click="getLastCreatedInvoiceForCustomer"
                      :disabled="checkSelectedCustomer" :loading="customerButtonLoading">
                 Continue
@@ -379,6 +400,15 @@ export default {
           return false;
         }
       }
+    },
+    checkDisplayConditionsForPrefillAlert() {
+      if ('created_at' in this.lastInvoicesForCustomer) {
+        if ('invoice_no' in this.lastInvoicesForCustomer.created_at) {
+          if (this.lastInvoicesForCustomer.created_at.invoice_no !== '') {
+            return true;
+          }
+        }
+      }
     }
   },
 
@@ -416,10 +446,10 @@ export default {
   },
 
   methods: {
-    getLastCreatedInvoiceForCustomer() {
+    customerClicked(customer) {
       const vm = this;
+      vm.selectedCustomer = customer;
       vm.customerButtonLoading = true;
-      console.log(vm.selectedCustomer);
       this.$http.get(process.env.VUE_APP_REST_URL + '/customers/' + vm.selectedCustomer.id
         + '/last_created_invoice?financial_year=' + vm.currentlySelectedFinancialYear,
       {
@@ -441,7 +471,6 @@ export default {
               'Content-Type': 'application/json; charset=utf-8'
             }
           }).then((response1) => {
-          vm.stepValue = 2;
           vm.companies = response1.data;
         }, (response1) => {
         });
@@ -451,6 +480,26 @@ export default {
       }, (response) => {
         vm.customerButtonLoading = false;
       });
+    },
+
+    preSelectSteps(packagingTypeIndex) {
+      // Select company from the list of companies
+      const vm = this;
+      if (vm.lastInvoicesForCustomer !== undefined
+        && vm.lastInvoicesForCustomer !== null) {
+        vm.companies.forEach((company) => {
+          if (company.id === vm.lastInvoicesForCustomer.created_at.company_id) {
+            vm.selectedCompany = company;
+            vm.getLastCreatedInvoiceForCompany();
+            vm.selectedPackaging = vm.packaging_options[packagingTypeIndex];
+            vm.stepValue = 3;
+          }
+        });
+      }
+    },
+
+    getLastCreatedInvoiceForCustomer() {
+      this.stepValue = 2;
     },
 
     getLastCreatedInvoiceForCompany() {

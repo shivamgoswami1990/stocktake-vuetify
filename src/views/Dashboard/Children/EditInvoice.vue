@@ -714,7 +714,14 @@
 
                         <td style="width: 6%;">{{item.units_for_display}}</td>
 
-                        <td style="width: 2%;"><v-icon @click="deleteItem(item)">mdi-delete</v-icon></td>
+                        <td style="width: 10%;">
+                          <v-btn icon @click="copyItem(item)" class="mr-2">
+                            <v-icon>mdi-content-copy</v-icon>
+                          </v-btn>
+                          <v-btn icon @click="deleteItem(item)" class="mr-2">
+                            <v-icon>mdi-delete</v-icon>
+                          </v-btn>
+                        </td>
 
                         <td class="text-right">₹ {{item.item_amount}}</td>
                       </tr>
@@ -1339,6 +1346,14 @@ export default {
         }
       }, (response) => {
       });
+    },
+
+    copyItem(item) {
+      this.itemArray.push(JSON.parse(JSON.stringify(item)));
+      this.itemArray[this.itemArray.length - 1].item_price = 0;
+      this.itemArray[this.itemArray.length - 1].packaging = 0;
+      this.itemArray[this.itemArray.length - 1].no_of_items = 0;
+      this.setItemPriceObjectAndInitPackagingAndUnits(this.itemArray[this.itemArray.length - 1]);
     },
 
     deleteItem(item) {
