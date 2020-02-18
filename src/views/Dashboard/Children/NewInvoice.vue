@@ -393,7 +393,10 @@ export default {
             const vm = this;
             vm.isCustomerDataLoading = true;
 
-            this.$http.get(process.env.VUE_APP_REST_URL + '/customers?search_term=' + val,
+            this.$http.post(process.env.VUE_APP_REST_URL + '/search_customers',
+              {
+                search_term: val
+              },
               {
                 headers: {
                   'Content-Type': 'application/json; charset=utf-8'

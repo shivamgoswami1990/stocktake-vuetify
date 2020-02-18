@@ -388,7 +388,10 @@ export default {
           clearTimeout(this._searchTimerId);
           // eslint-disable-next-line no-underscore-dangle
           this._searchTimerId = setTimeout(() => {
-            vm.$http.get(process.env.VUE_APP_REST_URL + '/items?search_term=' + vm.search,
+            vm.$http.post(process.env.VUE_APP_REST_URL + '/search_items',
+              {
+                search_term: vm.search
+              },
               {
                 headers: {
                   'Content-Type': 'application/json; charset=utf-8'

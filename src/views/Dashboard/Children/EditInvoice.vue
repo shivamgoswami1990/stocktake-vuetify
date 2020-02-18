@@ -1435,7 +1435,10 @@ export default {
       if (query !== '' && query !== null) {
         if (query.length > 2) {
           // Search for items
-          vm.$http.get(process.env.VUE_APP_REST_URL + '/items?search_term=' + query,
+          vm.$http.post(process.env.VUE_APP_REST_URL + '/search_items',
+            {
+              search_term: query
+            },
             {
               headers: {
                 'Content-Type': 'application/json; charset=utf-8'

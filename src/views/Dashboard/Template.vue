@@ -231,13 +231,16 @@ export default {
             const vm = this;
             vm.isSearchLoading = true;
 
-            this.$http.get(process.env.VUE_APP_REST_URL + '/past_invoices?search_term=' + val
-              + '&financial_year=' + vm.currentlySelectedFinancialYear,
-            {
-              headers: {
-                'Content-Type': 'application/json; charset=utf-8'
-              }
-            }).then((response) => {
+            this.$http.post(process.env.VUE_APP_REST_URL + '/past_invoices',
+              {
+                search_term: val,
+                financial_year: vm.currentlySelectedFinancialYear
+              },
+              {
+                headers: {
+                  'Content-Type': 'application/json; charset=utf-8'
+                }
+              }).then((response) => {
               vm.searchItems = response.data;
               vm.isSearchLoading = false;
               return response.data;
