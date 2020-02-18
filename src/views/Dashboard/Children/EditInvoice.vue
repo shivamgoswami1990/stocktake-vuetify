@@ -1994,9 +1994,9 @@ export default {
 
         delete item.wasItemPreviouslyOrdered;
         delete item.previousOrderDetails;
-        delete item.item_obj;
-        delete item.item_price_obj;
-        delete item.price_list;
+        // delete item.item_obj;
+        // delete item.item_price_obj;
+        // delete item.price_list;
 
         // Remove the keys added to item which were applied in - this.itemTyped(item) - function
         delete item.returned_items;
