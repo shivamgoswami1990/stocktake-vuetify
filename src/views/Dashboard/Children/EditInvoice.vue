@@ -506,6 +506,7 @@
                       <tr v-for="(item, index) in itemArray" :key="index">
                         <td style="position: relative">
                           <v-text-field v-model="item.item_name" hide-details @input="itemTyped(item)"
+                                        placeholder="Search item ..."
                                         @focusin="showSearchCard(item, index)"
                                         @click="showSearchCard(item, index)"
                                         :loading="item.isItemsLoading">
@@ -547,10 +548,18 @@
                                 <!-- Items from recently ordered items API -->
                                 <v-col cols="12" md="7" class="px-1">
                                   <h2 class="py-2 text-center">Ordered items</h2>
+
+                                  <v-layout align-center justify-center v-if="item.isLoadingPreviouslyOrderedItems">
+                                    <v-progress-circular indeterminate color="primary" :size="40"
+                                                         :width="7" class="my-5 mx-auto">
+                                    </v-progress-circular>
+                                  </v-layout>
+
                                   <p class="py-2 text-center" v-if="!item.wasItemPreviouslyOrdered">
                                     No previously ordered items found
                                   </p>
-                                  <v-list dense v-if="item.previousOrderDetails.length > 0" tile>
+                                  <v-list dense v-if="item.previousOrderDetails.length > 0
+                                   && !item.isLoadingPreviouslyOrderedItems" tile>
                                     <v-list-item v-for="(val, key) in item.previousOrderDetails" :key="key">
                                       <v-list-item-avatar color="primary"
                                                           class="headline font-weight-light white--text">
@@ -1449,50 +1458,57 @@ export default {
       item.isItemsLoading = true;
       if (query !== '' && query !== null) {
         if (query.length > 2) {
-          // Search for items
-          vm.$http.post(process.env.VUE_APP_REST_URL + '/search_items',
-            {
-              search_term: query
-            },
-            {
-              headers: {
-                'Content-Type': 'application/json; charset=utf-8'
-              }
-            }).then((response) => {
-            if (response.data.length > 0) {
-              item.returned_items = vm.cleanIncomingItemSearchData(response.data);
-              item.isItemsLoading = false;
-              item.showSearchCard = true;
-            } else {
-              delete item.returned_items;
-              delete item.isItemsLoading;
-              delete item.showSearchCard;
-            }
-
-            // Search for previously ordered items
-            // Add fields for showing if individual item was ordered by a customer in the past
-            item.wasItemPreviouslyOrdered = false;
-            item.previousOrderDetails = [];
-
-            vm.$http.post(process.env.VUE_APP_REST_URL + '/search_ordered_items_by_name',
+          // eslint-disable-next-line no-underscore-dangle
+          clearTimeout(vm._searchTimerId);
+          // eslint-disable-next-line no-underscore-dangle
+          vm._searchTimerId = setTimeout(() => {
+            // Search for items
+            vm.$http.post(process.env.VUE_APP_REST_URL + '/search_items',
               {
-                customer_id: vm.customer.id,
                 search_term: query
               },
               {
                 headers: {
                   'Content-Type': 'application/json; charset=utf-8'
                 }
-              }).then((response1) => {
-              // Match name of the entered item with the response
-              item.previousOrderDetails = vm.reformatOrderedItemsForDisplay(response1.data);
-              if (item.previousOrderDetails.length > 0) {
-                item.wasItemPreviouslyOrdered = true;
+              }).then((response) => {
+              if (response.data.length > 0) {
+                item.returned_items = vm.cleanIncomingItemSearchData(response.data);
+                item.isItemsLoading = false;
+                item.showSearchCard = true;
+              } else {
+                delete item.returned_items;
+                delete item.isItemsLoading;
+                delete item.showSearchCard;
               }
-            }, (response1) => {
+
+              // Search for previously ordered items
+              // Add fields for showing if individual item was ordered by a customer in the past
+              item.wasItemPreviouslyOrdered = false;
+              item.isLoadingPreviouslyOrderedItems = true;
+              item.previousOrderDetails = [];
+
+              vm.$http.post(process.env.VUE_APP_REST_URL + '/search_ordered_items_by_name',
+                {
+                  customer_id: vm.customer.id,
+                  search_term: query
+                },
+                {
+                  headers: {
+                    'Content-Type': 'application/json; charset=utf-8'
+                  }
+                }).then((response1) => {
+                // Match name of the entered item with the response
+                item.previousOrderDetails = vm.reformatOrderedItemsForDisplay(response1.data);
+                item.isLoadingPreviouslyOrderedItems = false;
+                if (item.previousOrderDetails.length > 0) {
+                  item.wasItemPreviouslyOrdered = true;
+                }
+              }, (response1) => {
+              });
+            }, (response) => {
             });
-          }, (response) => {
-          });
+          }, 1000); /* 1000ms throttle */
         }
       }
     },

@@ -35,7 +35,8 @@
 
         <v-tabs-items v-model="tabs">
           <v-tab-item value="search-items">
-            <v-text-field label="Search ordered items" v-model="searchTerm" flat color="black"
+            <v-text-field label="Search items starting with 'A' / Search by name"
+                          v-model="searchTerm" flat color="black"
                           :loading="isSearchedItemsLoading" solo hide-details clearable
                           @input="searchRecentlyOrderedItems">
             </v-text-field>
@@ -100,13 +101,16 @@ export default {
     recentOrderedItemsTabClicked() {
       const vm = this;
       vm.isRecentItemsDataLoading = true;
-      vm.$http.get(process.env.VUE_APP_REST_URL + '/ordered_items?customer_id='
-        + vm.$attrs.data.id + '&recent_items=true',
-      {
-        headers: {
-          'Content-Type': 'application/json; charset=utf-8'
-        }
-      })
+      vm.$http.post(process.env.VUE_APP_REST_URL + '/search_ordered_items_by_name',
+        {
+          customer_id: vm.$attrs.data.id,
+          recent_items: true
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json; charset=utf-8'
+          }
+        })
         .then((response) => {
           vm.isRecentItemsDataLoading = false;
           vm.recentlyOrderedItems = Object.values(response.data);
@@ -119,23 +123,30 @@ export default {
       const vm = this;
 
       if (vm.searchTerm !== undefined && vm.searchTerm !== null) {
-        if (vm.searchTerm.length > 1) {
+        if (vm.searchTerm.length > 0) {
           vm.isSearchedItemsLoading = true;
-          vm.$http.post(process.env.VUE_APP_REST_URL + '/search_ordered_items_by_name',
-            {
-              customer_id: vm.$attrs.data.id,
-              search_term: vm.searchTerm
-            },
-            {
-              headers: {
-                'Content-Type': 'application/json; charset=utf-8'
-              }
-            }).then((response) => {
-            vm.isSearchedItemsLoading = false;
-            vm.searchedOrderedItems = Object.values(response.data);
-          }, (response) => {
-            vm.isSearchedItemsLoading = false;
-          });
+
+          // eslint-disable-next-line no-underscore-dangle
+          clearTimeout(this._searchTimerId);
+          // eslint-disable-next-line no-underscore-dangle
+          this._searchTimerId = setTimeout(() => {
+            vm.$http.post(process.env.VUE_APP_REST_URL + '/search_ordered_items_by_name',
+              {
+                customer_id: vm.$attrs.data.id,
+                search_term: vm.searchTerm,
+                is_single_letter_search: (vm.searchTerm.length === 1)
+              },
+              {
+                headers: {
+                  'Content-Type': 'application/json; charset=utf-8'
+                }
+              }).then((response) => {
+              vm.isSearchedItemsLoading = false;
+              vm.searchedOrderedItems = Object.values(response.data);
+            }, (response) => {
+              vm.isSearchedItemsLoading = false;
+            });
+          }, 1000); /* 1000ms throttle */
         } else {
           vm.searchedOrderedItems = [];
         }
