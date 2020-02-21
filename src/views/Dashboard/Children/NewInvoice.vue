@@ -120,6 +120,7 @@
             <v-stepper-content step="1">
               <v-flex>
                 <v-autocomplete hide-no-data v-model="selectedCustomer"
+                                placeholder="Search for a customer ..."
                                 :loading="isCustomerDataLoading" :items="customersList"
                                 :search-input.sync="searchCustomer" item-text="name"
                                 item-value="id" no-filter return-object clearable>
@@ -183,6 +184,7 @@
             <v-stepper-content step="2">
               <v-flex>
                 <v-autocomplete v-model="selectedCompany" :items="companies"
+                                placeholder="Search for a company ..."
                                 item-text="name" item-value="id" return-object clearable>
                   <template slot="item" slot-scope="{ item, tile }">
                     <v-list-item-avatar color="primary" class="headline font-weight-light white--text">
@@ -296,11 +298,12 @@
       </v-card>
     </v-dialog>
 
-    <customer-modal :dialog.sync="showAddCustomerModal"/>
+    <customer-modal :dialog.sync="showAddCustomerModal" @successResponse="successResponse"
+                    @errorResponse="errorResponse"/>
 
-    <v-snackbar v-model="showToast" color="error" :timeout=7000 bottom right>
+    <v-snackbar v-model="showToast" :color="toastColor" :timeout="toastTimeout" bottom right>
       {{ toastMessage }}
-      <v-btn dark text @click="showToast = false">Close</v-btn>
+      <v-btn dark depressed text @click="showToast = false">Close</v-btn>
     </v-snackbar>
   </v-card>
 </template>
@@ -332,8 +335,10 @@ export default {
       createInvoiceButtonLoading: false,
       isLastInvoiceForCustomerPresent: false,
       isLastInvoiceForCompanyPresent: false,
-      showToast: false,
       toastMessage: '',
+      toastTimeout: 5000,
+      toastColor: '',
+      showToast: false,
       lastInvoicesForCustomer: {},
       mostRecentInvoiceNoForCompany: '',
       createdDateForCompanyInvoice: '',
@@ -461,6 +466,36 @@ export default {
   },
 
   methods: {
+    successResponse(data) {
+      // On operation complete, add / update table record
+      if (data.type === 'add') {
+        // Set selected customer
+        this.customersList = [data.data];
+        this.selectedCustomer = this.customersList[0];
+        this.stepValue = 2;
+
+        // Show success toast
+        this.showToast = true;
+        this.toastMessage = 'Successfully created customer';
+        this.toastColor = 'success';
+      }
+    },
+
+    errorResponse(data) {
+      if (data.type === 'add') {
+        // error callback. Show error alert
+        if (data.status === 409) {
+          this.showToast = true;
+          this.toastMessage = 'Customer already exists with GSTIN No';
+          this.toastColor = 'error';
+        } else {
+          this.showToast = true;
+          this.toastMessage = 'Something went wrong';
+          this.toastColor = 'error';
+        }
+      }
+    },
+
     customerClicked(customer) {
       const vm = this;
       vm.selectedCustomer = customer;
@@ -677,6 +712,7 @@ export default {
             if (response.data.data !== undefined && response.data.data !== null) {
               vm.showToast = true;
               vm.toastMessage = response.data.data;
+              vm.toastColor = 'error';
             }
           }
         }
