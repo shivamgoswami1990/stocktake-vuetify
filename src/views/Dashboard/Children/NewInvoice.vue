@@ -124,6 +124,12 @@
                                 :search-input.sync="searchCustomer" item-text="name"
                                 item-value="id" no-filter return-object clearable>
 
+                  <template slot="prepend">
+                    <v-btn icon color="primary" @click="showAddCustomerModal = true">
+                      <v-icon size="30">mdi-plus-circle</v-icon>
+                    </v-btn>
+                  </template>
+
                   <template slot="item" slot-scope="{ item, tile }">
                     <v-list-item-avatar color="primary" class="headline font-weight-light white--text">
                       {{ item.name.charAt(0) }}
@@ -290,6 +296,8 @@
       </v-card>
     </v-dialog>
 
+    <customer-modal :dialog.sync="showAddCustomerModal"/>
+
     <v-snackbar v-model="showToast" color="error" :timeout=7000 bottom right>
       {{ toastMessage }}
       <v-btn dark text @click="showToast = false">Close</v-btn>
@@ -298,6 +306,8 @@
 </template>
 
 <script>
+import CustomerModal from '@/components/CustomerModal.vue';
+
 export default {
   data() {
     return {
@@ -330,8 +340,13 @@ export default {
       recentInvoicesForCompany: [],
       previousInvoiceDate: null,
       nextInvoiceDate: null,
-      showSkippedInvoiceNoDialog: false
+      showSkippedInvoiceNoDialog: false,
+      showAddCustomerModal: false
     };
+  },
+
+  components: {
+    CustomerModal
   },
 
   computed: {
