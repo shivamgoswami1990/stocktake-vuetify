@@ -13,23 +13,23 @@
     "vue": "^2.6.11",
     "vue-chartjs": "^3.5.0",
     "vue-resource": "^1.5.1",
-    "vue-router": "^3.1.5",
-    "vuetify": "^2.2.14",
+    "vue-router": "^3.1.6",
+    "vuetify": "^2.2.15",
     "written-number": "^0.9.1"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^4.2.2",
-    "@vue/cli-plugin-eslint": "^4.2.2",
-    "@vue/cli-service": "^4.2.2",
+    "@vue/cli-plugin-babel": "^4.2.3",
+    "@vue/cli-plugin-eslint": "^4.2.3",
+    "@vue/cli-service": "^4.2.3",
     "@vue/eslint-config-airbnb": "^5.0.2",
-    "babel-eslint": "^10.0.3",
+    "babel-eslint": "^10.1.0",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "chart.js": "^2.9.3",
     "eslint": "^6.8.0",
     "eslint-plugin-vuetify": "~1.0.0-beta.6",
     "eslint-plugin-vue": "^6.2.1",
-    "postcss-pxtorem": "^4.0.1",
-    "sass": "^1.25.0",
+    "postcss-pxtorem": "^5.1.0",
+    "sass": "^1.26.2",
     "sass-loader": "^7.3.0",
     "vue-cli-plugin-vuetify": "^2.0.5",
     "vue-template-compiler": "^2.6.11",
@@ -72,7 +72,7 @@
     "plugins": {
       "autoprefixer": {},
       "postcss-pxtorem": {
-        "rootValue": 14,
+        "rootValue": 15,
         "unitPrecision": 5,
         "propList": [
           "*"
