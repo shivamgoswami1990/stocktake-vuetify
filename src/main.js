@@ -21,9 +21,10 @@ Vue.prototype.financialYearList = () => {
   const nextYear = (today.getFullYear() + 1) + '';
   let result;
 
-  if (currentMonth >= 4) {
+  if (currentMonth >= 3) {
     // eslint-disable-next-line radix
     result = currentYear + '-' + nextYear.charAt(2) + nextYear.charAt(3);
+    console.log(result);
   } else {
     result = previousYear + '-' + currentYear.charAt(2) + currentYear.charAt(3);
   }
