@@ -24,7 +24,6 @@ Vue.prototype.financialYearList = () => {
   if (currentMonth >= 3) {
     // eslint-disable-next-line radix
     result = currentYear + '-' + nextYear.charAt(2) + nextYear.charAt(3);
-    console.log(result);
   } else {
     result = previousYear + '-' + currentYear.charAt(2) + currentYear.charAt(3);
   }
@@ -76,6 +75,7 @@ Vue.prototype.postageOptionsList = function () {
     0: 'Postage & Courier charges',
     1: 'Labour charges',
     2: 'Postage & Courier & Labour charges',
+    3: 'Freight paid',
   };
 };
 

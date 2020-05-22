@@ -603,48 +603,6 @@
                               </v-row>
                             </v-card-text>
                           </v-card>
-
-<!--                          <v-combobox v-model="item.item_name" :items="perfumesAfterFormatting"-->
-<!--                                      hide-details item-text="name" return-object item-value="id"-->
-<!--                                      :rules="[rules.required]"-->
-<!--                                      @input="setItemNameObjectAndInitPriceList(item)">-->
-<!--                            <template slot="item" slot-scope="{ item }">-->
-<!--                              <v-list-item-avatar color="primary"-->
-<!--                                                  class="headline font-weight-light white&#45;&#45;text">-->
-<!--                                {{ item.name.charAt(0) }}-->
-<!--                              </v-list-item-avatar>-->
-<!--                              <v-list-item-content>-->
-<!--                                <v-list-item-title v-text="item.name"></v-list-item-title>-->
-<!--                                <v-list-item-subtitle-->
-<!--                                  v-text="'Series - ' + item.series"></v-list-item-subtitle>-->
-<!--                              </v-list-item-content>-->
-<!--                            </template>-->
-<!--                            <template slot="prepend" v-if="item.wasItemPreviouslyOrdered">-->
-<!--                              <v-menu v-if="item.previousOrderDetails.length > 0"-->
-<!--                                      :close-on-content-click="false">-->
-<!--                                <template v-slot:activator="{ on }">-->
-<!--                                  <v-btn v-on="on" icon small color="primary">-->
-<!--                                    <v-icon size="20">mdi-emoticon-outline</v-icon>-->
-<!--                                  </v-btn>-->
-<!--                                </template>-->
-
-<!--                                &lt;!&ndash; Menu popover content &ndash;&gt;-->
-<!--                                <v-card flat color="secondary" tile>-->
-<!--                                  <v-card-title>-->
-<!--                                    Ordered {{item.previousOrderDetails.length}} times-->
-<!--                                  </v-card-title>-->
-<!--                                  <v-card-text>-->
-<!--                                    <customer-book-item-results :items="item.previousOrderDetails"-->
-<!--                                                                :loading="false"-->
-<!--                                                                :hide-add-btn="true"-->
-<!--                                                                :customer_id="customer.id"/>-->
-<!--                                  </v-card-text>-->
-<!--                                </v-card>-->
-<!--                                &lt;!&ndash; Menu popover content &ndash;&gt;-->
-
-<!--                              </v-menu>-->
-<!--                            </template>-->
-<!--                          </v-combobox>-->
                         </td>
 
                         <td style="width: 15%;">
