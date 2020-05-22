@@ -72,12 +72,13 @@
                 <v-flex md6 class="pr-2">
                   <v-menu v-model="toDateMenu" :close-on-content-click="false"
                           :nudge-right="40" transition="scale-transition" offset-y
-                          min-width="290px">
+                          min-width="290px" :disabled="fromDate === ''">
                     <template v-slot:activator="{ on }">
                       <v-text-field v-model="toDate" readonly v-on="on"
                                     label="To date"></v-text-field>
                     </template>
-                    <v-date-picker v-model="toDate" scrollable first-day-of-week="1"
+                    <v-date-picker v-model="toDate" scrollable first-day-of-week="1" :disabled="fromDate === ''"
+                                   :min="fromDate"
                                    color="primary" @input="toDateMenu = false" @change="toDateSelected">
                     </v-date-picker>
                   </v-menu>
@@ -95,8 +96,8 @@
         </v-container>
       </v-card>
 
-      <v-card flat tile v-if="resultDisplayMessage && invoices.length > 0">
-        <v-card-title class="px-7">
+      <v-card flat tile>
+        <v-card-title class="px-7" v-if="resultDisplayMessage && invoices.length > 0 && !isDataLoading">
           {{resultDisplayMessage}}
           <v-spacer></v-spacer>
           <div class="mt-2">
@@ -110,54 +111,55 @@
           </v-btn>
         </v-card-title>
 
-        <v-card-text>
-          <v-simple-table>
-            <v-simple-table>
-              <thead>
-              <tr>
-                <th v-for="header in headers" :key="header.text" class="text-center"
-                    :style="{ 'width': header.width }">
-                  {{header.text}}</th>
-              </tr>
-              </thead>
+        <v-card-text class="pa-0">
+          <v-layout fill-height align-center justify-center row v-if="isDataLoading">
+            <v-progress-circular color="primary" indeterminate/>
+          </v-layout>
+          <v-simple-table v-if="!isDataLoading && invoices.length > 0">
+            <thead>
+            <tr>
+              <th v-for="header in headers" :key="header.text" class="text-center"
+                  :style="{ 'width': header.width }">
+                {{header.text}}</th>
+            </tr>
+            </thead>
 
-              <tbody>
-              <!-- Items row -->
-                <tr v-for="(item, index) in invoices" :key="item.id">
-                  <td class="text-center">{{ item.invoice_no }}</td>
-                  <td class="text-center">{{ calendarDate(item.invoice_date) }}</td>
-                  <td class="text-center">{{ item.consignee_details.name }}</td>
-                  <td class="text-center">{{ item.consignee_details.city }}</td>
-                  <td class="text-center">{{ item.consignee_details.state_name }}</td>
-                  <td class="text-center">{{ item.is_same_state_invoice ? 'CGST' : 'IGST' }}</td>
-                  <td class="text-right">{{ item.item_summary.total_quantity_sum }}</td>
-                  <td class="text-right">₹ {{ item.item_summary.total_after_round_off }}</td>
-                  <td class="text-right" v-text="getTotalIntegratedTaxAmount(item.tax_summary)"></td>
-                  <td class="text-right" v-text="getTotalCombinedTaxAmount(item.tax_summary)"></td>
-                  <td class="text-right" v-text="getTotalTaxAmount(item.tax_summary)"></td>
-                  <td class="text-right">
-                    <a @click="$router.push({ name: 'viewInvoice', params: { id: item.id}})">View</a>
-                    <a class="ml-4"  v-if="userDetails().permissions.invoice.edit"
-                       @click="$router.push({ name: 'editInvoice', params: { id: item.id}})">
-                      Edit</a>
-                  </td>
-                </tr>
+            <tbody>
+            <!-- Items row -->
+            <tr v-for="(item, index) in invoices" :key="item.id">
+              <td class="text-center">{{ item.invoice_no }}</td>
+              <td class="text-center">{{ calendarDate(item.invoice_date) }}</td>
+              <td class="text-center">{{ item.consignee_details.name }}</td>
+              <td class="text-center">{{ item.consignee_details.city }}</td>
+              <td class="text-center">{{ item.consignee_details.state_name }}</td>
+              <td class="text-center">{{ item.is_same_state_invoice ? 'CGST' : 'IGST' }}</td>
+              <td class="text-right">{{ item.item_summary.total_quantity_sum }}</td>
+              <td class="text-right">₹ {{ item.item_summary.total_after_round_off }}</td>
+              <td class="text-right" v-text="getTotalIntegratedTaxAmount(item.tax_summary)"></td>
+              <td class="text-right" v-text="getTotalCombinedTaxAmount(item.tax_summary)"></td>
+              <td class="text-right" v-text="getTotalTaxAmount(item.tax_summary)"></td>
+              <td class="text-right">
+                <a @click="$router.push({ name: 'viewInvoice', params: { id: item.id}})">View</a>
+                <a class="ml-4"  v-if="userDetails().permissions.invoice.edit"
+                   @click="$router.push({ name: 'editInvoice', params: { id: item.id}})">
+                  Edit</a>
+              </td>
+            </tr>
 
-                <tr style="border-top: 1px solid black">
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td class="text-right font-weight-bold">₹ {{parseFloat(summary.quantity).toFixed(2)}}</td>
-                  <td class="text-right font-weight-bold">₹ {{parseFloat(summary.amount).toFixed(2)}}</td>
-                  <td class="text-right font-weight-bold">₹ {{parseFloat(summary.igst_tax_sum).toFixed(2)}}</td>
-                  <td class="text-right font-weight-bold">₹ {{parseFloat(summary.cgst_and_sgst_tax_sum).toFixed(2)}}</td>
-                  <td class="text-right font-weight-bold">₹ {{parseFloat(summary.taxable_value).toFixed(2)}}</td>
-                </tr>
-              </tbody>
-            </v-simple-table>
+            <tr style="border-top: 1px solid black">
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td class="text-right font-weight-bold">₹ {{parseFloat(summary.quantity).toFixed(2)}}</td>
+              <td class="text-right font-weight-bold">₹ {{parseFloat(summary.amount).toFixed(2)}}</td>
+              <td class="text-right font-weight-bold">₹ {{parseFloat(summary.igst_tax_sum).toFixed(2)}}</td>
+              <td class="text-right font-weight-bold">₹ {{parseFloat(summary.cgst_and_sgst_tax_sum).toFixed(2)}}</td>
+              <td class="text-right font-weight-bold">₹ {{parseFloat(summary.taxable_value).toFixed(2)}}</td>
+            </tr>
+            </tbody>
           </v-simple-table>
         </v-card-text>
       </v-card>
@@ -350,6 +352,7 @@ export default {
     loadInvoices() {
       // Check which option was selected & load data accordingly
       const vm = this;
+      vm.isDataLoading = true;
 
       // Form the api query based on the selected option
       let apiUrl = '/invoice_list';
@@ -418,7 +421,9 @@ export default {
           vm.invoices = response.data;
           vm.unfilteredInvoices = response.data;
           vm.calculateSummary(response.data);
+          vm.isDataLoading = false;
         }, (response) => {
+          vm.isDataLoading = false;
         });
       }
     },
