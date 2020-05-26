@@ -201,7 +201,7 @@
                                 {{item.no_of_items}} x {{getPackagingForPrint(item.packaging)}}
                             </span>
             <span v-if="unitsForDisplay(item) === 'ℓ'">
-                                {{item.no_of_items}} x {{item.packaging}} ltr
+                                {{item.no_of_items}} x {{parseFloat(item.packaging)}} ltr
                             </span>
           </td>
           <!--- Conditional display --->
