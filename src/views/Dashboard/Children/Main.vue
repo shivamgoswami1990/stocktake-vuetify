@@ -78,9 +78,7 @@ export default {
           'Content-Type': 'application/json; charset=utf-8'
         }
       }).then((response) => {
-        if (response.data.length > 0) {
-          vm.setStatisticsData(response.data[0]);
-        }
+        vm.setStatisticsData(response.data);
       }, (response) => {
       })
     );
