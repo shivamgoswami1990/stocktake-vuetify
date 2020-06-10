@@ -288,9 +288,14 @@
                       <span class="subheading d-block">Destination</span>
                       <span class="body-1 d-block">{{destination}}</span>
                     </v-flex>
+
                     <v-flex xs12 sm6 md6>
                       <span class="subheading d-block">Vehicle no</span>
                       <span class="body-1 d-block">{{vehicleNo}}</span>
+                    </v-flex>
+                    <v-flex xs12 sm6 md6>
+                      <span class="subheading d-block">Transport GST No</span>
+                      <span class="body-1 d-block">{{despatchThroughGST}}</span>
                     </v-flex>
 
                   </v-layout>
@@ -744,6 +749,7 @@ export default {
       despatchDate: '',
       despatchDateMenu: false,
       despatchThrough: '',
+      despatchThroughGST: '',
       destination: '',
       vehicleNo: '',
       buyerAadhar: '',
@@ -898,6 +904,7 @@ export default {
       this.despatchDocumentNo = invoiceData.despatch_document_no;
       this.despatchDate = invoiceData.delivery_note_date.split('T')[0];
       this.despatchThrough = invoiceData.despatched_through;
+      this.despatchThroughGST = invoiceData.despatched_through_gst;
       this.destination = invoiceData.destination;
       this.vehicleNo = invoiceData.vehicle_no;
       this.pmNo = invoiceData.pm_no;
@@ -943,6 +950,7 @@ export default {
         despatch_document_no: vm.despatchDocumentNo,
         delivery_note_date: vm.despatchDate,
         despatched_through: vm.despatchThrough,
+        despatched_through_gst: vm.despatchThroughGST,
         destination: vm.destination,
         vehicle_no: vm.vehicleNo,
         pm_no: vm.pmNo,

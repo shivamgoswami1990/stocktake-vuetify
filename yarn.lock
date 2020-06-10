@@ -1049,10 +1049,10 @@
     cssnano-preset-default "^4.0.0"
     postcss "^7.0.0"
 
-"@mdi/font@^5.2.45":
-  version "5.2.45"
-  resolved "https://registry.yarnpkg.com/@mdi/font/-/font-5.2.45.tgz#88d3d83954b7e9b88a9691567ae6c8b922cbab53"
-  integrity sha512-3ReoMrZh2OJR8loD7to2hheYWh6pD+ypv6EpuvnEvoR04fsShwpDfS2ZErM3k98REEk4XIqPzuctAztmhWm+Pw==
+"@mdi/font@^5.3.45":
+  version "5.3.45"
+  resolved "https://registry.yarnpkg.com/@mdi/font/-/font-5.3.45.tgz#086d3ef77dee260c04dd5a593af602c250e5b315"
+  integrity sha512-SD5d2vHEKRvDCInZQFXOwiFpBlzpuZOiqwxKf6E+zCt7UDc52TUSrL0+TXqY57VQh/SnTpZVXM+Uvs21OdPFWg==
 
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
@@ -4094,7 +4094,7 @@ file-entry-cache@^5.0.1:
   dependencies:
     flat-cache "^2.0.1"
 
-file-loader@^4.2.0:
+file-loader@^4.0.0, file-loader@^4.2.0:
   version "4.3.0"
   resolved "https://registry.yarnpkg.com/file-loader/-/file-loader-4.3.0.tgz#780f040f729b3d18019f20605f723e844b8a58af"
   integrity sha512-aKrYPYjF1yG3oX0kWRrqrSMfgftm7oJW5M+m4owoldH5C51C0RkIwB++JbRvEW3IU6/ZG5n8UvEcdgwOt2UOWA==
@@ -7814,10 +7814,10 @@ sass-loader@^7.3.1:
     pify "^4.0.1"
     semver "^6.3.0"
 
-sass@^1.26.5:
-  version "1.26.5"
-  resolved "https://registry.yarnpkg.com/sass/-/sass-1.26.5.tgz#2d7aecfbbabfa298567c8f06615b6e24d2d68099"
-  integrity sha512-FG2swzaZUiX53YzZSjSakzvGtlds0lcbF+URuU9mxOv7WBh7NhXEVDa4kPKN4hN6fC2TkOTOKqiqp6d53N9X5Q==
+sass@^1.26.8:
+  version "1.26.8"
+  resolved "https://registry.yarnpkg.com/sass/-/sass-1.26.8.tgz#312652530721f9568d4c4000b0db07ec6eb23325"
+  integrity sha512-yvtzyrKLGiXQu7H12ekXqsfoGT/aTKeMDyVzCB675k1HYuaj0py63i8Uf4SI9CHXj6apDhpfwbUr3gGOjdpu2Q==
   dependencies:
     chokidar ">=2.0.0 <4.0.0"
 
@@ -9039,10 +9039,10 @@ vue-resource@^1.5.1:
   dependencies:
     got "^8.0.3"
 
-vue-router@^3.2.0:
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/vue-router/-/vue-router-3.2.0.tgz#da35195ffe37fdf0bec9f5f8f72781d2a7718815"
-  integrity sha512-khkrcUIzMcI1rDcNtqkvLwfRFzB97GmJEsPAQdj7t/VvpGhmXLOkUfhc+Ah8CvpSXGXwuWuQO+x8Sy/xDhXZIA==
+vue-router@^3.3.2:
+  version "3.3.2"
+  resolved "https://registry.yarnpkg.com/vue-router/-/vue-router-3.3.2.tgz#0099de402edb2fe92f9711053ab5a2156f239cad"
+  integrity sha512-5sEbcfb7MW8mY8lbUVbF4kgcipGXsagkM/X+pb6n0MhjP+RorWIUTPAPSqgPaiPOxVCXgAItBl8Vwz8vq78faA==
 
 vue-style-loader@^4.1.0, vue-style-loader@^4.1.2:
   version "4.1.2"
@@ -9070,17 +9070,18 @@ vue@^2.6.11:
   resolved "https://registry.yarnpkg.com/vue/-/vue-2.6.11.tgz#76594d877d4b12234406e84e35275c6d514125c5"
   integrity sha512-VfPwgcGABbGAue9+sfrD4PuwFar7gPb1yl1UK1MwXoQPAw0BKSqWfoYCT/ThFrdEVWoI51dBuyCoiNU9bZDZxQ==
 
-vuetify-loader@^1.4.3:
-  version "1.4.3"
-  resolved "https://registry.yarnpkg.com/vuetify-loader/-/vuetify-loader-1.4.3.tgz#df1323c558be09890877e5fbe817b3a71a6c538d"
-  integrity sha512-fS0wRil682Ebsj2as+eruBoMPKaQYDhu/fDAndnTItzSY4RK4LOEIsssVL4vD6QY8dvUgoGL84SUQ6vGr777CA==
+vuetify-loader@^1.4.4:
+  version "1.4.4"
+  resolved "https://registry.yarnpkg.com/vuetify-loader/-/vuetify-loader-1.4.4.tgz#f31196c631f259f3e42cc1a892ed8ea4594a42ee"
+  integrity sha512-ryEtVZ/t+zvTM9UscEX5mWsbTOH5HGWITxlysYkkXtcgzgV21t7rRLHBhReH8oMBYddAij4AOosimhcfKnxFHQ==
   dependencies:
+    file-loader "^4.0.0"
     loader-utils "^1.2.0"
 
-vuetify@^2.2.29:
-  version "2.2.29"
-  resolved "https://registry.yarnpkg.com/vuetify/-/vuetify-2.2.29.tgz#77fd26d8d143251445bed69d3fa0e5d418f25fd0"
-  integrity sha512-UI1i8kEdV+s7tNQe2yJJMPlvxGTE8cZfUAXEGV2yO4owHmeybn6p5YzFpJqimoKkfX6ok+zV29+6yIKfkyUDAA==
+vuetify@^2.2.33:
+  version "2.2.33"
+  resolved "https://registry.yarnpkg.com/vuetify/-/vuetify-2.2.33.tgz#0946ce4c437b27846b500ec5d1e92267e31fbf35"
+  integrity sha512-MvyEISdInPpgehiScXCBDdmPHLliHtNYrjRKmWNKLzW3NGnbm9cMeWRXE48q4QjskRwST6g2HDMzyUgWVuC7wA==
 
 watchpack@^1.6.0:
   version "1.6.0"
