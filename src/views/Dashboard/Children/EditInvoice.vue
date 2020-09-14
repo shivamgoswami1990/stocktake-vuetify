@@ -522,6 +522,10 @@
                           <v-card class="item-search-card overflow-auto" tile width="600" max-width="600"
                                   color="secondary" v-if="item.showSearchCard" max-height="300"
                                   :id="'search-card-' + index">
+                            <v-btn color="accent" block class="black--text" tile elevation="0"
+                                   @click="closeSearchCard(index)">
+                              Close search
+                            </v-btn>
                             <v-card-text class="pa-0">
                               <v-row no-gutters>
 

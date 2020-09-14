@@ -969,7 +969,8 @@ export default {
         },
         tax_amount_in_words: vm.taxAmountInWords,
         buyer_aadhar: vm.buyerAadhar,
-        sample_comments: vm.sampleComments
+        sample_comments: vm.sampleComments,
+        postage_text_options: vm.postageOptionsList()[vm.postageTextOptions]
       };
       this.printInvoiceComponent = () => import('../../../components/PrintInvoice.vue');
     },

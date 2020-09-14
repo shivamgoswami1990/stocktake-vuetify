@@ -62,11 +62,11 @@
       </template>
     </v-app-bar>
 
-    <v-content>
+    <v-main>
       <v-container fluid>
         <router-view></router-view>
       </v-container>
-    </v-content>
+    </v-main>
 
     <component :is="notificationDrawerComponent" @reduceNotificationsCount="reduceNotificationsCount"
     @clearNotificationsCount = "clearNotificationsCount"/>
