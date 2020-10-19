@@ -3,6 +3,6 @@ module.exports = {
     ['@vue/app', { useBuiltIns: 'entry' }]
   ],
   plugins: [
-    ['transform-object-rest-spread', { useBuiltIns: true }]
+    ['@babel/plugin-proposal-object-rest-spread', { useBuiltIns: true }]
   ]
 };

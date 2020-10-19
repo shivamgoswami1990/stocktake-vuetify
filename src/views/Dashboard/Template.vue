@@ -79,6 +79,7 @@
     display: flex;
     list-style: none;
     justify-content: center;
+    height: inherit;
 
     a {
       text-decoration: none;

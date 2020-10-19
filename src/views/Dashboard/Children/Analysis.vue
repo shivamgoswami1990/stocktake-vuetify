@@ -142,14 +142,13 @@ export default {
       if (n === 0) {
         // Same month. Extract month number & date
         return '[' + (d.getMonth() + 1) + ',' + d.getFullYear() + ']';
-      } else {
-        const month = d.getMonth();
-        d.setMonth(d.getMonth() - n);
-        while (d.getMonth() === month) {
-          d.setDate(d.getDate() - n);
-        }
-        return '[' + (d.getMonth() + 1) + ',' + d.getFullYear() + ']';
       }
+      const month = d.getMonth();
+      d.setMonth(d.getMonth() - n);
+      while (d.getMonth() === month) {
+        d.setDate(d.getDate() - n);
+      }
+      return '[' + (d.getMonth() + 1) + ',' + d.getFullYear() + ']';
     },
 
     setChartData(data) {
