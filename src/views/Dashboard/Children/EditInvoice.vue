@@ -74,7 +74,7 @@
             <v-layout row wrap>
 
               <v-flex xs12 sm6 md6 lg6>
-                <v-toolbar color="secondary" dense flat>
+                <v-toolbar color="secondary" flat>
                   <v-toolbar-title>
                     Company details
                   </v-toolbar-title>
@@ -138,7 +138,7 @@
               </v-flex>
 
               <v-flex xs12 sm6 md6 lg6>
-                <v-toolbar color="secondary" dense flat>
+                <v-toolbar color="secondary" flat>
                   <v-toolbar-title>
                     Invoice details
                   </v-toolbar-title>
@@ -214,7 +214,7 @@
           <v-card flat>
             <v-layout row wrap>
               <v-flex xs12 sm6 md6 lg6>
-                <v-toolbar color="secondary" dense flat>
+                <v-toolbar color="secondary" flat>
                   <v-toolbar-title>
                     Consignee details
                   </v-toolbar-title>
@@ -282,7 +282,7 @@
               </v-flex>
 
               <v-flex xs12 sm6 md6 lg6>
-                <v-toolbar color="secondary" dense flat>
+                <v-toolbar color="secondary" flat>
                   <v-toolbar-title>
                     Delivery details
                   </v-toolbar-title>
@@ -371,7 +371,7 @@
             <v-layout row wrap>
               <v-flex xs12 sm6 md6 lg6>
 
-                <v-toolbar color="secondary" dense flat>
+                <v-toolbar color="secondary" flat>
                   <v-toolbar-title>
                     Aadhar & bank details
                   </v-toolbar-title>
@@ -412,7 +412,7 @@
 
               <v-flex xs12 sm6 md6 lg6>
 
-                <v-toolbar color="secondary" dense flat>
+                <v-toolbar color="secondary" flat>
                   <v-toolbar-title>
                     Package details
                   </v-toolbar-title>
@@ -457,14 +457,14 @@
           <v-layout row wrap>
             <v-flex xs12 sm12 md12 lg12>
               <div>
-                <v-toolbar color="secondary" dense flat>
+                <v-toolbar color="secondary" height="80">
                   <v-toolbar-title>
                     Item details
                   </v-toolbar-title>
 
                   <v-spacer></v-spacer>
 
-                  <v-btn icon color="primary" @click="itemArray.push({})">
+                  <v-btn icon color="primary" @click="itemArray.push({})" class="mr-2 mt-1">
                     <v-icon size="30">mdi-plus-circle</v-icon>
                   </v-btn>
                 </v-toolbar>
@@ -1168,7 +1168,9 @@ export default {
       showToast: false,
       toastMessage: '',
       toastColor: '',
-      toastTimeout: 5000
+      toastTimeout: 5000,
+      initialItemArray: [],
+      isInvoiceEdited: false
     };
   },
 
@@ -1199,6 +1201,24 @@ export default {
       }, (response) => {
       })
     );
+  },
+
+  beforeRouteLeave(to, from, next) {
+    if (this.isInvoiceEdited) {
+      if (window.confirm('Do you really want to leave? you have unsaved changes!')) {
+        next();
+      } else {
+        next(false);
+      }
+    } else {
+      next();
+    }
+  },
+
+  watch: {
+    itemArray(newVal) {
+      this.isInvoiceEdited = this.initialItemArray !== JSON.stringify(newVal);
+    }
   },
 
   methods: {
@@ -1263,6 +1283,7 @@ export default {
       this.goodsDescription = invoiceData.goods_description;
       this.sampleComments = invoiceData.sample_comments;
       this.itemArray = invoiceData.item_array;
+      this.initialItemArray = JSON.stringify(invoiceData.item_array);
       this.itemSummary = invoiceData.item_summary;
       this.hsnList = invoiceData.company.hsn_list;
       this.taxAmountInWords = invoiceData.tax_amount_in_words;
@@ -1339,6 +1360,7 @@ export default {
           || rowItem.no_of_items === undefined || rowItem.no_of_items === null
           || rowItem.item_hsn === undefined || rowItem.item_hsn === null);
       });
+      vm.setItemPriceObjectAndInitPackagingAndUnits(vm.itemArray[vm.itemArray.length - 1]);
     },
 
     setDespatchDetails() {
@@ -2048,6 +2070,7 @@ export default {
           vm.toastMessage = 'Successfully saved item';
           vm.toastColor = 'success';
           vm.editInvoiceFormValid = true;
+          vm.isInvoiceEdited = false;
         }, (response) => {
           // error callback. Show error alert
           vm.showToast = true;

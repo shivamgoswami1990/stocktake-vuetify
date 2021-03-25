@@ -72,7 +72,7 @@
             <v-layout row wrap>
 
               <v-flex xs12 sm6 md6 lg6>
-                <v-toolbar color="secondary" dense flat>
+                <v-toolbar color="secondary" flat>
                   <v-toolbar-title>
                     Company details
                   </v-toolbar-title>
@@ -130,7 +130,7 @@
               </v-flex>
 
               <v-flex xs12 sm6 md6 lg6>
-                <v-toolbar color="secondary" dense flat>
+                <v-toolbar color="secondary" flat>
                   <v-toolbar-title>
                     Invoice details
                   </v-toolbar-title>
@@ -195,7 +195,7 @@
           <v-card flat>
             <v-layout row wrap>
               <v-flex xs12 sm6 md6 lg6>
-                <v-toolbar color="secondary" dense flat>
+                <v-toolbar color="secondary" flat>
                   <v-toolbar-title>
                     Consignee details
                   </v-toolbar-title>
@@ -253,7 +253,7 @@
               </v-flex>
 
               <v-flex xs12 sm6 md6 lg6>
-                <v-toolbar color="secondary" dense flat>
+                <v-toolbar color="secondary" flat>
                   <v-toolbar-title>
                     Delivery details
                   </v-toolbar-title>
@@ -312,7 +312,7 @@
             <v-layout row wrap>
               <v-flex xs12 sm6 md6 lg6>
 
-                <v-toolbar color="secondary" dense flat>
+                <v-toolbar color="secondary" flat>
                   <v-toolbar-title>
                     Aadhar & bank details
                   </v-toolbar-title>
@@ -350,7 +350,7 @@
 
               <v-flex xs12 sm6 md6 lg6>
 
-                <v-toolbar color="secondary" dense flat>
+                <v-toolbar color="secondary" flat>
                   <v-toolbar-title>
                     Package details
                   </v-toolbar-title>
@@ -394,7 +394,7 @@
           <v-layout row wrap>
             <v-flex xs12 sm12 md12 lg12>
               <div>
-                <v-toolbar color="secondary" dense flat>
+                <v-toolbar color="secondary" flat>
                   <v-toolbar-title>Item details</v-toolbar-title>
                 </v-toolbar>
 

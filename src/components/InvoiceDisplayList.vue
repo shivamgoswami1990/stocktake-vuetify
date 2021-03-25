@@ -39,13 +39,15 @@
           </v-list-item-action-text>
 
           <v-list-item-action-text class="d-inline-flex" v-if="!clickableTile">
-            <a @click="routeToInvoice('viewInvoice', item.id)">
+            <v-btn text depressed height="30" class="primary--text"
+                   @click="routeToInvoice('viewInvoice', item.id)">
               View
-            </a>
-            <a class="ml-4"  v-if="userDetails().permissions.invoice.edit"
+            </v-btn>
+            <v-btn class="ml-1" text depressed height="30"
+                   v-if="userDetails().permissions.invoice.edit"
                @click="routeToInvoice('editInvoice', item.id)">
               Edit
-            </a>
+            </v-btn>
           </v-list-item-action-text>
         </v-list-item-action>
       </v-list-item>
