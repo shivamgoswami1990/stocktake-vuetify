@@ -13,7 +13,8 @@ Vue.prototype.financialYearList = () => {
   const today = new Date();
   const resultList = {
     financial_year: [],
-    quarters: []
+    quarters: [],
+    fy_date_range: {}
   };
   const currentMonth = today.getMonth();
   const currentYear = today.getFullYear() + '';
@@ -32,6 +33,10 @@ Vue.prototype.financialYearList = () => {
   let j = parseInt(result.split('-')[1], 10);
   for (let k = i; k >= 2016; k--) {
     resultList.financial_year.push(k + '-' + j);
+    resultList.fy_date_range[k + '-' + j] = {
+      from: '1 Apr ' + k,
+      to: '31 Mar ' + (k + 1),
+    };
     resultList.quarters.push({
       name: 'Oct-Dec ' + k,
       quarterValue: 4,
@@ -55,6 +60,17 @@ Vue.prototype.financialYearList = () => {
     j--;
   }
   return resultList;
+};
+
+// Only allow datepicker dates for the current financial year
+// i.e. 1 April of last year to 31 March of this year
+Vue.prototype.onlyAllowCurrentFinancialDates = (val) => {
+  const fromYear = parseInt(Vue.prototype.currentlySelectedFinancialYear.split('-'), 10);
+  const toYear = fromYear + 1;
+  const fromYearFinancialDate = new Date(fromYear, 3, 1);
+  const toYearFinancialDate = new Date(toYear, 3, 1);
+
+  return new Date(val) >= fromYearFinancialDate && new Date(val) <= toYearFinancialDate;
 };
 
 // Set current financial year from generated list

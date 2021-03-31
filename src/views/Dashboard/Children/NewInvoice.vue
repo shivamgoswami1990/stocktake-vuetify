@@ -237,6 +237,14 @@
             </v-stepper-step>
 
             <v-stepper-content step="4">
+              <v-alert type="info" outlined border="left" class="mb-0" dense>
+                You can  only select a date between
+                <b>
+                  {{financialYearList().fy_date_range[currentlySelectedFinancialYear].from}}
+                  -
+                  {{financialYearList().fy_date_range[currentlySelectedFinancialYear].to}}
+                </b>
+              </v-alert>
               <v-layout wrap>
                 <v-flex md6 class="pr-2">
                   <v-text-field v-model="selectedInvoiceNo" clearable type="number" label="Invoice No" persistent-hint>
@@ -248,11 +256,13 @@
                           :nudge-right="40" transition="scale-transition" offset-y
                           min-width="290px">
                     <template v-slot:activator="{ on }">
-                      <v-text-field v-model="selectedDate" readonly v-on="on"
-                                    label="Invoice date"></v-text-field>
+                      <v-text-field v-model="selectedDate" readonly v-on="on" hide-details
+                                    label="Invoice date" persistent-hint/>
                     </template>
                     <v-date-picker v-model="selectedDate" scrollable first-day-of-week="1"
-                                   color="primary" @input="menu = false" :min="previousInvoiceDate" :max="nextInvoiceDate">
+                                   :allowed-dates="onlyAllowCurrentFinancialDates"
+                                   color="primary" @input="menu = false"
+                                   :min="previousInvoiceDate" :max="nextInvoiceDate">
                     </v-date-picker>
                   </v-menu>
                 </v-flex>
@@ -314,13 +324,13 @@ import CustomerModal from '@/components/CustomerModal.vue';
 export default {
   data() {
     return {
-      stepValue: 1,
+      stepValue: 4,
       searchCustomer: null,
       customersList: [],
       isCustomerDataLoading: false,
       companies: [],
       menu: false,
-      selectedDate: new Date().toJSON().slice(0, 10),
+      selectedDate: null,
       packaging_options: [
         { id: 1, name: 'kg/dozen/piece' },
         { id: 2, name: 'litre' }
@@ -352,6 +362,19 @@ export default {
 
   components: {
     CustomerModal
+  },
+
+  mounted() {
+    // Set the default invoice date based on the financial year
+    // If today's date is outside of the selected financial year, set 30 Mar of the ending year.
+    // If today's date is between the selected financial year, set current date as today's date in the datepicker
+    const todaysDate = new Date();
+    if (todaysDate >= new Date(this.financialYearList().fy_date_range[this.currentlySelectedFinancialYear].from)
+      && todaysDate <= this.financialYearList().fy_date_range[this.currentlySelectedFinancialYear].to) {
+      this.selectedDate = new Date().toJSON().slice(0, 10);
+    } else {
+      this.selectedDate = new Date(this.financialYearList().fy_date_range[this.currentlySelectedFinancialYear].to).toJSON().slice(0, 10);
+    }
   },
 
   computed: {
