@@ -238,12 +238,11 @@
 
             <v-stepper-content step="4">
               <v-alert type="info" outlined border="left" class="mb-0" dense>
-                You can  only select a date between
+                Current <strong>FY{{currentlySelectedFinancialYear}}</strong> dates (
                 <b>
-                  {{financialYearList().fy_date_range[currentlySelectedFinancialYear].from}}
-                  -
-                  {{financialYearList().fy_date_range[currentlySelectedFinancialYear].to}}
+                  {{financialYearList().fy_date_range[currentlySelectedFinancialYear].from}}-{{financialYearList().fy_date_range[currentlySelectedFinancialYear].to}}
                 </b>
+                ) can be selected
               </v-alert>
               <v-layout wrap>
                 <v-flex md6 class="pr-2">
@@ -370,10 +369,12 @@ export default {
     // If today's date is between the selected financial year, set current date as today's date in the datepicker
     const todaysDate = new Date();
     if (todaysDate >= new Date(this.financialYearList().fy_date_range[this.currentlySelectedFinancialYear].from)
-      && todaysDate <= this.financialYearList().fy_date_range[this.currentlySelectedFinancialYear].to) {
-      this.selectedDate = new Date().toJSON().slice(0, 10);
+      && todaysDate <= new Date(this.financialYearList().fy_date_range[this.currentlySelectedFinancialYear].to)) {
+      const reversedDateStringArray = todaysDate.toLocaleDateString().split('/').reverse();
+      this.selectedDate = reversedDateStringArray[0] + '-' + reversedDateStringArray[1] + '-' + reversedDateStringArray[2];
     } else {
-      this.selectedDate = new Date(this.financialYearList().fy_date_range[this.currentlySelectedFinancialYear].to).toJSON().slice(0, 10);
+      const reversedDateStringArray = new Date(this.financialYearList().fy_date_range[this.currentlySelectedFinancialYear].to).toLocaleDateString().split('/').reverse();
+      this.selectedDate = reversedDateStringArray[0] + '-' + reversedDateStringArray[1] + '-' + reversedDateStringArray[2];
     }
   },
 
