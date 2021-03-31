@@ -324,7 +324,7 @@ import CustomerModal from '@/components/CustomerModal.vue';
 export default {
   data() {
     return {
-      stepValue: 4,
+      stepValue: 1,
       searchCustomer: null,
       customersList: [],
       isCustomerDataLoading: false,
