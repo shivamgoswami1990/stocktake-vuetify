@@ -319,6 +319,7 @@
 
 <script>
 import CustomerModal from '@/components/CustomerModal.vue';
+import Vue from 'vue';
 
 export default {
   data() {
@@ -376,6 +377,18 @@ export default {
       const reversedDateStringArray = new Date(this.financialYearList().fy_date_range[this.currentlySelectedFinancialYear].to).toLocaleDateString().split('/').reverse();
       this.selectedDate = reversedDateStringArray[0] + '-' + reversedDateStringArray[1] + '-' + reversedDateStringArray[2];
     }
+
+    // Load companies for the next step
+    const vm = this;
+    vm.$http.get(process.env.VUE_APP_REST_URL + '/companies',
+      {
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8'
+        }
+      }).then((response1) => {
+      vm.companies = response1.data;
+    }, (response1) => {
+    });
   },
 
   computed: {
@@ -537,17 +550,6 @@ export default {
         } else {
           vm.isLastInvoiceForCustomerPresent = false;
         }
-
-        // Load companies for the next step
-        vm.$http.get(process.env.VUE_APP_REST_URL + '/companies',
-          {
-            headers: {
-              'Content-Type': 'application/json; charset=utf-8'
-            }
-          }).then((response1) => {
-          vm.companies = response1.data;
-        }, (response1) => {
-        });
 
         // Go to company selection step
         vm.customerButtonLoading = false;
@@ -749,6 +751,17 @@ export default {
       } else {
         this.showSkippedInvoiceNoDialog = true;
       }
+    },
+
+    onlyAllowCurrentFinancialDates(val) {
+      // Only allow datepicker dates for the current financial year
+      // i.e. 1 April of last year to 31 March of this year
+      const fromYear = parseInt(Vue.prototype.currentlySelectedFinancialYear.split('-'), 10);
+      const toYear = fromYear + 1;
+      const fromYearFinancialDate = new Date(fromYear, 3, 1);
+      const toYearFinancialDate = new Date(toYear, 3, 1);
+
+      return new Date(val) >= fromYearFinancialDate && new Date(val) <= toYearFinancialDate;
     }
   }
 };

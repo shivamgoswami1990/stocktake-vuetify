@@ -62,17 +62,6 @@ Vue.prototype.financialYearList = () => {
   return resultList;
 };
 
-// Only allow datepicker dates for the current financial year
-// i.e. 1 April of last year to 31 March of this year
-Vue.prototype.onlyAllowCurrentFinancialDates = (val) => {
-  const fromYear = parseInt(Vue.prototype.currentlySelectedFinancialYear.split('-'), 10);
-  const toYear = fromYear + 1;
-  const fromYearFinancialDate = new Date(fromYear, 3, 1);
-  const toYearFinancialDate = new Date(toYear, 3, 1);
-
-  return new Date(val) >= fromYearFinancialDate && new Date(val) <= toYearFinancialDate;
-};
-
 // Set current financial year from generated list
 Vue.prototype.currentlySelectedFinancialYear = localStorage['financial-year'];
 
