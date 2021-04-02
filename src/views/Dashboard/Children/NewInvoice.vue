@@ -324,7 +324,7 @@ import Vue from 'vue';
 export default {
   data() {
     return {
-      stepValue: 4,
+      stepValue: 1,
       searchCustomer: null,
       customersList: [],
       isCustomerDataLoading: false,
