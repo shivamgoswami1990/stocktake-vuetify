@@ -324,7 +324,7 @@ import Vue from 'vue';
 export default {
   data() {
     return {
-      stepValue: 1,
+      stepValue: 4,
       searchCustomer: null,
       customersList: [],
       isCustomerDataLoading: false,
@@ -371,11 +371,10 @@ export default {
     const todaysDate = new Date();
     if (todaysDate >= new Date(this.financialYearList().fy_date_range[this.currentlySelectedFinancialYear].from)
       && todaysDate <= new Date(this.financialYearList().fy_date_range[this.currentlySelectedFinancialYear].to)) {
-      const reversedDateStringArray = todaysDate.toLocaleDateString().split('/').reverse();
-      this.selectedDate = reversedDateStringArray[0] + '-' + reversedDateStringArray[1] + '-' + reversedDateStringArray[2];
+      this.selectedDate = todaysDate.getFullYear() + '-' + (todaysDate.getMonth() + 1) + '-' + todaysDate.getDate();
     } else {
-      const reversedDateStringArray = new Date(this.financialYearList().fy_date_range[this.currentlySelectedFinancialYear].to).toLocaleDateString().split('/').reverse();
-      this.selectedDate = reversedDateStringArray[0] + '-' + reversedDateStringArray[1] + '-' + reversedDateStringArray[2];
+      const reversedDateStringArray = new Date(this.financialYearList().fy_date_range[this.currentlySelectedFinancialYear].to);
+      this.selectedDate = reversedDateStringArray.getFullYear() + '-' + (reversedDateStringArray.getMonth() + 1) + '-' + reversedDateStringArray.getDate();
     }
 
     // Load companies for the next step
