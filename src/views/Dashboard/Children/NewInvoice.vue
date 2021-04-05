@@ -363,7 +363,7 @@ export default {
   watch: {
     searchCustomer(val) {
       if (val !== undefined && val !== null) {
-        if (val.length > 2) {
+        if (val.length > 1) {
           // eslint-disable-next-line no-underscore-dangle
           clearTimeout(this._searchTimerId);
           // eslint-disable-next-line no-underscore-dangle
@@ -373,7 +373,7 @@ export default {
 
             this.$http.post(process.env.VUE_APP_REST_URL + '/search_customers',
               {
-                search_term: val
+                search_term: val.replace(/[^a-zA-Z ]/g, '')
               },
               {
                 headers: {
