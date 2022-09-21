@@ -14,7 +14,7 @@
     "vue-chartjs": "^3.5.1",
     "vue-resource": "^1.5.2",
     "vue-router": "^3.5.1",
-    "vuetify": "^2.4.8",
+    "vuetify": "^2.6.10",
     "written-number": "^0.9.1"
   },
   "devDependencies": {
